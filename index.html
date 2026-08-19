@@ -887,6 +887,7 @@ CA Exam Checker • Educational evaluation platform
 </footer>
 
 
+
 <script>
 
 /* ==================================================
@@ -1214,7 +1215,7 @@ ${size} MB
 
 
 /* ==================================================
-STUDENT SUBMIT
+STUDENT SUBMIT + AI FLOW
 ================================================== */
 
 async function submitAnswerSheet(){
@@ -1240,6 +1241,7 @@ const testType =
 document
 .getElementById("studentTestType")
 .value;
+
 
 if(!name){
 
@@ -1292,6 +1294,7 @@ return;
 }
 
 if(
+selectedFile.type !== "application/pdf" &&
 !selectedFile.name
 .toLowerCase()
 .endsWith(".pdf")
@@ -1321,22 +1324,58 @@ return;
 const subject =
 SUBJECTS[subjectKey];
 
+if(!subject){
+
+showStudentError(
+"Invalid subject selected."
+);
+
+return;
+
+}
+
 const button =
-document.getElementById("submitButton");
+document.getElementById(
+"submitButton"
+);
 
 button.disabled = true;
-button.textContent =
-"⏳ Uploading Answer Sheet...";
+
+
+/* ==================================================
+RESET OLD RESULT
+================================================== */
+
+document
+.getElementById("resultPanel")
+.style.display = "none";
+
+document
+.getElementById("checkin")
+.style.display = "none";
+
 
 try{
 
+/* ==================================================
+READ ANSWER SHEET
+================================================== */
+
+button.textContent =
+"📄 Reading Answer Sheet...";
+
 const base64 =
-await fileToBase64(selectedFile);
+await fileToBase64(
+selectedFile
+);
 
 
 /* ==================================================
 STEP 1 — UPLOAD ANSWER SHEET
 ================================================== */
+
+button.textContent =
+"☁️ Uploading Answer Sheet...";
 
 const uploadResponse =
 await fetch(
@@ -1401,82 +1440,24 @@ uploadResult.error ||
 
 
 /* ==================================================
-STEP 2 — FIND TEST MATERIAL
+STEP 2 — DIRECT AI CHECK
 ================================================== */
 
 button.textContent =
-"🔎 Loading Test Material...";
+"🔎 Finding Question Paper...";
 
-const materialResponse =
-await fetch(
-"/api/materials",
-{
-
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:JSON.stringify({
-
-subject:
-subjectKey,
-
-testType:
-testType
-
-})
-
-}
+await new Promise(
+resolve =>
+setTimeout(resolve,500)
 );
-
-const materialResult =
-await materialResponse.json();
-
-if(!materialResponse.ok){
-
-throw new Error(
-materialResult.error ||
-"Unable to find test material."
-);
-
-}
-
-if(
-!materialResult.questionPaper ||
-!materialResult.suggestedAnswer
-){
-
-throw new Error(
-"Question Paper or Suggested Answer not found for this Subject and Test Type."
-);
-
-}
-
-
-/* ==================================================
-STEP 3 — DOWNLOAD MATERIAL FILES
-================================================== */
 
 button.textContent =
-"📚 Preparing Test Material...";
+"📚 Loading Suggested Answer...";
 
-const questionPaperBase64 =
-await fetchFileAsBase64(
-materialResult.questionPaper.url
+await new Promise(
+resolve =>
+setTimeout(resolve,500)
 );
-
-const suggestedAnswerBase64 =
-await fetchFileAsBase64(
-materialResult.suggestedAnswer.url
-);
-
-
-/* ==================================================
-STEP 4 — AI CHECK
-================================================== */
 
 button.textContent =
 "🤖 AI Checking Answer Sheet...";
@@ -1501,20 +1482,11 @@ base64,
 answerSheetName:
 selectedFile.name,
 
-questionPaperBase64:
-questionPaperBase64,
-
-questionPaperName:
-materialResult.questionPaper.name,
-
-suggestedAnswerBase64:
-suggestedAnswerBase64,
-
-suggestedAnswerName:
-materialResult.suggestedAnswer.name,
-
 subject:
 subject.name,
+
+subjectKey:
+subjectKey,
 
 testType:
 testType,
@@ -1554,7 +1526,7 @@ throw new Error(
 
 
 /* ==================================================
-STEP 5 — SHOW SUBMISSION
+STEP 3 — SUBMISSION SUCCESS
 ================================================== */
 
 showStudentSuccess(
@@ -1586,14 +1558,18 @@ ${escapeHTML(subject.name)}
 <br>
 
 <b>Test Type:</b>
-${escapeHTML(formatTestType(testType))}
+${escapeHTML(
+formatTestType(testType)
+)}
 
 <br>
 
 <b>Checking Mode:</b>
-${checkingMode === "strict"
+${
+checkingMode === "strict"
 ? "ICAI Strict"
-: "Moderate"}
+: "Moderate"
+}
 
 <br>
 
@@ -1602,14 +1578,740 @@ ${subject.descriptive}
 
 <br><br>
 
-AI evaluation completed.
+🤖 AI evaluation completed.
+
+<br>
+
+MCQs were ignored as requested.
 
 `;
 
 
 /* ==================================================
-STEP 6 — DISPLAY RESULT
+STEP 4 — DISPLAY AI RESULT
 ================================================== */
 
 displayEvaluation(
-che
+checkResult.evaluation
+);
+
+button.textContent =
+"✅ Evaluation Complete";
+
+}catch(error){
+
+console.error(
+"AI CHECK ERROR:",
+error
+);
+
+showStudentError(
+error.message ||
+"Unable to evaluate answer sheet."
+);
+
+button.textContent =
+"🚀 Submit Answer Sheet";
+
+button.disabled = false;
+
+return;
+
+}
+
+button.disabled = false;
+
+}
+
+
+/* ==================================================
+DISPLAY EVALUATION
+================================================== */
+
+function displayEvaluation(
+evaluation
+){
+
+const panel =
+document.getElementById(
+"resultPanel"
+);
+
+const scoreText =
+document.getElementById(
+"scoreText"
+);
+
+const percentageText =
+document.getElementById(
+"percentageText"
+);
+
+const overallSummary =
+document.getElementById(
+"overallSummary"
+);
+
+const questionResults =
+document.getElementById(
+"questionResults"
+);
+
+const total =
+Number(
+evaluation.total_marks || 0
+);
+
+const maximum =
+Number(
+evaluation.maximum_marks || 0
+);
+
+const percentage =
+Number(
+evaluation.percentage || 0
+);
+
+scoreText.textContent =
+`${total} / ${maximum}`;
+
+percentageText.textContent =
+`${percentage.toFixed(2)}%`;
+
+overallSummary.innerHTML =
+escapeHTML(
+evaluation.overall_summary ||
+"No overall summary available."
+);
+
+questionResults.innerHTML = "";
+
+
+if(
+!Array.isArray(
+evaluation.questions
+)
+){
+
+questionResults.innerHTML =
+`
+<div class="info">
+No question-wise evaluation was returned.
+</div>
+`;
+
+panel.style.display =
+"block";
+
+return;
+
+}
+
+
+evaluation.questions.forEach(
+question => {
+
+const card =
+document.createElement(
+"div"
+);
+
+card.className =
+"question-result";
+
+
+switch(
+question.status
+){
+
+case "correct":
+card.classList.add(
+"correct"
+);
+break;
+
+case "partially_correct":
+card.classList.add(
+"partial"
+);
+break;
+
+case "incorrect":
+card.classList.add(
+"incorrect"
+);
+break;
+
+case "not_attempted":
+card.classList.add(
+"unattempted"
+);
+break;
+
+case "unclear":
+card.classList.add(
+"unclear"
+);
+break;
+
+}
+
+
+const marksAvailable =
+Number(
+question.marks_available || 0
+);
+
+const marksAwarded =
+Number(
+question.marks_awarded || 0
+);
+
+card.innerHTML = `
+
+<h3>
+Question ${escapeHTML(
+question.question_number
+)}
+</h3>
+
+<div class="question-meta">
+
+Marks:
+<b>
+${marksAwarded}
+/
+${marksAvailable}
+</b>
+
+&nbsp; • &nbsp;
+
+Status:
+<b>
+${escapeHTML(
+formatStatus(
+question.status
+)
+)}
+</b>
+
+</div>
+
+<div class="question-remarks">
+
+${escapeHTML(
+question.remarks ||
+"No remarks available."
+)}
+
+</div>
+
+`;
+
+questionResults.appendChild(
+card
+);
+
+});
+
+
+panel.style.display =
+"block";
+
+panel.scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
+
+}
+
+
+/* ==================================================
+ADMIN MATERIAL UPLOAD
+================================================== */
+
+async function uploadMaterials(){
+
+const subjectKey =
+document
+.getElementById("adminSubject")
+.value;
+
+const testType =
+document
+.getElementById("adminTestType")
+.value;
+
+const questionPaper =
+document
+.getElementById("questionPaper")
+.files[0];
+
+const suggestedAnswer =
+document
+.getElementById("suggestedAnswer")
+.files[0];
+
+
+if(!subjectKey){
+
+showAdminError(
+"Please select a subject."
+);
+
+return;
+
+}
+
+if(!testType){
+
+showAdminError(
+"Please select the Test / Paper Type."
+);
+
+return;
+
+}
+
+if(!questionPaper){
+
+showAdminError(
+"Please select the Question Paper."
+);
+
+return;
+
+}
+
+if(!suggestedAnswer){
+
+showAdminError(
+"Please select the Suggested Answer."
+);
+
+return;
+
+}
+
+
+/* Only PDF materials for current AI flow */
+
+if(
+!isPDF(questionPaper)
+){
+
+showAdminError(
+"Question Paper must be a PDF."
+);
+
+return;
+
+}
+
+if(
+!isPDF(suggestedAnswer)
+){
+
+showAdminError(
+"Suggested Answer must be a PDF."
+);
+
+return;
+
+}
+
+
+/* Size protection */
+
+if(
+questionPaper.size >
+10 * 1024 * 1024
+){
+
+showAdminError(
+"Question Paper must be smaller than 10 MB."
+);
+
+return;
+
+}
+
+if(
+suggestedAnswer.size >
+10 * 1024 * 1024
+){
+
+showAdminError(
+"Suggested Answer must be smaller than 10 MB."
+);
+
+return;
+
+}
+
+const subject =
+SUBJECTS[subjectKey];
+
+const button =
+document.getElementById(
+"materialButton"
+);
+
+button.disabled = true;
+
+button.textContent =
+"⏳ Uploading Question Paper...";
+
+
+try{
+
+await uploadMaterialFile(
+questionPaper,
+subjectKey,
+testType,
+"question-paper"
+);
+
+button.textContent =
+"⏳ Uploading Suggested Answer...";
+
+await uploadMaterialFile(
+suggestedAnswer,
+subjectKey,
+testType,
+"suggested-answer"
+);
+
+showAdminSuccess(`
+Test material uploaded successfully. ✓
+
+<br><br>
+
+<b>Subject:</b>
+${escapeHTML(subject.name)}
+
+<br>
+
+<b>Test Type:</b>
+${escapeHTML(
+formatTestType(testType)
+)}
+
+<br>
+
+<b>Descriptive Maximum:</b>
+${subject.descriptive}
+
+<br>
+
+<b>Question Paper:</b>
+${escapeHTML(
+questionPaper.name
+)}
+
+<br>
+
+<b>Suggested Answer:</b>
+${escapeHTML(
+suggestedAnswer.name
+)}
+
+<br><br>
+
+Material is now available for AI checking.
+`);
+
+}catch(error){
+
+console.error(error);
+
+showAdminError(
+error.message ||
+"Material upload failed."
+);
+
+}
+
+button.disabled = false;
+
+button.textContent =
+"📚 Upload Test Material";
+
+}
+
+
+/* ==================================================
+SINGLE MATERIAL UPLOAD
+================================================== */
+
+async function uploadMaterialFile(
+file,
+subjectKey,
+testType,
+type
+){
+
+const base64 =
+await fileToBase64(file);
+
+const response =
+await fetch(
+"/api/material",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:JSON.stringify({
+
+filename:
+file.name,
+
+data:
+base64,
+
+contentType:
+"application/pdf",
+
+subject:
+subjectKey,
+
+testType:
+testType,
+
+type:
+type
+
+})
+
+}
+);
+
+const result =
+await response.json();
+
+if(!response.ok){
+
+throw new Error(
+result.error ||
+`${type} upload failed.`
+);
+
+}
+
+return result;
+
+}
+
+
+/* ==================================================
+HELPERS
+================================================== */
+
+function fileToBase64(file){
+
+return new Promise(
+(resolve,reject)=>{
+
+const reader =
+new FileReader();
+
+reader.onload =
+function(){
+
+const result =
+reader.result;
+
+resolve(
+result.split(",")[1]
+);
+
+};
+
+reader.onerror =
+function(){
+
+reject(
+new Error(
+"Unable to read file."
+)
+);
+
+};
+
+reader.readAsDataURL(
+file
+);
+
+}
+);
+
+
+}
+
+
+function isPDF(file){
+
+return (
+file.type ===
+"application/pdf"
+||
+file.name
+.toLowerCase()
+.endsWith(".pdf")
+);
+
+}
+
+
+function formatTestType(
+type
+){
+
+if(type === "MODEL_TEST"){
+return "Model Test";
+}
+
+if(type === "MTP"){
+return "MTP";
+}
+
+if(type === "RTP"){
+return "RTP";
+}
+
+return "Other";
+
+}
+
+
+function formatStatus(
+status
+){
+
+const map = {
+
+correct:
+"Correct",
+
+partially_correct:
+"Partially Correct",
+
+incorrect:
+"Incorrect",
+
+not_attempted:
+"Not Attempted",
+
+unclear:
+"Unclear"
+
+};
+
+return map[status] ||
+"Unknown";
+
+}
+
+
+function showStudentError(
+message
+){
+
+const box =
+document.getElementById(
+"studentStatus"
+);
+
+box.className =
+"status error";
+
+box.innerHTML =
+"❌ <b>Error</b><br>" +
+escapeHTML(message);
+
+}
+
+
+function showStudentSuccess(
+message
+){
+
+const box =
+document.getElementById(
+"studentStatus"
+);
+
+box.className =
+"status success";
+
+box.innerHTML =
+"✅ <b>Success</b><br>" +
+escapeHTML(message);
+
+}
+
+
+function showAdminError(
+message
+){
+
+const box =
+document.getElementById(
+"adminStatus"
+);
+
+box.className =
+"status error";
+
+box.innerHTML =
+"❌ <b>Error</b><br>" +
+escapeHTML(message);
+
+}
+
+
+function showAdminSuccess(
+message
+){
+
+const box =
+document.getElementById(
+"adminStatus"
+);
+
+box.className =
+"status success";
+
+box.innerHTML =
+"✅ <b>Success</b><br>" +
+message;
+
+}
+
+
+function escapeHTML(
+value
+){
+
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* ==================================================
+START PORTAL
+================================================== */
+
+initializePortal();
+
+  </script>
