@@ -1,6 +1,7 @@
 import { put } from "@vercel/blob";
 
 export default async function handler(req, res) {
+
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Method not allowed"
@@ -8,6 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
+
     const {
       filename,
       data,
@@ -16,116 +18,91 @@ export default async function handler(req, res) {
       registrationNumber,
       subject,
       subjectKey,
-      classification,
-      exam,
+      testType,
       checkingMode,
       descriptiveMaximum
     } = req.body;
 
-    // Required fields
     if (!filename || !data) {
       return res.status(400).json({
         error: "File data missing"
       });
     }
 
-    if (!studentName) {
-      return res.status(400).json({
-        error: "Student name is required"
-      });
-    }
+    const safeSubject =
+      String(subjectKey || "unknown")
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
 
-    if (!registrationNumber) {
-      return res.status(400).json({
-        error: "Registration number is required"
-      });
-    }
+    const safeTestType =
+      String(testType || "OTHER")
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
 
-    if (!subject || !subjectKey) {
-      return res.status(400).json({
-        error: "Subject information is required"
-      });
-    }
+    const safeFilename =
+      String(filename)
+        .replace(/[^a-zA-Z0-9._-]/g, "_");
 
-    if (!classification) {
-      return res.status(400).json({
-        error: "Paper classification is required"
-      });
-    }
+    const timestamp = Date.now();
 
-    if (!exam) {
-      return res.status(400).json({
-        error: "Exam/Test name is required"
-      });
-    }
+    const buffer =
+      Buffer.from(data, "base64");
 
-    // Allowed paper classifications
-    const allowedClassifications = [
-      "MTP",
-      "RTP",
-      "Model Test Paper",
-      "Other"
-    ];
+    const pathname =
+      `answer-sheets/${safeSubject}/${safeTestType}/${timestamp}-${safeFilename}`;
 
-    if (!allowedClassifications.includes(classification)) {
-      return res.status(400).json({
-        error: "Invalid paper classification"
-      });
-    }
+    const blob =
+      await put(
+        pathname,
+        buffer,
+        {
+          access: "private",
+          contentType:
+            contentType || "application/pdf"
+        }
+      );
 
-    // Convert Base64 to Buffer
-    const buffer = Buffer.from(data, "base64");
-
-    // Safe filename
-    const safeFilename = String(filename)
-      .replace(/[^a-zA-Z0-9._-]/g, "-");
-
-    // Upload answer sheet
-    const blob = await put(
-      `answer-sheets/${subjectKey}/${classification}/${Date.now()}-${safeFilename}`,
-      buffer,
-      {
-        access: "private",
-        contentType: contentType || "application/pdf"
-      }
-    );
-
-    // Return complete metadata
     return res.status(200).json({
+
       success: true,
 
       url: blob.url,
 
       pathname: blob.pathname,
 
-      student: {
-        name: studentName,
-        registrationNumber: registrationNumber
-      },
+      metadata: {
+        studentName:
+          studentName || "",
 
-      test: {
-        subject: subject,
-        subjectKey: subjectKey,
-        classification: classification,
-        exam: exam
-      },
+        registrationNumber:
+          registrationNumber || "",
 
-      checking: {
-        mode: checkingMode || "strict",
+        subject:
+          subject || "",
+
+        subjectKey:
+          subjectKey || "",
+
+        testType:
+          testType || "OTHER",
+
+        checkingMode:
+          checkingMode || "strict",
+
         descriptiveMaximum:
           descriptiveMaximum || null
-      },
+      }
 
-      message:
-        "Answer sheet uploaded successfully with complete test metadata."
     });
 
   } catch (error) {
 
-    console.error("UPLOAD ERROR:", error);
+    console.error(error);
 
     return res.status(500).json({
-      error: "Upload failed"
+      error:
+        error.message ||
+        "Upload failed"
     });
+
   }
+
 }
