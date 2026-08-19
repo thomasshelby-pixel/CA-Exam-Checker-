@@ -2,12 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>CA Exam Checker V2</title>
 
 <style>
-
 *{
   box-sizing:border-box;
   margin:0;
@@ -17,24 +15,23 @@
 
 body{
   background:#070b14;
-  color:#f8fafc;
+  color:#fff;
   min-height:100vh;
 }
 
 header{
   background:
-    radial-gradient(circle at top,#312e81 0%,transparent 45%),
+    radial-gradient(circle at top,#312e81 0,transparent 42%),
     linear-gradient(135deg,#0f172a,#111827);
-
-  padding:28px 18px;
+  padding:30px 18px;
   text-align:center;
   border-bottom:1px solid #26334d;
 }
 
 header h1{
-  font-size:29px;
+  font-size:30px;
   font-weight:800;
-  margin-bottom:7px;
+  margin-bottom:8px;
 }
 
 header p{
@@ -43,29 +40,48 @@ header p{
 }
 
 .container{
-  max-width:900px;
+  max-width:950px;
   margin:auto;
-  padding:20px 14px 45px;
+  padding:22px 15px 50px;
 }
 
 .card{
   background:#0f172a;
   border:1px solid #26334d;
-  border-radius:16px;
-  padding:20px;
+  border-radius:18px;
+  padding:22px;
   margin-bottom:18px;
-  box-shadow:0 12px 30px rgba(0,0,0,.22);
+  box-shadow:0 12px 30px rgba(0,0,0,.25);
 }
 
 .card h2{
-  font-size:19px;
+  font-size:20px;
   margin-bottom:17px;
+}
+
+.badge{
+  display:inline-flex;
+  padding:6px 11px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:15px;
+}
+
+.badge.blue{
+  background:#1e3a8a;
+  color:#bfdbfe;
+}
+
+.badge.green{
+  background:#14532d;
+  color:#bbf7d0;
 }
 
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:14px;
+  gap:15px;
 }
 
 label{
@@ -79,10 +95,10 @@ input,
 select,
 textarea{
   width:100%;
-  background:#080d18;
+  background:#080f1c;
   color:#fff;
   border:1px solid #334155;
-  border-radius:9px;
+  border-radius:10px;
   padding:12px;
   outline:none;
   font-size:14px;
@@ -92,1391 +108,966 @@ input:focus,
 select:focus,
 textarea:focus{
   border-color:#6366f1;
-  box-shadow:0 0 0 2px rgba(99,102,241,.12);
 }
 
 textarea{
-  min-height:95px;
+  min-height:100px;
   resize:vertical;
+}
+
+.mode-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:15px;
+}
+
+.mode{
+  border:1px solid #334155;
+  background:#0b1220;
+  border-radius:13px;
+  padding:16px;
+  cursor:pointer;
+}
+
+.mode.active{
+  border-color:#6366f1;
+  background:#111a38;
+}
+
+.mode input{
+  width:auto;
+  margin-right:8px;
+}
+
+.mode-title{
+  font-weight:bold;
+  margin-bottom:5px;
+}
+
+.mode-text{
+  color:#94a3b8;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.upload-box{
+  border:2px dashed #334155;
+  border-radius:15px;
+  padding:28px 18px;
+  text-align:center;
+  background:#080f1c;
+  transition:.2s;
+}
+
+.upload-box.drag{
+  border-color:#6366f1;
+  background:#10183a;
+}
+
+.upload-icon{
+  font-size:38px;
+  margin-bottom:10px;
+}
+
+.upload-box h3{
+  margin-bottom:7px;
+}
+
+.upload-box p{
+  color:#94a3b8;
+  font-size:13px;
+  margin-bottom:15px;
+}
+
+.file-label{
+  display:inline-block;
+  background:#6366f1;
+  color:white;
+  padding:12px 18px;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.file-label:hover{
+  background:#4f46e5;
+}
+
+#answerFile{
+  display:none;
+}
+
+.file-info{
+  display:none;
+  margin-top:15px;
+  padding:12px;
+  border-radius:10px;
+  background:#111827;
+  border:1px solid #26334d;
+  color:#cbd5e1;
+  font-size:13px;
+}
+
+.check-options{
+  display:grid;
+  gap:10px;
+  margin-top:12px;
+}
+
+.option{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#080f1c;
+  border:1px solid #26334d;
+  padding:12px;
+  border-radius:10px;
+}
+
+.option input{
+  width:auto;
 }
 
 button{
   border:0;
-  border-radius:9px;
-  padding:12px 17px;
+  border-radius:10px;
+  padding:13px 18px;
+  font-weight:bold;
   font-size:14px;
-  font-weight:700;
   cursor:pointer;
-  transition:.2s;
 }
 
 .primary{
   width:100%;
+  background:#6366f1;
+  color:white;
   margin-top:18px;
-  background:linear-gradient(135deg,#6366f1,#4f46e5);
-  color:#fff;
 }
 
 .primary:hover{
-  transform:translateY(-1px);
-  background:linear-gradient(135deg,#818cf8,#6366f1);
+  background:#4f46e5;
+}
+
+.primary:disabled{
+  opacity:.5;
+  cursor:not-allowed;
 }
 
 .secondary{
-  margin-top:15px;
   background:#1e293b;
   color:#fff;
+}
+
+.status-box{
+  display:none;
+  margin-top:18px;
+  padding:15px;
+  border-radius:12px;
+  background:#0b1220;
   border:1px solid #334155;
 }
 
-.secondary:hover{
-  background:#273449;
+.status-title{
+  font-weight:bold;
+  margin-bottom:6px;
 }
 
-.danger{
-  background:#3f1722;
-  color:#fda4af;
-  border:1px solid #7f1d1d;
-  margin-left:8px;
-}
-
-.question{
-  border:1px solid #293750;
-  background:#0b1220;
-  border-radius:13px;
-  padding:16px;
-  margin-top:14px;
-}
-
-.question-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin-bottom:10px;
-}
-
-.question-title{
-  font-size:16px;
-  font-weight:700;
-}
-
-.question-badge{
-  font-size:11px;
-  color:#a5b4fc;
-  background:#1e1b4b;
-  border:1px solid #3730a3;
-  padding:5px 8px;
-  border-radius:20px;
-}
-
-.marks-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.marks-box{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.marks-box input{
-  width:100%;
-}
-
-.marks-box span{
+.status-text{
   color:#94a3b8;
   font-size:13px;
-  white-space:nowrap;
-}
-
-.remove-question{
-  margin-top:10px;
-  background:transparent;
-  color:#f87171;
-  padding:5px 0;
-  font-size:12px;
-}
-
-.result{
-  display:none;
-}
-
-.score{
-  text-align:center;
-  padding:26px 15px;
-  border-radius:15px;
-  background:
-    radial-gradient(circle at top,#4338ca 0%,transparent 55%),
-    linear-gradient(135deg,#172554,#312e81);
-  border:1px solid #4338ca;
-}
-
-.score-label{
-  color:#c7d2fe;
-  font-size:13px;
-  margin-bottom:4px;
-}
-
-.score-number{
-  font-size:48px;
-  font-weight:800;
-}
-
-.percentage{
-  color:#cbd5e1;
-  margin-top:4px;
-}
-
-.status{
-  display:inline-block;
-  margin-top:12px;
-  padding:7px 17px;
-  border-radius:30px;
-  font-size:12px;
-  font-weight:800;
-  background:#166534;
-  color:#dcfce7;
-}
-
-.status.fail{
-  background:#7f1d1d;
-  color:#fee2e2;
-}
-
-.summary{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-top:15px;
-}
-
-.stat{
-  background:#080d18;
-  border:1px solid #26334d;
-  padding:15px 8px;
-  text-align:center;
-  border-radius:11px;
-}
-
-.stat strong{
-  display:block;
-  font-size:22px;
-  margin-bottom:4px;
-}
-
-.stat span{
-  color:#94a3b8;
-  font-size:11px;
-}
-
-.examiner{
-  margin-top:16px;
-  padding:17px;
-  background:#0b1220;
-  border:1px solid #26334d;
-  border-radius:12px;
-}
-
-.examiner h2{
-  margin-bottom:12px;
-}
-
-.progress{
-  height:9px;
-  background:#1e293b;
-  border-radius:20px;
-  overflow:hidden;
-  margin-bottom:15px;
-}
-
-.progress-bar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#6366f1,#8b5cf6);
-  transition:width .5s ease;
-}
-
-.remark{
-  padding:13px;
-  background:#080d18;
-  border-left:3px solid #6366f1;
-  border-radius:5px;
-  color:#cbd5e1;
-  font-size:13px;
-  line-height:1.6;
-}
-
-.checked-list{
-  margin-top:15px;
-}
-
-.checked-item{
-  padding:13px;
-  border:1px solid #26334d;
-  background:#080d18;
-  border-radius:10px;
-  margin-top:9px;
-}
-
-.checked-item strong{
-  color:#a5b4fc;
-}
-
-.checked-item p{
-  color:#94a3b8;
-  font-size:12px;
-  margin-top:6px;
   line-height:1.5;
 }
 
-.result-actions{
-  display:flex;
-  gap:10px;
-  margin-top:15px;
+.success{
+  border-color:#166534;
+  background:#052e16;
 }
 
-.result-actions button{
-  flex:1;
+.error{
+  border-color:#991b1b;
+  background:#450a0a;
+}
+
+.checkin{
+  display:none;
+}
+
+.note{
+  color:#64748b;
+  font-size:12px;
+  line-height:1.5;
+  margin-top:12px;
 }
 
 footer{
   text-align:center;
-  color:#475569;
-  padding:20px 10px;
-  font-size:11px;
-}
-
-.small-note{
   color:#64748b;
-  font-size:11px;
-  margin-top:7px;
+  padding:20px;
+  font-size:12px;
 }
 
-@media(max-width:650px){
-
-  header{
-    padding:23px 15px;
-  }
+@media(max-width:700px){
 
   header h1{
-    font-size:24px;
+    font-size:25px;
   }
 
-  .grid{
+  .grid,
+  .mode-grid{
     grid-template-columns:1fr;
-  }
-
-  .marks-row{
-    grid-template-columns:1fr;
-  }
-
-  .summary{
-    grid-template-columns:1fr 1fr 1fr;
   }
 
   .card{
-    padding:16px;
+    padding:18px;
   }
-
-  .score-number{
-    font-size:44px;
-  }
-
-  .result-actions{
-    flex-direction:column;
-  }
-
 }
-
 </style>
 </head>
 
 <body>
 
 <header>
-
   <h1>CA Exam Checker</h1>
-
-  <p>
-    Professional CA Answer Sheet Evaluation System
-  </p>
-
+  <p>CA Answer Sheet Evaluation & Examination Portal</p>
 </header>
-
 
 <div class="container">
 
+  <!-- CHECK-IN -->
 
-<!-- EXAM DETAILS -->
+  <div class="card">
 
-<div class="card">
+    <span class="badge blue">STUDENT CHECK-IN</span>
 
-  <h2>📋 Exam Details</h2>
+    <h2>👤 Student Details</h2>
 
-  <div class="grid">
+    <div class="grid">
 
-    <div>
+      <div>
+        <label>Student Name</label>
+        <input
+          id="studentName"
+          type="text"
+          placeholder="Enter full name"
+        >
+      </div>
 
-      <label>Student Name</label>
+      <div>
+        <label>Roll / Registration No.</label>
+        <input
+          id="rollNo"
+          type="text"
+          placeholder="Enter roll number"
+        >
+      </div>
 
-      <input
-        id="studentName"
-        placeholder="Enter student name"
-      >
+      <div>
+        <label>Subject</label>
 
-    </div>
+        <select id="subject">
 
+          <option value="">
+            Select Subject
+          </option>
 
-    <div>
+          <option>
+            Advanced Accounting
+          </option>
 
-      <label>Subject</label>
+          <option>
+            Corporate & Other Laws
+          </option>
 
-      <select id="subject">
+          <option>
+            Taxation
+          </option>
 
-        <option>Advanced Accounts</option>
-        <option>Corporate & Other Laws</option>
-        <option>Taxation</option>
-        <option>Cost & Management Accounting</option>
-        <option>Auditing</option>
-        <option>Financial Management</option>
-        <option>Strategic Management</option>
+          <option>
+            Cost & Management Accounting
+          </option>
 
-      </select>
+          <option>
+            Auditing
+          </option>
 
-    </div>
+          <option>
+            Financial Management
+          </option>
 
+          <option>
+            Strategic Management
+          </option>
 
-    <div>
+        </select>
+      </div>
 
-      <label>Exam / Test Name</label>
+      <div>
+        <label>Exam / Test</label>
 
-      <input
-        id="examName"
-        placeholder="e.g. CA Inter MTP"
-      >
-
-    </div>
-
-
-    <div>
-
-      <label>Total Marks</label>
-
-      <input
-        id="totalMarks"
-        type="number"
-        min="1"
-        value="100"
-      >
+        <input
+          id="examName"
+          type="text"
+          placeholder="CA Inter MTP / Mock Test"
+        >
+      </div>
 
     </div>
 
   </div>
 
 
-  <label>General Examiner Remarks</label>
+  <!-- CHECKING MODE -->
 
-  <textarea
-    id="generalRemark"
-    placeholder="Write overall examiner remarks..."
-  ></textarea>
+  <div class="card">
 
+    <span class="badge green">CHECKING CONFIGURATION</span>
 
-  <button
-    class="primary"
-    onclick="generateChecker()"
-  >
-    Generate Checked Result
-  </button>
+    <h2>⚙️ Checking Mode</h2>
 
-</div>
-
-
-
-<!-- QUESTION CHECKING -->
-
-<div class="card">
-
-  <h2>✍️ Question-wise Checking</h2>
-
-  <div id="questions">
-
-
-    <!-- QUESTION 1 -->
-
-    <div class="question">
-
-      <div class="question-header">
-
-        <div class="question-title">
-          Question 1
-        </div>
-
-        <div class="question-badge">
-          20 Marks
-        </div>
-
-      </div>
-
-
-      <div class="marks-row">
-
-        <div>
-
-          <label>Marks Obtained</label>
-
-          <div class="marks-box">
-
-            <input
-              class="qmarks"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-            <span>/ 20</span>
-
-          </div>
-
-        </div>
-
-
-        <div>
-
-          <label>Maximum Marks</label>
-
-          <input
-            class="qmax"
-            type="number"
-            min="1"
-            value="20"
-          >
-
-        </div>
-
-      </div>
-
-
-      <label>Examiner Remark</label>
-
-      <textarea
-        class="qremark"
-        placeholder="e.g. Correct approach but calculation error..."
-      ></textarea>
-
-    </div>
-
-
-
-    <!-- QUESTION 2 -->
-
-    <div class="question">
-
-      <div class="question-header">
-
-        <div class="question-title">
-          Question 2
-        </div>
-
-        <div class="question-badge">
-          20 Marks
-        </div>
-
-      </div>
-
-
-      <div class="marks-row">
-
-        <div>
-
-          <label>Marks Obtained</label>
-
-          <div class="marks-box">
-
-            <input
-              class="qmarks"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-            <span>/ 20</span>
-
-          </div>
-
-        </div>
-
-
-        <div>
-
-          <label>Maximum Marks</label>
-
-          <input
-            class="qmax"
-            type="number"
-            min="1"
-            value="20"
-          >
-
-        </div>
-
-      </div>
-
-
-      <label>Examiner Remark</label>
-
-      <textarea
-        class="qremark"
-        placeholder="Write examiner remark..."
-      ></textarea>
-
-    </div>
-
-
-
-    <!-- QUESTION 3 -->
-
-    <div class="question">
-
-      <div class="question-header">
-
-        <div class="question-title">
-          Question 3
-        </div>
-
-        <div class="question-badge">
-          20 Marks
-        </div>
-
-      </div>
-
-
-      <div class="marks-row">
-
-        <div>
-
-          <label>Marks Obtained</label>
-
-          <div class="marks-box">
-
-            <input
-              class="qmarks"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-            <span>/ 20</span>
-
-          </div>
-
-        </div>
-
-
-        <div>
-
-          <label>Maximum Marks</label>
-
-          <input
-            class="qmax"
-            type="number"
-            min="1"
-            value="20"
-          >
-
-        </div>
-
-      </div>
-
-
-      <label>Examiner Remark</label>
-
-      <textarea
-        class="qremark"
-        placeholder="Write examiner remark..."
-      ></textarea>
-
-    </div>
-
-
-
-    <!-- QUESTION 4 -->
-
-    <div class="question">
-
-      <div class="question-header">
-
-        <div class="question-title">
-          Question 4
-        </div>
-
-        <div class="question-badge">
-          20 Marks
-        </div>
-
-      </div>
-
-
-      <div class="marks-row">
-
-        <div>
-
-          <label>Marks Obtained</label>
-
-          <div class="marks-box">
-
-            <input
-              class="qmarks"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-            <span>/ 20</span>
-
-          </div>
-
-        </div>
-
-
-        <div>
-
-          <label>Maximum Marks</label>
-
-          <input
-            class="qmax"
-            type="number"
-            min="1"
-            value="20"
-          >
-
-        </div>
-
-      </div>
-
-
-      <label>Examiner Remark</label>
-
-      <textarea
-        class="qremark"
-        placeholder="Write examiner remark..."
-      ></textarea>
-
-    </div>
-
-
-
-    <!-- QUESTION 5 -->
-
-    <div class="question">
-
-      <div class="question-header">
-
-        <div class="question-title">
-          Question 5
-        </div>
-
-        <div class="question-badge">
-          20 Marks
-        </div>
-
-      </div>
-
-
-      <div class="marks-row">
-
-        <div>
-
-          <label>Marks Obtained</label>
-
-          <div class="marks-box">
-
-            <input
-              class="qmarks"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-            <span>/ 20</span>
-
-          </div>
-
-        </div>
-
-
-        <div>
-
-          <label>Maximum Marks</label>
-
-          <input
-            class="qmax"
-            type="number"
-            min="1"
-            value="20"
-          >
-
-        </div>
-
-      </div>
-
-
-      <label>Examiner Remark</label>
-
-      <textarea
-        class="qremark"
-        placeholder="Write examiner remark..."
-      ></textarea>
-
-    </div>
-
-
-  </div>
-
-
-  <button
-    class="secondary"
-    onclick="addQuestion()"
-  >
-    + Add Question
-  </button>
-
-</div>
-
-
-
-<!-- RESULT -->
-
-<div
-  class="card result"
-  id="result"
->
-
-  <div class="score">
-
-    <div class="score-label">
-      FINAL SCORE
-    </div>
-
-    <div
-      class="score-number"
-      id="finalScore"
-    >
-      0 / 100
-    </div>
-
-    <div
-      class="percentage"
-      id="percentage"
-    >
-      0%
-    </div>
-
-    <div
-      class="status"
-      id="status"
-    >
-      PASS
-    </div>
-
-  </div>
-
-
-
-  <div class="summary">
-
-    <div class="stat">
-
-      <strong id="attempted">
-        0
-      </strong>
-
-      <span>
-        Questions
-      </span>
-
-    </div>
-
-
-    <div class="stat">
-
-      <strong id="average">
-        0
-      </strong>
-
-      <span>
-        Average
-      </span>
-
-    </div>
-
-
-    <div class="stat">
-
-      <strong id="grade">
-        -
-      </strong>
-
-      <span>
-        Grade
-      </span>
-
-    </div>
-
-  </div>
-
-
-
-  <div class="examiner">
-
-    <h2>
-      📊 Examiner Summary
-    </h2>
-
-
-    <div class="progress">
+    <div class="mode-grid">
 
       <div
-        class="progress-bar"
-        id="progress"
+        class="mode active"
+        id="strictMode"
+        onclick="selectMode('strict')"
+      >
+
+        <div class="mode-title">
+          🧑‍⚖️ ICAI Strict Checking
+        </div>
+
+        <div class="mode-text">
+          Strict evaluation with focus on
+          correctness, working notes,
+          presentation, concepts and
+          step-wise marks.
+        </div>
+
+      </div>
+
+
+      <div
+        class="mode"
+        id="moderateMode"
+        onclick="selectMode('moderate')"
+      >
+
+        <div class="mode-title">
+          📝 Moderate Checking
+        </div>
+
+        <div class="mode-text">
+          Balanced evaluation with
+          reasonable step marking and
+          examiner-style remarks.
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="check-options">
+
+      <label class="option">
+
+        <input
+          type="checkbox"
+          id="workingMarks"
+          checked
+        >
+
+        <span>
+          Consider step-wise / working marks
+        </span>
+
+      </label>
+
+
+      <label class="option">
+
+        <input
+          type="checkbox"
+          id="presentationMarks"
+          checked
+        >
+
+        <span>
+          Consider presentation & format
+        </span>
+
+      </label>
+
+
+      <label class="option">
+
+        <input
+          type="checkbox"
+          id="conceptMarks"
+          checked
+        >
+
+        <span>
+          Prioritise conceptual correctness
+        </span>
+
+      </label>
+
+    </div>
+
+  </div>
+
+
+  <!-- ANSWER SHEET -->
+
+  <div class="card">
+
+    <span class="badge blue">ANSWER SHEET</span>
+
+    <h2>📄 Upload Answer Sheet</h2>
+
+    <div
+      class="upload-box"
+      id="uploadBox"
+    >
+
+      <div class="upload-icon">
+        📑
+      </div>
+
+      <h3>
+        Upload your answer sheet
+      </h3>
+
+      <p>
+        PDF recommended • Maximum recommended size 4 MB
+      </p>
+
+      <label
+        class="file-label"
+        for="answerFile"
+      >
+        Choose Answer Sheet
+      </label>
+
+      <input
+        id="answerFile"
+        type="file"
+        accept=".pdf,image/jpeg,image/png"
+      >
+
+      <div
+        class="file-info"
+        id="fileInfo"
       ></div>
 
     </div>
 
+    <p class="note">
+      Your answer sheet is uploaded to private storage.
+      Do not upload unnecessary personal information.
+    </p>
+
+    <button
+      class="primary"
+      id="uploadButton"
+      onclick="uploadAnswerSheet()"
+    >
+      🚀 Submit Answer Sheet
+    </button>
+
 
     <div
-      class="remark"
-      id="finalRemark"
-    ></div>
+      class="status-box"
+      id="statusBox"
+    >
 
+      <div
+        class="status-title"
+        id="statusTitle"
+      ></div>
 
-    <div
-      class="checked-list"
-      id="checkedList"
-    ></div>
+      <div
+        class="status-text"
+        id="statusText"
+      ></div>
+
+    </div>
 
   </div>
 
 
-  <div class="result-actions">
+  <!-- CHECK-IN CONFIRMATION -->
 
-    <button
-      class="secondary"
-      onclick="window.print()"
-    >
-      🖨️ Print Result
-    </button>
+  <div
+    class="card checkin"
+    id="checkinCard"
+  >
 
-    <button
-      class="danger"
-      onclick="resetChecker()"
-    >
-      ↻ Reset
-    </button>
+    <span class="badge green">
+      CHECK-IN COMPLETE
+    </span>
+
+    <h2>✅ Submission Received</h2>
+
+    <p
+      id="checkinText"
+      class="status-text"
+    ></p>
 
   </div>
-
-</div>
 
 </div>
 
 
 <footer>
-
-  CA Exam Checker V2 • Educational Evaluation System
-
+  CA Exam Checker V2 • Educational evaluation platform
 </footer>
-
 
 
 <script>
 
-let questionCount = 5;
+let checkingMode = "strict";
+
+let selectedFile = null;
 
 
-/* ADD QUESTION */
+/* MODE */
 
-function addQuestion(){
+function selectMode(mode){
 
-  questionCount++;
+  checkingMode = mode;
 
-  const questions =
-    document.getElementById("questions");
+  document
+    .getElementById("strictMode")
+    .classList.remove("active");
 
-
-  const div =
-    document.createElement("div");
-
-  div.className = "question";
-
-
-  div.innerHTML = `
-
-    <div class="question-header">
-
-      <div class="question-title">
-        Question ${questionCount}
-      </div>
-
-      <div class="question-badge">
-        20 Marks
-      </div>
-
-    </div>
+  document
+    .getElementById("moderateMode")
+    .classList.remove("active");
 
 
-    <div class="marks-row">
+  if(mode === "strict"){
 
-      <div>
+    document
+      .getElementById("strictMode")
+      .classList.add("active");
 
-        <label>Marks Obtained</label>
+  }else{
 
-        <div class="marks-box">
+    document
+      .getElementById("moderateMode")
+      .classList.add("active");
 
-          <input
-            class="qmarks"
-            type="number"
-            min="0"
-            value="0"
-          >
-
-          <span>/ 20</span>
-
-        </div>
-
-      </div>
-
-
-      <div>
-
-        <label>Maximum Marks</label>
-
-        <input
-          class="qmax"
-          type="number"
-          min="1"
-          value="20"
-        >
-
-      </div>
-
-    </div>
-
-
-    <label>Examiner Remark</label>
-
-    <textarea
-      class="qremark"
-      placeholder="Write examiner remark..."
-    ></textarea>
-
-
-    <button
-      class="remove-question"
-      onclick="this.parentElement.remove()"
-    >
-      ✕ Remove Question
-    </button>
-
-  `;
-
-
-  questions.appendChild(div);
+  }
 
 }
 
 
+/* FILE SELECT */
 
-/* GENERATE RESULT */
+document
+  .getElementById("answerFile")
+  .addEventListener("change", function(){
 
-function generateChecker(){
+    if(!this.files.length){
 
-  const name =
-    document.getElementById("studentName")
-    .value.trim() || "Student";
+      selectedFile = null;
 
+      return;
+    }
 
-  const subject =
-    document.getElementById("subject")
-    .value;
+    selectedFile = this.files[0];
 
-
-  const exam =
-    document.getElementById("examName")
-    .value.trim() || "CA Examination";
-
-
-  const totalMarks =
-    Number(
-      document.getElementById("totalMarks")
-      .value
-    ) || 100;
-
-
-  const questionBoxes =
-    [...document.querySelectorAll(".question")];
-
-
-  let obtained = 0;
-
-  let maximum = 0;
-
-
-  questionBoxes.forEach(box => {
-
-    const marksInput =
-      box.querySelector(".qmarks");
-
-    const maxInput =
-      box.querySelector(".qmax");
-
-
-    let marks =
-      Number(marksInput.value) || 0;
-
-    let max =
-      Number(maxInput.value) || 20;
-
-
-    if(max < 1)
-      max = 1;
-
-
-    if(marks < 0)
-      marks = 0;
-
-
-    if(marks > max)
-      marks = max;
-
-
-    marksInput.value = marks;
-
-    maxInput.value = max;
-
-
-    obtained += marks;
-
-    maximum += max;
+    showFile(selectedFile);
 
   });
 
 
+function showFile(file){
 
-  /* SCALE TO TOTAL MARKS */
+  const info =
+    document.getElementById("fileInfo");
 
-  let finalScore =
-    maximum > 0
-    ? (obtained / maximum) * totalMarks
-    : 0;
+  const size =
+    (file.size / 1024 / 1024).toFixed(2);
 
+  info.style.display = "block";
 
-  finalScore =
-    Math.round(finalScore * 100) / 100;
+  info.innerHTML =
+    "📎 <b>" +
+    escapeHTML(file.name) +
+    "</b><br>" +
+    size +
+    " MB";
 
-
-  const percentage =
-    totalMarks > 0
-    ? (finalScore / totalMarks) * 100
-    : 0;
-
-
-
-  /* STATUS */
-
-  const status =
-    percentage >= 40
-    ? "PASS"
-    : "FAIL";
+}
 
 
-  /* GRADE */
+/* DRAG & DROP */
 
-  let grade;
-
-
-  if(percentage >= 80)
-    grade = "A+";
-
-  else if(percentage >= 70)
-    grade = "A";
-
-  else if(percentage >= 60)
-    grade = "B";
-
-  else if(percentage >= 50)
-    grade = "C";
-
-  else if(percentage >= 40)
-    grade = "D";
-
-  else
-    grade = "F";
+const uploadBox =
+  document.getElementById("uploadBox");
 
 
+uploadBox.addEventListener(
+  "dragover",
+  function(e){
 
-  /* UPDATE SCORE */
+    e.preventDefault();
 
-  document.getElementById("finalScore")
-    .textContent =
-    finalScore.toFixed(1)
-    + " / "
-    + totalMarks;
+    uploadBox.classList.add("drag");
 
-
-  document.getElementById("percentage")
-    .textContent =
-    percentage.toFixed(1)
-    + "%";
+  }
+);
 
 
-  const statusElement =
-    document.getElementById("status");
+uploadBox.addEventListener(
+  "dragleave",
+  function(){
+
+    uploadBox.classList.remove("drag");
+
+  }
+);
 
 
-  statusElement.textContent =
-    status;
+uploadBox.addEventListener(
+  "drop",
+  function(e){
 
+    e.preventDefault();
 
-  if(status === "FAIL")
-    statusElement.classList.add("fail");
+    uploadBox.classList.remove("drag");
 
-  else
-    statusElement.classList.remove("fail");
+    if(e.dataTransfer.files.length){
 
+      selectedFile =
+        e.dataTransfer.files[0];
 
+      document
+        .getElementById("answerFile")
+        .files =
+        e.dataTransfer.files;
 
-  document.getElementById("attempted")
-    .textContent =
-    questionBoxes.length;
-
-
-  document.getElementById("average")
-    .textContent =
-    questionBoxes.length
-    ? (obtained / questionBoxes.length)
-      .toFixed(1)
-    : "0";
-
-
-  document.getElementById("grade")
-    .textContent =
-    grade;
-
-
-  document.getElementById("progress")
-    .style.width =
-    Math.min(percentage,100)
-    + "%";
-
-
-
-  /* GENERAL REMARK */
-
-  let remark =
-    document.getElementById("generalRemark")
-    .value.trim();
-
-
-  if(!remark){
-
-    if(percentage >= 80){
-
-      remark =
-      "Excellent performance. Strong conceptual understanding, good accuracy and effective answer presentation.";
-
-    }
-
-    else if(percentage >= 60){
-
-      remark =
-      "Good attempt. Concepts are mostly clear. Focus on accuracy, working notes and better presentation.";
-
-    }
-
-    else if(percentage >= 40){
-
-      remark =
-      "Satisfactory attempt. More revision and question practice is required. Improve conceptual clarity and answer presentation.";
-
-    }
-
-    else{
-
-      remark =
-      "Needs significant improvement. Focus on conceptual clarity, revision, question practice and proper exam presentation.";
+      showFile(selectedFile);
 
     }
 
   }
+);
 
 
+/* UPLOAD */
 
-  document.getElementById("finalRemark")
-    .innerHTML =
+async function uploadAnswerSheet(){
 
-    "<b>"
-    + escapeHTML(name)
-    + "</b>"
-    + " — "
-    + escapeHTML(subject)
-    + " — "
-    + escapeHTML(exam)
-    + "<br><br>"
-    + escapeHTML(remark);
+  const name =
+    document
+      .getElementById("studentName")
+      .value
+      .trim();
 
+  const roll =
+    document
+      .getElementById("rollNo")
+      .value
+      .trim();
 
+  const subject =
+    document
+      .getElementById("subject")
+      .value;
 
-  /* QUESTION SUMMARY */
-
-  const checkedList =
-    document.getElementById("checkedList");
-
-
-  checkedList.innerHTML =
-    "<h3 style='margin-bottom:10px;font-size:15px;'>Question-wise Result</h3>";
-
-
-  questionBoxes.forEach((box,index) => {
-
-    const marks =
-      Number(
-        box.querySelector(".qmarks").value
-      ) || 0;
+  const exam =
+    document
+      .getElementById("examName")
+      .value
+      .trim();
 
 
-    const max =
-      Number(
-        box.querySelector(".qmax").value
-      ) || 20;
+  if(!name){
 
+    showStatus(
+      "error",
+      "Missing Student Name",
+      "Please enter the student's name."
+    );
 
-    const qremark =
-      box.querySelector(".qremark")
-      .value.trim()
-      || "No specific remark provided.";
-
-
-    const item =
-      document.createElement("div");
-
-
-    item.className =
-      "checked-item";
-
-
-    item.innerHTML = `
-
-      <strong>
-        Question ${index + 1}
-      </strong>
-
-      <span style="float:right;color:#e2e8f0;">
-        ${marks} / ${max}
-      </span>
-
-      <p>
-        ${escapeHTML(qremark)}
-      </p>
-
-    `;
-
-
-    checkedList.appendChild(item);
-
-  });
-
-
-
-  /* SHOW RESULT */
-
-  const result =
-    document.getElementById("result");
-
-
-  result.style.display =
-    "block";
-
-
-  result.scrollIntoView({
-    behavior:"smooth",
-    block:"start"
-  });
-
-}
-
-
-
-/* ESCAPE HTML */
-
-function escapeHTML(text){
-
-  const div =
-    document.createElement("div");
-
-  div.textContent =
-    text;
-
-  return div.innerHTML;
-
-}
-
-
-
-/* RESET */
-
-function resetChecker(){
-
-  if(
-    !confirm(
-      "Reset the complete checker?"
-    )
-  ){
     return;
   }
 
 
-  document
-    .getElementById("studentName")
-    .value = "";
+  if(!roll){
+
+    showStatus(
+      "error",
+      "Missing Roll Number",
+      "Please enter the roll / registration number."
+    );
+
+    return;
+  }
 
 
-  document
-    .getElementById("examName")
-    .value = "";
+  if(!subject){
+
+    showStatus(
+      "error",
+      "Subject Required",
+      "Please select the examination subject."
+    );
+
+    return;
+  }
 
 
-  document
-    .getElementById("generalRemark")
-    .value = "";
+  if(!selectedFile){
+
+    showStatus(
+      "error",
+      "No Answer Sheet",
+      "Please select a PDF or image answer sheet."
+    );
+
+    return;
+  }
 
 
-  document
-    .getElementById("totalMarks")
-    .value = 100;
+  const maxSize =
+    4 * 1024 * 1024;
 
 
-  document
-    .getElementById("result")
-    .style.display = "none";
+  if(selectedFile.size > maxSize){
+
+    showStatus(
+      "error",
+      "File Too Large",
+      "Please upload a file smaller than 4 MB."
+    );
+
+    return;
+  }
 
 
-  const questions =
-    document.getElementById("questions");
+  const button =
+    document.getElementById("uploadButton");
+
+  button.disabled = true;
+
+  button.textContent =
+    "⏳ Uploading...";
 
 
-  questions.innerHTML = "";
+  try{
+
+    const base64 =
+      await fileToBase64(selectedFile);
 
 
-  questionCount = 0;
+    const response =
+      await fetch(
+        "/api/upload",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+
+            filename:
+              selectedFile.name,
+
+            data:
+              base64,
+
+            contentType:
+              selectedFile.type ||
+              "application/pdf"
+
+          })
+
+        }
+      );
 
 
-  for(let i=0;i<5;i++){
+    const result =
+      await response.json();
 
-    questionCount++;
+
+    if(!response.ok){
+
+      throw new Error(
+        result.error ||
+        "Upload failed"
+      );
+
+    }
 
 
-    const
+    showStatus(
+      "success",
+      "Answer Sheet Uploaded ✓",
+      "Your answer sheet has been securely uploaded. Checking mode: " +
+      (
+        checkingMode === "strict"
+        ? "ICAI Strict Checking"
+        : "Moderate Checking"
+      ) +
+      "."
+    );
+
+
+    document
+      .getElementById("checkinCard")
+      .style.display = "block";
+
+
+    document
+      .getElementById("checkinText")
+      .innerHTML =
+      "<b>" +
+      escapeHTML(name) +
+      "</b>, your submission has been received.<br><br>" +
+
+      "Subject: <b>" +
+      escapeHTML(subject) +
+      "</b><br>" +
+
+      "Exam/Test: <b>" +
+      escapeHTML(exam || "CA Examination") +
+      "</b><br>" +
+
+      "Roll No.: <b>" +
+      escapeHTML(roll) +
+      "</b><br>" +
+
+      "Checking Mode: <b>" +
+      (
+        checkingMode === "strict"
+        ? "ICAI Strict"
+        : "Moderate"
+      ) +
+      "</b>";
+
+
+  }catch(error){
+
+    console.error(error);
+
+    showStatus(
+      "error",
+      "Upload Failed",
+      error.message ||
+      "Something went wrong while uploading the answer sheet."
+    );
+
+  }
+
+
+  button.disabled = false;
+
+  button.textContent =
+    "🚀 Submit Answer Sheet";
+
+}
+
+
+/* FILE → BASE64 */
+
+function fileToBase64(file){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function(){
+
+          const result =
+            reader.result;
+
+          const base64 =
+            result.split(",")[1];
+
+          resolve(base64);
+
+        };
+
+
+      reader.onerror =
+        reject;
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+}
+
+
+/* STATUS */
+
+function showStatus(
+  type,
+  title,
+  text
+){
+
+  const box =
+    document.getElementById("statusBox");
+
+  const titleElement =
+    document.getElementById("statusTitle");
+
+  const textElement =
+    document.getElementById("statusText");
+
+
+  box.className =
+    "status-box " + type;
+
+  box.style.display =
+    "block";
+
+
+  titleElement.textContent =
+    title;
+
+
+  textElement.textContent =
+    text;
+
+
+  box.scrollIntoView({
+    behavior:"smooth",
+    block:"center"
+  });
+
+}
+
+
+/* SECURITY */
+
+function escapeHTML(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+</script>
+
+</body>
+</html>
