@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>CA Exam Checker V2</title>
+<title>CA Exam Checker</title>
 
 <style>
 *{
@@ -23,7 +23,7 @@ header{
   background:
     radial-gradient(circle at top,#312e81 0,transparent 42%),
     linear-gradient(135deg,#0f172a,#111827);
-  padding:30px 18px;
+  padding:28px 18px;
   text-align:center;
   border-bottom:1px solid #26334d;
 }
@@ -31,7 +31,7 @@ header{
 header h1{
   font-size:30px;
   font-weight:800;
-  margin-bottom:8px;
+  margin-bottom:7px;
 }
 
 header p{
@@ -68,14 +68,19 @@ header p{
   margin-bottom:15px;
 }
 
-.badge.blue{
+.blue{
   background:#1e3a8a;
   color:#bfdbfe;
 }
 
-.badge.green{
+.green{
   background:#14532d;
   color:#bbf7d0;
+}
+
+.red{
+  background:#7f1d1d;
+  color:#fecaca;
 }
 
 .grid{
@@ -110,16 +115,40 @@ textarea:focus{
   border-color:#6366f1;
 }
 
-textarea{
-  min-height:100px;
-  resize:vertical;
+button{
+  border:0;
+  border-radius:10px;
+  padding:13px 18px;
+  font-weight:bold;
+  font-size:14px;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.primary{
+  width:100%;
+  background:#6366f1;
+  color:white;
+  margin-top:18px;
+}
+
+.primary:hover{
+  background:#4f46e5;
+}
+
+.secondary{
+  background:#1e293b;
+  color:#fff;
 }
 
 .mode-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
-  margin-top:15px;
 }
 
 .mode{
@@ -135,14 +164,9 @@ textarea{
   background:#111a38;
 }
 
-.mode input{
-  width:auto;
-  margin-right:8px;
-}
-
 .mode-title{
   font-weight:bold;
-  margin-bottom:5px;
+  margin-bottom:6px;
 }
 
 .mode-text{
@@ -154,20 +178,14 @@ textarea{
 .upload-box{
   border:2px dashed #334155;
   border-radius:15px;
-  padding:28px 18px;
+  padding:27px 18px;
   text-align:center;
   background:#080f1c;
-  transition:.2s;
-}
-
-.upload-box.drag{
-  border-color:#6366f1;
-  background:#10183a;
 }
 
 .upload-icon{
   font-size:38px;
-  margin-bottom:10px;
+  margin-bottom:9px;
 }
 
 .upload-box h3{
@@ -183,7 +201,7 @@ textarea{
 .file-label{
   display:inline-block;
   background:#6366f1;
-  color:white;
+  color:#fff;
   padding:12px 18px;
   border-radius:10px;
   font-weight:bold;
@@ -194,7 +212,7 @@ textarea{
   background:#4f46e5;
 }
 
-#answerFile{
+input[type=file]{
   display:none;
 }
 
@@ -207,56 +225,31 @@ textarea{
   border:1px solid #26334d;
   color:#cbd5e1;
   font-size:13px;
+  text-align:left;
 }
 
-.check-options{
-  display:grid;
-  gap:10px;
-  margin-top:12px;
-}
-
-.option{
-  display:flex;
-  align-items:center;
-  gap:10px;
+.info-box{
   background:#080f1c;
   border:1px solid #26334d;
-  padding:12px;
-  border-radius:10px;
+  border-radius:12px;
+  padding:15px;
+  margin-top:15px;
 }
 
-.option input{
-  width:auto;
+.info-box strong{
+  display:block;
+  margin-bottom:8px;
 }
 
-button{
-  border:0;
-  border-radius:10px;
-  padding:13px 18px;
+.info-box p{
+  color:#94a3b8;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.marks{
+  color:#a5b4fc;
   font-weight:bold;
-  font-size:14px;
-  cursor:pointer;
-}
-
-.primary{
-  width:100%;
-  background:#6366f1;
-  color:white;
-  margin-top:18px;
-}
-
-.primary:hover{
-  background:#4f46e5;
-}
-
-.primary:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-.secondary{
-  background:#1e293b;
-  color:#fff;
 }
 
 .status-box{
@@ -293,6 +286,54 @@ button{
   display:none;
 }
 
+.admin{
+  display:none;
+}
+
+.section-line{
+  height:1px;
+  background:#26334d;
+  margin:20px 0;
+}
+
+.result-box{
+  display:none;
+}
+
+.result-score{
+  text-align:center;
+  padding:25px;
+  background:linear-gradient(135deg,#172554,#312e81);
+  border-radius:15px;
+}
+
+.result-score .big{
+  font-size:48px;
+  font-weight:800;
+  margin:8px 0;
+}
+
+.result-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:15px;
+}
+
+.stat{
+  background:#080f1c;
+  border:1px solid #26334d;
+  border-radius:12px;
+  padding:15px;
+  text-align:center;
+}
+
+.stat strong{
+  display:block;
+  font-size:23px;
+  margin-bottom:5px;
+}
+
 .note{
   color:#64748b;
   font-size:12px;
@@ -308,13 +349,13 @@ footer{
 }
 
 @media(max-width:700px){
-
   header h1{
     font-size:25px;
   }
 
   .grid,
-  .mode-grid{
+  .mode-grid,
+  .result-grid{
     grid-template-columns:1fr;
   }
 
@@ -334,7 +375,9 @@ footer{
 
 <div class="container">
 
-  <!-- CHECK-IN -->
+<!-- ================= STUDENT ================= -->
+
+<div id="studentPanel">
 
   <div class="card">
 
@@ -349,54 +392,62 @@ footer{
         <input
           id="studentName"
           type="text"
-          placeholder="Enter full name"
-        >
+          placeholder="Enter full name">
       </div>
 
       <div>
-        <label>Roll / Registration No.</label>
+        <label>Registration Number</label>
         <input
-          id="rollNo"
+          id="registrationNumber"
           type="text"
-          placeholder="Enter roll number"
-        >
+          placeholder="Enter registration number">
       </div>
 
       <div>
         <label>Subject</label>
 
-        <select id="subject">
+        <select id="subject" onchange="updateMarks()">
 
-          <option value="">
-            Select Subject
-          </option>
+          <option value="">Select Subject</option>
 
-          <option>
+          <option value="advanced_accounts">
             Advanced Accounting
           </option>
 
-          <option>
+          <option value="law">
             Corporate & Other Laws
           </option>
 
-          <option>
+          <option value="taxation">
             Taxation
           </option>
 
-          <option>
+          <option value="income_tax">
+            Income Tax
+          </option>
+
+          <option value="gst">
+            GST
+          </option>
+
+          <option value="costing">
             Cost & Management Accounting
           </option>
 
-          <option>
+          <option value="audit">
             Auditing
           </option>
 
-          <option>
+          <option value="fm">
             Financial Management
           </option>
 
-          <option>
+          <option value="sm">
             Strategic Management
+          </option>
+
+          <option value="fm_sm">
+            FM + SM
           </option>
 
         </select>
@@ -408,9 +459,19 @@ footer{
         <input
           id="examName"
           type="text"
-          placeholder="CA Inter MTP / Mock Test"
-        >
+          placeholder="CA Inter MTP / Mock Test">
       </div>
+
+    </div>
+
+    <div class="info-box" id="marksInfo">
+
+      <strong>📊 Checking Structure</strong>
+
+      <p>
+        Select a subject to see its descriptive
+        checking limit.
+      </p>
 
     </div>
 
@@ -421,99 +482,51 @@ footer{
 
   <div class="card">
 
-    <span class="badge green">CHECKING CONFIGURATION</span>
+    <span class="badge green">CHECKING MODE</span>
 
-    <h2>⚙️ Checking Mode</h2>
+    <h2>⚙️ Evaluation Standard</h2>
 
     <div class="mode-grid">
 
       <div
         class="mode active"
         id="strictMode"
-        onclick="selectMode('strict')"
-      >
+        onclick="selectMode('strict')">
 
         <div class="mode-title">
           🧑‍⚖️ ICAI Strict Checking
         </div>
 
         <div class="mode-text">
-          Strict evaluation with focus on
-          correctness, working notes,
-          presentation, concepts and
-          step-wise marks.
+          Strict evaluation based on correctness,
+          concepts, working, relevant points and
+          proper answer presentation.
         </div>
 
       </div>
 
-
       <div
         class="mode"
         id="moderateMode"
-        onclick="selectMode('moderate')"
-      >
+        onclick="selectMode('moderate')">
 
         <div class="mode-title">
           📝 Moderate Checking
         </div>
 
         <div class="mode-text">
-          Balanced evaluation with
-          reasonable step marking and
-          examiner-style remarks.
+          Balanced examiner-style evaluation with
+          reasonable step marking.
         </div>
 
       </div>
 
     </div>
 
-    <div class="check-options">
-
-      <label class="option">
-
-        <input
-          type="checkbox"
-          id="workingMarks"
-          checked
-        >
-
-        <span>
-          Consider step-wise / working marks
-        </span>
-
-      </label>
-
-
-      <label class="option">
-
-        <input
-          type="checkbox"
-          id="presentationMarks"
-          checked
-        >
-
-        <span>
-          Consider presentation & format
-        </span>
-
-      </label>
-
-
-      <label class="option">
-
-        <input
-          type="checkbox"
-          id="conceptMarks"
-          checked
-        >
-
-        <span>
-          Prioritise conceptual correctness
-        </span>
-
-      </label>
-
-    </div>
+    <p class="note">
+      The system evaluates only the descriptive
+      portion. MCQs are not evaluated by the AI checker.
+    </p>
 
   </div>
 
@@ -526,18 +539,11 @@ footer{
 
     <h2>📄 Upload Answer Sheet</h2>
 
-    <div
-      class="upload-box"
-      id="uploadBox"
-    >
+    <div class="upload-box">
 
-      <div class="upload-icon">
-        📑
-      </div>
+      <div class="upload-icon">📑</div>
 
-      <h3>
-        Upload your answer sheet
-      </h3>
+      <h3>Upload your answer sheet</h3>
 
       <p>
         PDF recommended • Maximum recommended size 4 MB
@@ -545,64 +551,58 @@ footer{
 
       <label
         class="file-label"
-        for="answerFile"
-      >
+        for="answerFile">
         Choose Answer Sheet
       </label>
 
       <input
         id="answerFile"
         type="file"
-        accept=".pdf,image/jpeg,image/png"
-      >
+        accept=".pdf,image/jpeg,image/png">
 
       <div
         class="file-info"
-        id="fileInfo"
-      ></div>
+        id="fileInfo">
+      </div>
 
     </div>
 
     <p class="note">
       Your answer sheet is uploaded to private storage.
-      Do not upload unnecessary personal information.
+      Only the examination submission will be used for checking.
     </p>
 
     <button
       class="primary"
       id="uploadButton"
-      onclick="uploadAnswerSheet()"
-    >
+      onclick="uploadAnswerSheet()">
       🚀 Submit Answer Sheet
     </button>
 
-
     <div
       class="status-box"
-      id="statusBox"
-    >
+      id="statusBox">
 
       <div
         class="status-title"
-        id="statusTitle"
-      ></div>
+        id="statusTitle">
+      </div>
 
       <div
         class="status-text"
-        id="statusText"
-      ></div>
+        id="statusText">
+      </div>
 
     </div>
 
   </div>
 
 
-  <!-- CHECK-IN CONFIRMATION -->
+  <!-- CHECK-IN -->
 
   <div
     class="card checkin"
-    id="checkinCard"
-  >
+    id="checkinCard">
 
     <span class="badge green">
       CHECK-IN COMPLETE
@@ -612,27 +612,344 @@ footer{
 
     <p
       id="checkinText"
-      class="status-text"
-    ></p>
+      class="status-text">
+    </p>
+
+  </div>
+
+
+  <!-- RESULT -->
+
+  <div
+    class="card result-box"
+    id="resultBox">
+
+    <span class="badge green">
+      CHECKING COMPLETE
+    </span>
+
+    <h2>📊 Checked Result</h2>
+
+    <div class="result-score">
+
+      <div>Descriptive Score</div>
+
+      <div
+        class="big"
+        id="resultScore">
+        —
+      </div>
+
+      <div id="resultPercent">
+        —
+      </div>
+
+    </div>
+
+    <div class="result-grid">
+
+      <div class="stat">
+        <strong id="resultCorrect">—</strong>
+        Questions
+      </div>
+
+      <div class="stat">
+        <strong id="resultGrade">—</strong>
+        Grade
+      </div>
+
+      <div class="stat">
+        <strong id="resultMode">—</strong>
+        Mode
+      </div>
+
+    </div>
+
+    <button
+      class="primary"
+      onclick="downloadCheckedCopy()">
+      📄 View / Download Checked Copy
+    </button>
 
   </div>
 
 </div>
 
 
+<!-- ================= ADMIN ================= -->
+
+<div id="adminPanel" class="admin">
+
+  <div class="card">
+
+    <span class="badge red">ADMIN / CHECKER</span>
+
+    <h2>🔐 Test Material</h2>
+
+    <p class="status-text">
+      Upload the Question Paper and Suggested Answer.
+      These materials are used by the AI checker as
+      the reference for descriptive evaluation.
+    </p>
+
+    <label>Subject</label>
+
+    <select id="adminSubject">
+
+      <option value="">Select Subject</option>
+
+      <option value="advanced_accounts">
+        Advanced Accounting
+      </option>
+
+      <option value="law">
+        Corporate & Other Laws
+      </option>
+
+      <option value="taxation">
+        Taxation
+      </option>
+
+      <option value="income_tax">
+        Income Tax
+      </option>
+
+      <option value="gst">
+        GST
+      </option>
+
+      <option value="costing">
+        Cost & Management Accounting
+      </option>
+
+      <option value="audit">
+        Auditing
+      </option>
+
+      <option value="fm">
+        Financial Management
+      </option>
+
+      <option value="sm">
+        Strategic Management
+      </option>
+
+      <option value="fm_sm">
+        FM + SM
+      </option>
+
+    </select>
+
+
+    <label>Question Paper</label>
+
+    <input
+      id="questionPaper"
+      type="file"
+      accept=".pdf,image/jpeg,image/png"
+      style="display:block">
+
+
+    <label>Suggested Answer</label>
+
+    <input
+      id="suggestedAnswer"
+      type="file"
+      accept=".pdf,image/jpeg,image/png"
+      style="display:block">
+
+
+    <div class="info-box">
+
+      <strong>AI Checking Rule</strong>
+
+      <p>
+        Only descriptive questions will be evaluated.
+        MCQs will not be checked. The AI must follow
+        the marks actually assigned to each descriptive
+        question and must never exceed the applicable
+        descriptive maximum.
+      </p>
+
+    </div>
+
+    <button
+      class="primary"
+      onclick="createTest()">
+      📚 Save Test Material
+    </button>
+
+    <div
+      class="status-box"
+      id="adminStatus">
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
 <footer>
-  CA Exam Checker V2 • Educational evaluation platform
+  CA Exam Checker • Educational evaluation platform
 </footer>
 
 
 <script>
 
+/* =====================================================
+   SUBJECT MARKING CONFIGURATION
+   ===================================================== */
+
+const SUBJECTS = {
+
+  advanced_accounts:{
+    name:"Advanced Accounting",
+    descriptive:70,
+    paper:100,
+    mcq:30
+  },
+
+  law:{
+    name:"Corporate & Other Laws",
+    descriptive:70,
+    paper:100,
+    mcq:30
+  },
+
+  taxation:{
+    name:"Taxation",
+    descriptive:70,
+    paper:100,
+    mcq:30,
+    sections:{
+      "Income Tax":35,
+      "GST":35
+    }
+  },
+
+  income_tax:{
+    name:"Income Tax",
+    descriptive:35,
+    paper:50,
+    mcq:15
+  },
+
+  gst:{
+    name:"GST",
+    descriptive:35,
+    paper:50,
+    mcq:15
+  },
+
+  costing:{
+    name:"Cost & Management Accounting",
+    descriptive:70,
+    paper:100,
+    mcq:30
+  },
+
+  audit:{
+    name:"Auditing",
+    descriptive:70,
+    paper:100,
+    mcq:30
+  },
+
+  fm:{
+    name:"Financial Management",
+    descriptive:35,
+    paper:50,
+    mcq:15
+  },
+
+  sm:{
+    name:"Strategic Management",
+    descriptive:35,
+    paper:50,
+    mcq:15
+  },
+
+  fm_sm:{
+    name:"FM + SM",
+    descriptive:70,
+    paper:100,
+    mcq:30,
+    sections:{
+      "Financial Management":35,
+      "Strategic Management":35
+    }
+  }
+
+};
+
+
+/* =====================================================
+   STATE
+   ===================================================== */
+
 let checkingMode = "strict";
-
 let selectedFile = null;
+let lastSubmissionId = null;
 
 
-/* MODE */
+/* =====================================================
+   SUBJECT MARKS
+   ===================================================== */
+
+function updateMarks(){
+
+  const key =
+    document.getElementById("subject").value;
+
+  const box =
+    document.getElementById("marksInfo");
+
+  if(!key){
+
+    box.innerHTML = `
+      <strong>📊 Checking Structure</strong>
+      <p>Select a subject to see its descriptive checking limit.</p>
+    `;
+
+    return;
+  }
+
+  const subject =
+    SUBJECTS[key];
+
+  let sectionText = "";
+
+  if(subject.sections){
+
+    sectionText =
+      Object.entries(subject.sections)
+        .map(
+          ([name,marks]) =>
+          `${name}: <span class="marks">${marks} descriptive</span>`
+        )
+        .join("<br>");
+  }
+
+  box.innerHTML = `
+    <strong>📊 ${subject.name}</strong>
+
+    <p>
+      Paper: ${subject.paper} marks<br>
+      MCQ: ${subject.mcq} marks — <b>Not evaluated</b><br>
+      Descriptive: <span class="marks">
+      ${subject.descriptive} marks
+      </span>
+      ${sectionText ? "<br><br>"+sectionText : ""}
+    </p>
+  `;
+
+}
+
+
+/* =====================================================
+   MODE
+   ===================================================== */
 
 function selectMode(mode){
 
@@ -640,125 +957,65 @@ function selectMode(mode){
 
   document
     .getElementById("strictMode")
-    .classList.remove("active");
+    .classList.toggle(
+      "active",
+      mode === "strict"
+    );
 
   document
     .getElementById("moderateMode")
-    .classList.remove("active");
-
-
-  if(mode === "strict"){
-
-    document
-      .getElementById("strictMode")
-      .classList.add("active");
-
-  }else{
-
-    document
-      .getElementById("moderateMode")
-      .classList.add("active");
-
-  }
+    .classList.toggle(
+      "active",
+      mode === "moderate"
+    );
 
 }
 
 
-/* FILE SELECT */
+/* =====================================================
+   FILE SELECT
+   ===================================================== */
 
 document
   .getElementById("answerFile")
-  .addEventListener("change", function(){
-
-    if(!this.files.length){
-
-      selectedFile = null;
-
-      return;
-    }
-
-    selectedFile = this.files[0];
-
-    showFile(selectedFile);
-
-  });
-
-
-function showFile(file){
-
-  const info =
-    document.getElementById("fileInfo");
-
-  const size =
-    (file.size / 1024 / 1024).toFixed(2);
-
-  info.style.display = "block";
-
-  info.innerHTML =
-    "📎 <b>" +
-    escapeHTML(file.name) +
-    "</b><br>" +
-    size +
-    " MB";
-
-}
-
-
-/* DRAG & DROP */
-
-const uploadBox =
-  document.getElementById("uploadBox");
-
-
-uploadBox.addEventListener(
-  "dragover",
-  function(e){
-
-    e.preventDefault();
-
-    uploadBox.classList.add("drag");
-
-  }
-);
-
-
-uploadBox.addEventListener(
-  "dragleave",
-  function(){
-
-    uploadBox.classList.remove("drag");
-
-  }
-);
-
-
-uploadBox.addEventListener(
-  "drop",
-  function(e){
-
-    e.preventDefault();
-
-    uploadBox.classList.remove("drag");
-
-    if(e.dataTransfer.files.length){
+  .addEventListener(
+    "change",
+    function(){
 
       selectedFile =
-        e.dataTransfer.files[0];
+        this.files.length
+        ? this.files[0]
+        : null;
 
-      document
-        .getElementById("answerFile")
-        .files =
-        e.dataTransfer.files;
+      if(selectedFile){
 
-      showFile(selectedFile);
+        const info =
+          document.getElementById("fileInfo");
+
+        const size =
+          (
+            selectedFile.size /
+            1024 /
+            1024
+          ).toFixed(2);
+
+        info.style.display = "block";
+
+        info.innerHTML =
+          "📎 <b>" +
+          escapeHTML(selectedFile.name) +
+          "</b><br>" +
+          size +
+          " MB";
+      }
 
     }
-
-  }
-);
+  );
 
 
-/* UPLOAD */
+/* =====================================================
+   STUDENT UPLOAD
+   ===================================================== */
 
 async function uploadAnswerSheet(){
 
@@ -768,13 +1025,13 @@ async function uploadAnswerSheet(){
       .value
       .trim();
 
-  const roll =
+  const registrationNumber =
     document
-      .getElementById("rollNo")
+      .getElementById("registrationNumber")
       .value
       .trim();
 
-  const subject =
+  const subjectKey =
     document
       .getElementById("subject")
       .value;
@@ -798,24 +1055,36 @@ async function uploadAnswerSheet(){
   }
 
 
-  if(!roll){
+  if(!registrationNumber){
 
     showStatus(
       "error",
-      "Missing Roll Number",
-      "Please enter the roll / registration number."
+      "Missing Registration Number",
+      "Please enter the registration number."
     );
 
     return;
   }
 
 
-  if(!subject){
+  if(!subjectKey){
 
     showStatus(
       "error",
       "Subject Required",
-      "Please select the examination subject."
+      "Please select a subject."
+    );
+
+    return;
+  }
+
+
+  if(!exam){
+
+    showStatus(
+      "error",
+      "Exam/Test Required",
+      "Please enter the exam or test name."
     );
 
     return;
@@ -827,27 +1096,15 @@ async function uploadAnswerSheet(){
     showStatus(
       "error",
       "No Answer Sheet",
-      "Please select a PDF or image answer sheet."
+      "Please select the answer sheet."
     );
 
     return;
   }
 
 
-  const maxSize =
-    4 * 1024 * 1024;
-
-
-  if(selectedFile.size > maxSize){
-
-    showStatus(
-      "error",
-      "File Too Large",
-      "Please upload a file smaller than 4 MB."
-    );
-
-    return;
-  }
+  const subject =
+    SUBJECTS[subjectKey];
 
 
   const button =
@@ -864,6 +1121,10 @@ async function uploadAnswerSheet(){
     const base64 =
       await fileToBase64(selectedFile);
 
+
+    /*
+      Existing working Blob endpoint is preserved.
+    */
 
     const response =
       await fetch(
@@ -886,7 +1147,28 @@ async function uploadAnswerSheet(){
 
             contentType:
               selectedFile.type ||
-              "application/pdf"
+              "application/pdf",
+
+            studentName:
+              name,
+
+            registrationNumber:
+              registrationNumber,
+
+            subject:
+              subject.name,
+
+            subjectKey:
+              subjectKey,
+
+            exam:
+              exam,
+
+            checkingMode:
+              checkingMode,
+
+            descriptiveMaximum:
+              subject.descriptive
 
           })
 
@@ -908,16 +1190,16 @@ async function uploadAnswerSheet(){
     }
 
 
+    lastSubmissionId =
+      result.submissionId ||
+      result.id ||
+      null;
+
+
     showStatus(
       "success",
       "Answer Sheet Uploaded ✓",
-      "Your answer sheet has been securely uploaded. Checking mode: " +
-      (
-        checkingMode === "strict"
-        ? "ICAI Strict Checking"
-        : "Moderate Checking"
-      ) +
-      "."
+      "Your answer sheet has been securely submitted."
     );
 
 
@@ -929,29 +1211,36 @@ async function uploadAnswerSheet(){
     document
       .getElementById("checkinText")
       .innerHTML =
+
       "<b>" +
       escapeHTML(name) +
       "</b>, your submission has been received.<br><br>" +
 
+      "Registration Number: <b>" +
+      escapeHTML(registrationNumber) +
+      "</b><br>" +
+
       "Subject: <b>" +
-      escapeHTML(subject) +
+      escapeHTML(subject.name) +
       "</b><br>" +
 
       "Exam/Test: <b>" +
-      escapeHTML(exam || "CA Examination") +
+      escapeHTML(exam) +
       "</b><br>" +
 
-      "Roll No.: <b>" +
-      escapeHTML(roll) +
+      "Descriptive Checking Maximum: <b>" +
+      subject.descriptive +
       "</b><br>" +
 
       "Checking Mode: <b>" +
       (
         checkingMode === "strict"
-        ? "ICAI Strict"
-        : "Moderate"
+        ? "ICAI Strict Checking"
+        : "Moderate Checking"
       ) +
-      "</b>";
+      "</b><br><br>" +
+
+      "MCQs are not evaluated by the AI checker.";
 
 
   }catch(error){
@@ -962,7 +1251,7 @@ async function uploadAnswerSheet(){
       "error",
       "Upload Failed",
       error.message ||
-      "Something went wrong while uploading the answer sheet."
+      "Something went wrong while uploading."
     );
 
   }
@@ -976,98 +1265,4 @@ async function uploadAnswerSheet(){
 }
 
 
-/* FILE → BASE64 */
-
-function fileToBase64(file){
-
-  return new Promise(
-    (resolve,reject)=>{
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        function(){
-
-          const result =
-            reader.result;
-
-          const base64 =
-            result.split(",")[1];
-
-          resolve(base64);
-
-        };
-
-
-      reader.onerror =
-        reject;
-
-
-      reader.readAsDataURL(file);
-
-    }
-  );
-
-}
-
-
-/* STATUS */
-
-function showStatus(
-  type,
-  title,
-  text
-){
-
-  const box =
-    document.getElementById("statusBox");
-
-  const titleElement =
-    document.getElementById("statusTitle");
-
-  const textElement =
-    document.getElementById("statusText");
-
-
-  box.className =
-    "status-box " + type;
-
-  box.style.display =
-    "block";
-
-
-  titleElement.textContent =
-    title;
-
-
-  textElement.textContent =
-    text;
-
-
-  box.scrollIntoView({
-    behavior:"smooth",
-    block:"center"
-  });
-
-}
-
-
-/* SECURITY */
-
-function escapeHTML(value){
-
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-</script>
-
-</body>
-</html>
+/* ==========================
