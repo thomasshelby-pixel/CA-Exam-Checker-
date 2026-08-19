@@ -1,4 +1,7 @@
+import { list } from "@vercel/blob";
+
 export default async function handler(req, res) {
+
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Method not allowed"
@@ -6,14 +9,12 @@ export default async function handler(req, res) {
   }
 
   try {
+
     const {
       answerSheetBase64,
       answerSheetName,
-      questionPaperBase64,
-      questionPaperName,
-      suggestedAnswerBase64,
-      suggestedAnswerName,
       subject,
+      subjectKey,
       testType,
       checkingMode,
       descriptiveMaximum
@@ -23,18 +24,13 @@ export default async function handler(req, res) {
        VALIDATION
     ================================================== */
 
-    if (
-      !answerSheetBase64 ||
-      !questionPaperBase64 ||
-      !suggestedAnswerBase64
-    ) {
+    if (!answerSheetBase64) {
       return res.status(400).json({
-        error:
-          "Answer sheet, question paper and suggested answer are required."
+        error: "Answer sheet is required."
       });
     }
 
-    if (!subject) {
+    if (!subjectKey) {
       return res.status(400).json({
         error: "Subject is required."
       });
@@ -46,9 +42,13 @@ export default async function handler(req, res) {
       });
     }
 
-    const maximumMarks = Number(descriptiveMaximum);
+    const maximumMarks =
+      Number(descriptiveMaximum);
 
-    if (!Number.isFinite(maximumMarks) || maximumMarks <= 0) {
+    if (
+      !Number.isFinite(maximumMarks) ||
+      maximumMarks <= 0
+    ) {
       return res.status(400).json({
         error: "Invalid descriptive maximum marks."
       });
@@ -59,6 +59,130 @@ export default async function handler(req, res) {
         error: "AI Gateway API key is not configured."
       });
     }
+
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return res.status(500).json({
+        error: "Vercel Blob token is not configured."
+      });
+    }
+
+    /* ==================================================
+       SAFE PATH
+    ================================================== */
+
+    const safeSubject =
+      String(subjectKey)
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
+
+    const safeTestType =
+      String(testType)
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
+
+    /* ==================================================
+       FIND STORED MATERIALS
+    ================================================== */
+
+    const materialPrefix =
+      `materials/${safeSubject}/${safeTestType}/`;
+
+    const materialList =
+      await list({
+        prefix: materialPrefix,
+        token:
+          process.env.BLOB_READ_WRITE_TOKEN
+      });
+
+    const blobs =
+      materialList.blobs || [];
+
+    const questionPapers =
+      blobs
+        .filter(blob =>
+          blob.pathname.includes(
+            "/question-paper-"
+          )
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.uploadedAt) -
+            new Date(a.uploadedAt)
+        );
+
+    const suggestedAnswers =
+      blobs
+        .filter(blob =>
+          blob.pathname.includes(
+            "/suggested-answer-"
+          )
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.uploadedAt) -
+            new Date(a.uploadedAt)
+        );
+
+    if (!questionPapers.length) {
+      return res.status(404).json({
+        error:
+          `No Question Paper found for ${subject} - ${testType}.`
+      });
+    }
+
+    if (!suggestedAnswers.length) {
+      return res.status(404).json({
+        error:
+          `No Suggested Answer found for ${subject} - ${testType}.`
+      });
+    }
+
+    /* Latest uploaded matching material */
+
+    const questionPaper =
+      questionPapers[0];
+
+    const suggestedAnswer =
+      suggestedAnswers[0];
+
+    /* ==================================================
+       DOWNLOAD PRIVATE BLOBS
+    ================================================== */
+
+    async function downloadBlob(blob) {
+
+      const response =
+        await fetch(
+          blob.url,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`
+            }
+          }
+        );
+
+      if (!response.ok) {
+        throw new Error(
+          `Unable to download ${blob.pathname}`
+        );
+      }
+
+      const arrayBuffer =
+        await response.arrayBuffer();
+
+      return Buffer
+        .from(arrayBuffer)
+        .toString("base64");
+    }
+
+    const questionPaperBase64 =
+      await downloadBlob(
+        questionPaper
+      );
+
+    const suggestedAnswerBase64 =
+      await downloadBlob(
+        suggestedAnswer
+      );
 
     /* ==================================================
        TEST TYPE
@@ -81,43 +205,42 @@ export default async function handler(req, res) {
 STRICT ICAI-STYLE CHECKING:
 
 - Be conservative with marks.
-- Award marks only where the student has actually demonstrated the required knowledge.
-- Penalise wrong concepts, wrong provisions, wrong calculations and unsupported conclusions.
+- Award marks only where the student demonstrates the required knowledge.
+- Penalise wrong concepts, provisions and calculations.
 - Give step marks only for genuinely correct steps.
-- Do not give marks merely for writing more.
-- Missing working notes should lose marks where workings are required.
-- For theory questions, check provision/concept + application + conclusion.
+- Missing workings should lose marks where required.
+- For theory, check provision/concept, application and conclusion.
 `
         : `
 MODERATE EXAMINER-STYLE CHECKING:
 
 - Give reasonable step marking.
-- Award credit for substantially correct approaches even if a minor error affects the final answer.
-- Still penalise conceptual mistakes.
-- Do not award marks simply because an answer is lengthy.
-- Missing essential workings should still affect marks.
+- Give credit for substantially correct approaches.
+- Minor calculation errors may still receive partial marks.
+- Conceptual errors must be penalised.
+- Missing essential workings should affect marks.
 `;
 
     /* ==================================================
-       MAIN EXAMINER PROMPT
+       AI PROMPT
     ================================================== */
 
     const prompt = `
 You are an expert CA Intermediate examiner.
 
-Your job is to evaluate a student's answer sheet against the supplied:
+Evaluate the student's answer sheet against:
 
-1. Official Question Paper
-2. Official / Reference Suggested Answer
-3. Student Answer Sheet
+1. The official Question Paper
+2. The official/reference Suggested Answer
+3. The Student Answer Sheet
 
-Do NOT evaluate the answer sheet from the student's writing alone.
+Do not evaluate from the student's answer alone.
 
-First identify the questions from the Question Paper.
+First identify the descriptive questions from the Question Paper.
 
-Then locate the student's corresponding answer.
+Then locate the student's corresponding answers.
 
-Then compare it with the Suggested Answer and the requirements of the Question Paper.
+Then compare those answers with the Suggested Answer.
 
 ==================================================
 EXAM INFORMATION
@@ -133,7 +256,9 @@ DESCRIPTIVE MAXIMUM:
 ${maximumMarks}
 
 CHECKING MODE:
-${checkingMode === "strict" ? "ICAI STRICT" : "MODERATE"}
+${checkingMode === "strict"
+  ? "ICAI STRICT"
+  : "MODERATE"}
 
 ${checkingInstructions}
 
@@ -143,306 +268,315 @@ IMPORTANT RULES
 
 1. Evaluate ONLY descriptive questions.
 
-2. IGNORE ALL MCQs completely.
-   Do not include MCQ marks in the descriptive total.
+2. IGNORE MCQs completely.
 
 3. Do not invent questions.
 
 4. Do not invent marks.
 
-5. Use the Question Paper as the authority for:
+5. Question Paper is the authority for:
    - question numbers
    - sub-parts
-   - marks available
-   - whether a question is descriptive
+   - marks
+   - question structure
 
-6. Use the Suggested Answer as the main reference for:
+6. Suggested Answer is the main reference for:
    - expected answer
    - calculations
    - provisions
    - concepts
-   - working notes
+   - workings
    - conclusions
 
-7. Compare the student's answer directly with the expected answer.
+7. Compare the student's answer directly.
 
-8. Give partial / step marks only when the student's work genuinely deserves them.
+8. Give genuine partial/step marks.
 
-9. If the final answer is wrong but the working is substantially correct,
-   award appropriate partial marks.
+9. Wrong final answer with substantially correct working may receive
+   appropriate partial marks.
 
-10. If the approach is wrong, do not award marks merely because some
-    numbers or keywords happen to appear.
+10. Wrong approach should not receive marks merely for containing
+    similar numbers or keywords.
 
-11. For theory answers:
-    Check:
+11. Theory questions must be checked for:
     - relevant provision
-    - legal/accounting/tax concept
+    - concept
     - application
     - conclusion
     - important keywords
 
-12. For practical questions:
-    Check:
+12. Practical questions must be checked for:
     - formula
     - working
-    - calculation
+    - calculations
     - adjustments
     - final answer
 
-13. If a question is not attempted:
+13. Unattempted question:
     marks_awarded = 0
     status = "not_attempted"
 
-14. If the student's answer is unreadable or genuinely ambiguous:
+14. Unclear handwriting:
     status = "unclear"
-    Do not confidently invent what the student intended.
+    Do not confidently guess.
 
 15. Never award more than marks_available.
 
 16. Never award negative marks.
 
-17. The sum of all question marks must equal total_marks.
+17. Include every descriptive question found.
 
-18. total_marks must never exceed ${maximumMarks}.
+18. Exclude MCQs.
 
-19. maximum_marks MUST be ${maximumMarks}.
+19. Handle internal choices carefully.
 
-20. percentage must be calculated as:
+20. Remarks must explain actual lost marks.
 
-   total_marks / maximum_marks * 100
+21. Do not give generic praise.
 
-   Round percentage to TWO decimal places.
-
-21. Include every descriptive question found in the Question Paper,
-   including unanswered descriptive questions.
-
-22. Do not include MCQs.
-
-23. If the Question Paper contains internal choices, do not penalise the
-   student for not answering a question that was an optional alternative.
-   Identify the question structure carefully.
-
-24. If a question has sub-parts, you may represent it as:
-   Q1(a), Q1(b), Q1(c), etc.
-
-25. Remarks must be concise but useful to the student.
-   Mention the actual reason for lost marks.
-
-26. Do not provide generic praise.
-
-27. Do not fabricate examiner comments.
-
-28. Do not reveal hidden reasoning or chain-of-thought.
+22. Do not reveal hidden reasoning.
 
 ==================================================
-FINAL QUALITY CHECK
+FINAL CHECK
 ==================================================
 
-Before returning the JSON:
+Verify:
 
-- Verify every question against the Question Paper.
-- Verify marks available.
-- Verify awarded marks.
-- Verify unanswered questions.
-- Verify MCQs are excluded.
-- Verify total_marks mathematically.
-- Verify percentage mathematically.
-- Verify total_marks <= ${maximumMarks}.
+- Every descriptive question is included.
+- MCQs are excluded.
+- Marks available are correct.
+- Awarded marks are correct.
+- Total marks are mathematically correct.
+- Total does not exceed ${maximumMarks}.
+- Percentage is mathematically correct.
 
-Return ONLY the requested JSON.
+Return ONLY valid JSON.
 `;
 
     /* ==================================================
        AI REQUEST
     ================================================== */
 
-    const response = await fetch(
-      "https://ai-gateway.vercel.sh/v1/responses",
-      {
-        method: "POST",
+    const aiResponse =
+      await fetch(
+        "https://ai-gateway.vercel.sh/v1/responses",
+        {
+          method: "POST",
 
-        headers: {
-          "Content-Type": "application/json",
-          Authorization:
-            `Bearer ${process.env.AI_GATEWAY_API_KEY}`
-        },
+          headers: {
+            "Content-Type":
+              "application/json",
 
-        body: JSON.stringify({
-          model: "openai/gpt-5.6-sol",
-
-          reasoning: {
-            effort: "high"
+            Authorization:
+              `Bearer ${process.env.AI_GATEWAY_API_KEY}`
           },
 
-          input: [
-            {
-              type: "message",
-              role: "user",
+          body: JSON.stringify({
 
-              content: [
+            model:
+              "openai/gpt-5.6-sol",
 
-                {
-                  type: "input_text",
-                  text: prompt
-                },
+            reasoning: {
+              effort: "high"
+            },
 
-                {
-                  type: "input_text",
-                  text:
-                    `QUESTION PAPER FILE: ${questionPaperName}`
-                },
+            input: [
 
-                {
-                  type: "input_file",
-                  filename: questionPaperName || "question-paper.pdf",
-                  file_data:
-                    `data:application/pdf;base64,${questionPaperBase64}`
-                },
+              {
+                type: "message",
 
-                {
-                  type: "input_text",
-                  text:
-                    `SUGGESTED ANSWER FILE: ${suggestedAnswerName}`
-                },
+                role: "user",
 
-                {
-                  type: "input_file",
-                  filename: suggestedAnswerName || "suggested-answer.pdf",
-                  file_data:
-                    `data:application/pdf;base64,${suggestedAnswerBase64}`
-                },
+                content: [
 
-                {
-                  type: "input_text",
-                  text:
-                    `STUDENT ANSWER SHEET: ${answerSheetName}`
-                },
+                  {
+                    type: "input_text",
 
-                {
-                  type: "input_file",
-                  filename: answerSheetName || "answer-sheet.pdf",
-                  file_data:
-                    `data:application/pdf;base64,${answerSheetBase64}`
-                }
-
-              ]
-            }
-          ],
-
-          text: {
-            format: {
-              type: "json_schema",
-
-              name: "ca_exam_evaluation",
-
-              strict: true,
-
-              schema: {
-
-                type: "object",
-
-                properties: {
-
-                  overall_summary: {
-                    type: "string"
+                    text: prompt
                   },
 
-                  questions: {
+                  {
+                    type: "input_text",
 
-                    type: "array",
+                    text:
+                      `QUESTION PAPER: ${questionPaper.pathname}`
+                  },
 
-                    items: {
+                  {
+                    type: "input_file",
 
-                      type: "object",
+                    filename:
+                      questionPaper.pathname
+                        .split("/")
+                        .pop(),
 
-                      properties: {
+                    file_data:
+                      `data:application/pdf;base64,${questionPaperBase64}`
+                  },
 
-                        question_number: {
-                          type: "string"
+                  {
+                    type: "input_text",
+
+                    text:
+                      `SUGGESTED ANSWER: ${suggestedAnswer.pathname}`
+                  },
+
+                  {
+                    type: "input_file",
+
+                    filename:
+                      suggestedAnswer.pathname
+                        .split("/")
+                        .pop(),
+
+                    file_data:
+                      `data:application/pdf;base64,${suggestedAnswerBase64}`
+                  },
+
+                  {
+                    type: "input_text",
+
+                    text:
+                      `STUDENT ANSWER SHEET: ${answerSheetName || "answer-sheet.pdf"}`
+                  },
+
+                  {
+                    type: "input_file",
+
+                    filename:
+                      answerSheetName ||
+                      "answer-sheet.pdf",
+
+                    file_data:
+                      `data:application/pdf;base64,${answerSheetBase64}`
+                  }
+
+                ]
+              }
+
+            ],
+
+            text: {
+
+              format: {
+
+                type: "json_schema",
+
+                name:
+                  "ca_exam_evaluation",
+
+                strict: true,
+
+                schema: {
+
+                  type: "object",
+
+                  properties: {
+
+                    overall_summary: {
+                      type: "string"
+                    },
+
+                    questions: {
+
+                      type: "array",
+
+                      items: {
+
+                        type: "object",
+
+                        properties: {
+
+                          question_number: {
+                            type: "string"
+                          },
+
+                          marks_available: {
+                            type: "number"
+                          },
+
+                          marks_awarded: {
+                            type: "number"
+                          },
+
+                          status: {
+
+                            type: "string",
+
+                            enum: [
+                              "correct",
+                              "partially_correct",
+                              "incorrect",
+                              "not_attempted",
+                              "unclear"
+                            ]
+
+                          },
+
+                          remarks: {
+                            type: "string"
+                          }
+
                         },
 
-                        marks_available: {
-                          type: "number"
-                        },
+                        required: [
+                          "question_number",
+                          "marks_available",
+                          "marks_awarded",
+                          "status",
+                          "remarks"
+                        ],
 
-                        marks_awarded: {
-                          type: "number"
-                        },
+                        additionalProperties:
+                          false
 
-                        status: {
+                      }
 
-                          type: "string",
+                    },
 
-                          enum: [
-                            "correct",
-                            "partially_correct",
-                            "incorrect",
-                            "not_attempted",
-                            "unclear"
-                          ]
+                    total_marks: {
+                      type: "number"
+                    },
 
-                        },
+                    maximum_marks: {
+                      type: "number"
+                    },
 
-                        remarks: {
-                          type: "string"
-                        }
-
-                      },
-
-                      required: [
-                        "question_number",
-                        "marks_available",
-                        "marks_awarded",
-                        "status",
-                        "remarks"
-                      ],
-
-                      additionalProperties: false
-
+                    percentage: {
+                      type: "number"
                     }
 
                   },
 
-                  total_marks: {
-                    type: "number"
-                  },
+                  required: [
+                    "overall_summary",
+                    "questions",
+                    "total_marks",
+                    "maximum_marks",
+                    "percentage"
+                  ],
 
-                  maximum_marks: {
-                    type: "number"
-                  },
+                  additionalProperties:
+                    false
 
-                  percentage: {
-                    type: "number"
-                  }
-
-                },
-
-                required: [
-                  "overall_summary",
-                  "questions",
-                  "total_marks",
-                  "maximum_marks",
-                  "percentage"
-                ],
-
-                additionalProperties: false
+                }
 
               }
 
             }
-          }
-        })
-      }
-    );
+
+          })
+        }
+      );
 
     /* ==================================================
-       READ AI RESPONSE
+       AI RESPONSE
     ================================================== */
 
-    const rawResult = await response.json();
+    const rawResult =
+      await aiResponse.json();
 
-    if (!response.ok) {
+    if (!aiResponse.ok) {
 
       console.error(
         "AI Gateway error:",
@@ -450,53 +584,58 @@ Return ONLY the requested JSON.
       );
 
       return res.status(500).json({
-        error: "AI evaluation failed.",
+
+        error:
+          "AI evaluation failed.",
+
         details:
           rawResult?.error?.message ||
           rawResult?.message ||
-          "Unknown AI Gateway error."
+          "Unknown AI error."
+
       });
 
     }
 
-    /* ==================================================
-       EXTRACT OUTPUT TEXT
-    ================================================== */
-
     let outputText = "";
 
-    if (typeof rawResult.output_text === "string") {
+    if (
+      typeof rawResult.output_text ===
+      "string"
+    ) {
 
       outputText =
         rawResult.output_text;
 
-    } else if (Array.isArray(rawResult.output)) {
+    } else if (
+      Array.isArray(
+        rawResult.output
+      )
+    ) {
 
       for (
-        const outputItem
+        const item
         of rawResult.output
       ) {
 
         if (
           !Array.isArray(
-            outputItem.content
+            item.content
           )
-        ) {
-          continue;
-        }
+        ) continue;
 
         for (
-          const contentItem
-          of outputItem.content
+          const content
+          of item.content
         ) {
 
           if (
-            typeof contentItem.text ===
+            typeof content.text ===
             "string"
           ) {
 
             outputText +=
-              contentItem.text;
+              content.text;
 
           }
 
@@ -508,11 +647,6 @@ Return ONLY the requested JSON.
 
     if (!outputText) {
 
-      console.error(
-        "AI response contained no text:",
-        rawResult
-      );
-
       return res.status(500).json({
         error:
           "AI returned an empty evaluation."
@@ -521,7 +655,7 @@ Return ONLY the requested JSON.
     }
 
     /* ==================================================
-       PARSE JSON
+       PARSE
     ================================================== */
 
     let evaluation;
@@ -529,9 +663,11 @@ Return ONLY the requested JSON.
     try {
 
       evaluation =
-        JSON.parse(outputText);
+        JSON.parse(
+          outputText
+        );
 
-    } catch (error) {
+    } catch {
 
       console.error(
         "Invalid AI JSON:",
@@ -546,7 +682,7 @@ Return ONLY the requested JSON.
     }
 
     /* ==================================================
-       SERVER-SIDE SCORE VALIDATION
+       SCORE VALIDATION
     ================================================== */
 
     if (
@@ -558,12 +694,12 @@ Return ONLY the requested JSON.
 
       return res.status(500).json({
         error:
-          "AI evaluation structure is invalid."
+          "Invalid evaluation structure."
       });
 
     }
 
-    let calculatedTotal = 0;
+    let total = 0;
 
     for (
       const question
@@ -580,30 +716,42 @@ Return ONLY the requested JSON.
           question.marks_awarded
         );
 
-      if (!Number.isFinite(available)) {
+      if (
+        !Number.isFinite(
+          available
+        )
+      ) {
+
         return res.status(500).json({
           error:
-            "Invalid marks_available returned by AI."
+            "Invalid marks returned by AI."
         });
+
       }
 
-      if (!Number.isFinite(awarded)) {
+      if (
+        !Number.isFinite(
+          awarded
+        )
+      ) {
+
         awarded = 0;
-      }
 
-      /* Never allow negative marks. */
+      }
 
       if (awarded < 0) {
         awarded = 0;
       }
 
-      /* Never allow more than question maximum. */
+      if (
+        awarded >
+        available
+      ) {
 
-      if (awarded > available) {
-        awarded = available;
+        awarded =
+          available;
+
       }
-
-      /* Round to 2 decimals. */
 
       awarded =
         Math.round(
@@ -613,48 +761,45 @@ Return ONLY the requested JSON.
       question.marks_awarded =
         awarded;
 
-      calculatedTotal +=
-        awarded;
+      total += awarded;
 
     }
 
-    calculatedTotal =
+    total =
       Math.round(
-        calculatedTotal * 100
+        total * 100
       ) / 100;
 
-    /* Hard cap against descriptive maximum. */
-
     if (
-      calculatedTotal >
+      total >
       maximumMarks
     ) {
 
-      calculatedTotal =
+      total =
         maximumMarks;
 
     }
 
-    const calculatedPercentage =
+    const percentage =
       Math.round(
         (
-          calculatedTotal /
+          total /
           maximumMarks
         ) *
         10000
       ) / 100;
 
     evaluation.total_marks =
-      calculatedTotal;
+      total;
 
     evaluation.maximum_marks =
       maximumMarks;
 
     evaluation.percentage =
-      calculatedPercentage;
+      percentage;
 
     /* ==================================================
-       RETURN FINAL RESULT
+       FINAL RESPONSE
     ================================================== */
 
     return res.status(200).json({
@@ -666,6 +811,8 @@ Return ONLY the requested JSON.
       metadata: {
 
         subject,
+
+        subjectKey,
 
         testType:
           formattedTestType,
@@ -679,13 +826,14 @@ Return ONLY the requested JSON.
           maximumMarks,
 
         questionPaper:
-          questionPaperName,
+          questionPaper.pathname,
 
         suggestedAnswer:
-          suggestedAnswerName,
+          suggestedAnswer.pathname,
 
         answerSheet:
-          answerSheetName
+          answerSheetName ||
+          "answer-sheet.pdf"
 
       }
 
@@ -699,11 +847,16 @@ Return ONLY the requested JSON.
     );
 
     return res.status(500).json({
+
       error:
         "Unable to evaluate answer sheet.",
+
       details:
-        error?.message || "Unknown error"
+        error?.message ||
+        "Unknown error"
+
     });
 
   }
-}
+
+                            }
