@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CA Exam Checker</title>
+
+<title>CA Exam Checker V2</title>
 
 <style>
+
 *{
   box-sizing:border-box;
   margin:0;
@@ -14,102 +16,188 @@
 }
 
 body{
-  background:#0b0f19;
-  color:#fff;
+  background:#070b14;
+  color:#f8fafc;
   min-height:100vh;
 }
 
 header{
-  background:linear-gradient(135deg,#111827,#172554);
-  padding:25px 18px;
+  background:
+    radial-gradient(circle at top,#312e81 0%,transparent 45%),
+    linear-gradient(135deg,#0f172a,#111827);
+
+  padding:28px 18px;
   text-align:center;
   border-bottom:1px solid #26334d;
 }
 
 header h1{
-  font-size:30px;
-  margin-bottom:8px;
+  font-size:29px;
+  font-weight:800;
+  margin-bottom:7px;
 }
 
 header p{
-  color:#aeb8ca;
+  color:#94a3b8;
+  font-size:14px;
 }
 
 .container{
-  max-width:1000px;
+  max-width:900px;
   margin:auto;
-  padding:25px 16px 50px;
+  padding:20px 14px 45px;
 }
 
 .card{
-  background:#111827;
+  background:#0f172a;
   border:1px solid #26334d;
   border-radius:16px;
-  padding:22px;
-  margin-bottom:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  padding:20px;
+  margin-bottom:18px;
+  box-shadow:0 12px 30px rgba(0,0,0,.22);
 }
 
 .card h2{
-  margin-bottom:15px;
-  font-size:21px;
+  font-size:19px;
+  margin-bottom:17px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
 }
 
 label{
   display:block;
   color:#cbd5e1;
-  margin:13px 0 7px;
+  font-size:13px;
+  margin:12px 0 7px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  background:#080d18;
+  color:#fff;
+  border:1px solid #334155;
+  border-radius:9px;
+  padding:12px;
+  outline:none;
   font-size:14px;
 }
 
-input,select,textarea{
-  width:100%;
-  background:#0b1220;
-  color:white;
-  border:1px solid #334155;
-  border-radius:10px;
-  padding:12px;
-  outline:none;
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 2px rgba(99,102,241,.12);
 }
 
 textarea{
-  min-height:110px;
+  min-height:95px;
   resize:vertical;
-}
-
-input:focus,select:focus,textarea:focus{
-  border-color:#6366f1;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:15px;
 }
 
 button{
   border:0;
-  border-radius:10px;
-  padding:13px 18px;
-  font-size:15px;
-  font-weight:bold;
+  border-radius:9px;
+  padding:12px 17px;
+  font-size:14px;
+  font-weight:700;
   cursor:pointer;
-  margin-top:15px;
+  transition:.2s;
 }
 
 .primary{
-  background:#6366f1;
-  color:white;
   width:100%;
+  margin-top:18px;
+  background:linear-gradient(135deg,#6366f1,#4f46e5);
+  color:#fff;
 }
 
 .primary:hover{
-  background:#4f46e5;
+  transform:translateY(-1px);
+  background:linear-gradient(135deg,#818cf8,#6366f1);
 }
 
 .secondary{
+  margin-top:15px;
   background:#1e293b;
   color:#fff;
+  border:1px solid #334155;
+}
+
+.secondary:hover{
+  background:#273449;
+}
+
+.danger{
+  background:#3f1722;
+  color:#fda4af;
+  border:1px solid #7f1d1d;
+  margin-left:8px;
+}
+
+.question{
+  border:1px solid #293750;
+  background:#0b1220;
+  border-radius:13px;
+  padding:16px;
+  margin-top:14px;
+}
+
+.question-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.question-title{
+  font-size:16px;
+  font-weight:700;
+}
+
+.question-badge{
+  font-size:11px;
+  color:#a5b4fc;
+  background:#1e1b4b;
+  border:1px solid #3730a3;
+  padding:5px 8px;
+  border-radius:20px;
+}
+
+.marks-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.marks-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.marks-box input{
+  width:100%;
+}
+
+.marks-box span{
+  color:#94a3b8;
+  font-size:13px;
+  white-space:nowrap;
+}
+
+.remove-question{
+  margin-top:10px;
+  background:transparent;
+  color:#f87171;
+  padding:5px 0;
+  font-size:12px;
 }
 
 .result{
@@ -118,407 +206,1059 @@ button{
 
 .score{
   text-align:center;
-  padding:25px;
+  padding:26px 15px;
   border-radius:15px;
-  background:linear-gradient(135deg,#172554,#312e81);
-  margin-bottom:20px;
+  background:
+    radial-gradient(circle at top,#4338ca 0%,transparent 55%),
+    linear-gradient(135deg,#172554,#312e81);
+  border:1px solid #4338ca;
+}
+
+.score-label{
+  color:#c7d2fe;
+  font-size:13px;
+  margin-bottom:4px;
 }
 
 .score-number{
-  font-size:52px;
-  font-weight:bold;
+  font-size:48px;
+  font-weight:800;
+}
+
+.percentage{
+  color:#cbd5e1;
+  margin-top:4px;
 }
 
 .status{
   display:inline-block;
-  margin-top:10px;
-  padding:7px 15px;
-  border-radius:30px;
-  background:#16a34a;
-}
-
-.question{
-  border:1px solid #334155;
-  border-radius:12px;
-  padding:18px;
-  margin-top:15px;
-}
-
-.question-title{
-  font-weight:bold;
-  margin-bottom:12px;
-}
-
-.marks-row{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-
-.marks-row input{
-  width:120px;
-}
-
-.remark{
   margin-top:12px;
-  padding:12px;
-  background:#0b1220;
-  border-left:3px solid #6366f1;
-  color:#cbd5e1;
-  border-radius:5px;
+  padding:7px 17px;
+  border-radius:30px;
+  font-size:12px;
+  font-weight:800;
+  background:#166534;
+  color:#dcfce7;
 }
 
-.progress{
-  height:10px;
-  background:#1e293b;
-  border-radius:10px;
-  overflow:hidden;
-  margin-top:10px;
-}
-
-.progress-bar{
-  height:100%;
-  background:#6366f1;
-  width:0%;
+.status.fail{
+  background:#7f1d1d;
+  color:#fee2e2;
 }
 
 .summary{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin-top:20px;
+  gap:10px;
+  margin-top:15px;
 }
 
 .stat{
-  background:#0b1220;
+  background:#080d18;
   border:1px solid #26334d;
-  padding:18px;
+  padding:15px 8px;
   text-align:center;
-  border-radius:12px;
+  border-radius:11px;
 }
 
 .stat strong{
   display:block;
-  font-size:25px;
-  margin-bottom:5px;
+  font-size:22px;
+  margin-bottom:4px;
+}
+
+.stat span{
+  color:#94a3b8;
+  font-size:11px;
+}
+
+.examiner{
+  margin-top:16px;
+  padding:17px;
+  background:#0b1220;
+  border:1px solid #26334d;
+  border-radius:12px;
+}
+
+.examiner h2{
+  margin-bottom:12px;
+}
+
+.progress{
+  height:9px;
+  background:#1e293b;
+  border-radius:20px;
+  overflow:hidden;
+  margin-bottom:15px;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#6366f1,#8b5cf6);
+  transition:width .5s ease;
+}
+
+.remark{
+  padding:13px;
+  background:#080d18;
+  border-left:3px solid #6366f1;
+  border-radius:5px;
+  color:#cbd5e1;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.checked-list{
+  margin-top:15px;
+}
+
+.checked-item{
+  padding:13px;
+  border:1px solid #26334d;
+  background:#080d18;
+  border-radius:10px;
+  margin-top:9px;
+}
+
+.checked-item strong{
+  color:#a5b4fc;
+}
+
+.checked-item p{
+  color:#94a3b8;
+  font-size:12px;
+  margin-top:6px;
+  line-height:1.5;
+}
+
+.result-actions{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+
+.result-actions button{
+  flex:1;
 }
 
 footer{
   text-align:center;
-  color:#64748b;
-  padding:20px;
+  color:#475569;
+  padding:20px 10px;
+  font-size:11px;
 }
 
-@media(max-width:700px){
+.small-note{
+  color:#64748b;
+  font-size:11px;
+  margin-top:7px;
+}
+
+@media(max-width:650px){
+
+  header{
+    padding:23px 15px;
+  }
+
+  header h1{
+    font-size:24px;
+  }
+
   .grid{
     grid-template-columns:1fr;
   }
 
-  .summary{
+  .marks-row{
     grid-template-columns:1fr;
   }
 
-  header h1{
-    font-size:25px;
+  .summary{
+    grid-template-columns:1fr 1fr 1fr;
   }
+
+  .card{
+    padding:16px;
+  }
+
+  .score-number{
+    font-size:44px;
+  }
+
+  .result-actions{
+    flex-direction:column;
+  }
+
 }
+
 </style>
 </head>
 
 <body>
 
 <header>
+
   <h1>CA Exam Checker</h1>
-  <p>Professional CA Answer Sheet Evaluation</p>
+
+  <p>
+    Professional CA Answer Sheet Evaluation System
+  </p>
+
 </header>
+
 
 <div class="container">
 
-  <div class="card">
-    <h2>📋 Exam Details</h2>
 
-    <div class="grid">
+<!-- EXAM DETAILS -->
 
-      <div>
-        <label>Student Name</label>
-        <input id="studentName" placeholder="Enter student name">
-      </div>
+<div class="card">
 
-      <div>
-        <label>Subject</label>
-        <select id="subject">
-          <option>Advanced Accounts</option>
-          <option>Corporate & Other Laws</option>
-          <option>Taxation</option>
-          <option>Cost & Management Accounting</option>
-          <option>Auditing</option>
-          <option>Financial Management</option>
-          <option>Strategic Management</option>
-        </select>
-      </div>
+  <h2>📋 Exam Details</h2>
 
-      <div>
-        <label>Exam / Test</label>
-        <input id="examName" placeholder="e.g. CA Inter MTP">
-      </div>
+  <div class="grid">
 
-      <div>
-        <label>Total Marks</label>
-        <input id="totalMarks" type="number" value="100">
-      </div>
+    <div>
+
+      <label>Student Name</label>
+
+      <input
+        id="studentName"
+        placeholder="Enter student name"
+      >
 
     </div>
 
-    <label>General Examiner Remarks</label>
-    <textarea id="generalRemark" placeholder="Write overall remarks..."></textarea>
 
-    <button class="primary" onclick="generateChecker()">
-      Generate Checked Result
-    </button>
+    <div>
+
+      <label>Subject</label>
+
+      <select id="subject">
+
+        <option>Advanced Accounts</option>
+        <option>Corporate & Other Laws</option>
+        <option>Taxation</option>
+        <option>Cost & Management Accounting</option>
+        <option>Auditing</option>
+        <option>Financial Management</option>
+        <option>Strategic Management</option>
+
+      </select>
+
+    </div>
+
+
+    <div>
+
+      <label>Exam / Test Name</label>
+
+      <input
+        id="examName"
+        placeholder="e.g. CA Inter MTP"
+      >
+
+    </div>
+
+
+    <div>
+
+      <label>Total Marks</label>
+
+      <input
+        id="totalMarks"
+        type="number"
+        min="1"
+        value="100"
+      >
+
+    </div>
+
   </div>
 
 
-  <div class="card">
-    <h2>✍️ Question-wise Checking</h2>
+  <label>General Examiner Remarks</label>
 
-    <div id="questions">
-
-      <div class="question">
-        <div class="question-title">Question 1</div>
-
-        <label>Marks Obtained</label>
-        <div class="marks-row">
-          <input class="qmarks" type="number" min="0" value="0">
-          <span>/ 20</span>
-        </div>
-
-        <label>Examiner Remark</label>
-        <textarea class="qremark" placeholder="e.g. Good attempt, calculation error..."></textarea>
-      </div>
-
-      <div class="question">
-        <div class="question-title">Question 2</div>
-
-        <label>Marks Obtained</label>
-        <div class="marks-row">
-          <input class="qmarks" type="number" min="0" value="0">
-          <span>/ 20</span>
-        </div>
-
-        <label>Examiner Remark</label>
-        <textarea class="qremark" placeholder="Write remark..."></textarea>
-      </div>
-
-      <div class="question">
-        <div class="question-title">Question 3</div>
-
-        <label>Marks Obtained</label>
-        <div class="marks-row">
-          <input class="qmarks" type="number" min="0" value="0">
-          <span>/ 20</span>
-        </div>
-
-        <label>Examiner Remark</label>
-        <textarea class="qremark" placeholder="Write remark..."></textarea>
-      </div>
-
-      <div class="question">
-        <div class="question-title">Question 4</div>
-
-        <label>Marks Obtained</label>
-        <div class="marks-row">
-          <input class="qmarks" type="number" min="0" value="0">
-          <span>/ 20</span>
-        </div>
-
-        <label>Examiner Remark</label>
-        <textarea class="qremark" placeholder="Write remark..."></textarea>
-      </div>
-
-      <div class="question">
-        <div class="question-title">Question 5</div>
-
-        <label>Marks Obtained</label>
-        <div class="marks-row">
-          <input class="qmarks" type="number" min="0" value="0">
-          <span>/ 20</span>
-        </div>
-
-        <label>Examiner Remark</label>
-        <textarea class="qremark" placeholder="Write remark..."></textarea>
-      </div>
-
-    </div>
-
-    <button class="secondary" onclick="addQuestion()">
-      + Add Question
-    </button>
-  </div>
+  <textarea
+    id="generalRemark"
+    placeholder="Write overall examiner remarks..."
+  ></textarea>
 
 
-  <div class="card result" id="result">
+  <button
+    class="primary"
+    onclick="generateChecker()"
+  >
+    Generate Checked Result
+  </button>
 
-    <div class="score">
-      <div>Final Score</div>
-      <div class="score-number" id="finalScore">0</div>
-      <div id="percentage">0%</div>
-      <div class="status" id="status">PASS</div>
-    </div>
+</div>
 
-    <div class="summary">
-      <div class="stat">
-        <strong id="attempted">0</strong>
-        Questions
-      </div>
 
-      <div class="stat">
-        <strong id="average">0</strong>
-        Average
-      </div>
 
-      <div class="stat">
-        <strong id="grade">-</strong>
-        Grade
-      </div>
-    </div>
+<!-- QUESTION CHECKING -->
+
+<div class="card">
+
+  <h2>✍️ Question-wise Checking</h2>
+
+  <div id="questions">
+
+
+    <!-- QUESTION 1 -->
 
     <div class="question">
-      <h2>📊 Examiner Summary</h2>
 
-      <div class="progress">
-        <div class="progress-bar" id="progress"></div>
+      <div class="question-header">
+
+        <div class="question-title">
+          Question 1
+        </div>
+
+        <div class="question-badge">
+          20 Marks
+        </div>
+
       </div>
 
-      <div class="remark" id="finalRemark"></div>
+
+      <div class="marks-row">
+
+        <div>
+
+          <label>Marks Obtained</label>
+
+          <div class="marks-box">
+
+            <input
+              class="qmarks"
+              type="number"
+              min="0"
+              value="0"
+            >
+
+            <span>/ 20</span>
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <label>Maximum Marks</label>
+
+          <input
+            class="qmax"
+            type="number"
+            min="1"
+            value="20"
+          >
+
+        </div>
+
+      </div>
+
+
+      <label>Examiner Remark</label>
+
+      <textarea
+        class="qremark"
+        placeholder="e.g. Correct approach but calculation error..."
+      ></textarea>
+
     </div>
+
+
+
+    <!-- QUESTION 2 -->
+
+    <div class="question">
+
+      <div class="question-header">
+
+        <div class="question-title">
+          Question 2
+        </div>
+
+        <div class="question-badge">
+          20 Marks
+        </div>
+
+      </div>
+
+
+      <div class="marks-row">
+
+        <div>
+
+          <label>Marks Obtained</label>
+
+          <div class="marks-box">
+
+            <input
+              class="qmarks"
+              type="number"
+              min="0"
+              value="0"
+            >
+
+            <span>/ 20</span>
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <label>Maximum Marks</label>
+
+          <input
+            class="qmax"
+            type="number"
+            min="1"
+            value="20"
+          >
+
+        </div>
+
+      </div>
+
+
+      <label>Examiner Remark</label>
+
+      <textarea
+        class="qremark"
+        placeholder="Write examiner remark..."
+      ></textarea>
+
+    </div>
+
+
+
+    <!-- QUESTION 3 -->
+
+    <div class="question">
+
+      <div class="question-header">
+
+        <div class="question-title">
+          Question 3
+        </div>
+
+        <div class="question-badge">
+          20 Marks
+        </div>
+
+      </div>
+
+
+      <div class="marks-row">
+
+        <div>
+
+          <label>Marks Obtained</label>
+
+          <div class="marks-box">
+
+            <input
+              class="qmarks"
+              type="number"
+              min="0"
+              value="0"
+            >
+
+            <span>/ 20</span>
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <label>Maximum Marks</label>
+
+          <input
+            class="qmax"
+            type="number"
+            min="1"
+            value="20"
+          >
+
+        </div>
+
+      </div>
+
+
+      <label>Examiner Remark</label>
+
+      <textarea
+        class="qremark"
+        placeholder="Write examiner remark..."
+      ></textarea>
+
+    </div>
+
+
+
+    <!-- QUESTION 4 -->
+
+    <div class="question">
+
+      <div class="question-header">
+
+        <div class="question-title">
+          Question 4
+        </div>
+
+        <div class="question-badge">
+          20 Marks
+        </div>
+
+      </div>
+
+
+      <div class="marks-row">
+
+        <div>
+
+          <label>Marks Obtained</label>
+
+          <div class="marks-box">
+
+            <input
+              class="qmarks"
+              type="number"
+              min="0"
+              value="0"
+            >
+
+            <span>/ 20</span>
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <label>Maximum Marks</label>
+
+          <input
+            class="qmax"
+            type="number"
+            min="1"
+            value="20"
+          >
+
+        </div>
+
+      </div>
+
+
+      <label>Examiner Remark</label>
+
+      <textarea
+        class="qremark"
+        placeholder="Write examiner remark..."
+      ></textarea>
+
+    </div>
+
+
+
+    <!-- QUESTION 5 -->
+
+    <div class="question">
+
+      <div class="question-header">
+
+        <div class="question-title">
+          Question 5
+        </div>
+
+        <div class="question-badge">
+          20 Marks
+        </div>
+
+      </div>
+
+
+      <div class="marks-row">
+
+        <div>
+
+          <label>Marks Obtained</label>
+
+          <div class="marks-box">
+
+            <input
+              class="qmarks"
+              type="number"
+              min="0"
+              value="0"
+            >
+
+            <span>/ 20</span>
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <label>Maximum Marks</label>
+
+          <input
+            class="qmax"
+            type="number"
+            min="1"
+            value="20"
+          >
+
+        </div>
+
+      </div>
+
+
+      <label>Examiner Remark</label>
+
+      <textarea
+        class="qremark"
+        placeholder="Write examiner remark..."
+      ></textarea>
+
+    </div>
+
+
+  </div>
+
+
+  <button
+    class="secondary"
+    onclick="addQuestion()"
+  >
+    + Add Question
+  </button>
+
+</div>
+
+
+
+<!-- RESULT -->
+
+<div
+  class="card result"
+  id="result"
+>
+
+  <div class="score">
+
+    <div class="score-label">
+      FINAL SCORE
+    </div>
+
+    <div
+      class="score-number"
+      id="finalScore"
+    >
+      0 / 100
+    </div>
+
+    <div
+      class="percentage"
+      id="percentage"
+    >
+      0%
+    </div>
+
+    <div
+      class="status"
+      id="status"
+    >
+      PASS
+    </div>
+
+  </div>
+
+
+
+  <div class="summary">
+
+    <div class="stat">
+
+      <strong id="attempted">
+        0
+      </strong>
+
+      <span>
+        Questions
+      </span>
+
+    </div>
+
+
+    <div class="stat">
+
+      <strong id="average">
+        0
+      </strong>
+
+      <span>
+        Average
+      </span>
+
+    </div>
+
+
+    <div class="stat">
+
+      <strong id="grade">
+        -
+      </strong>
+
+      <span>
+        Grade
+      </span>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="examiner">
+
+    <h2>
+      📊 Examiner Summary
+    </h2>
+
+
+    <div class="progress">
+
+      <div
+        class="progress-bar"
+        id="progress"
+      ></div>
+
+    </div>
+
+
+    <div
+      class="remark"
+      id="finalRemark"
+    ></div>
+
+
+    <div
+      class="checked-list"
+      id="checkedList"
+    ></div>
+
+  </div>
+
+
+  <div class="result-actions">
+
+    <button
+      class="secondary"
+      onclick="window.print()"
+    >
+      🖨️ Print Result
+    </button>
+
+    <button
+      class="danger"
+      onclick="resetChecker()"
+    >
+      ↻ Reset
+    </button>
 
   </div>
 
 </div>
 
+</div>
+
+
 <footer>
-  CA Exam Checker • For educational evaluation purposes
+
+  CA Exam Checker V2 • Educational Evaluation System
+
 </footer>
+
 
 
 <script>
 
 let questionCount = 5;
 
+
+/* ADD QUESTION */
+
 function addQuestion(){
 
   questionCount++;
 
-  const questions = document.getElementById("questions");
+  const questions =
+    document.getElementById("questions");
 
-  const div = document.createElement("div");
+
+  const div =
+    document.createElement("div");
 
   div.className = "question";
 
-  div.innerHTML = `
-    <div class="question-title">Question ${questionCount}</div>
 
-    <label>Marks Obtained</label>
+  div.innerHTML = `
+
+    <div class="question-header">
+
+      <div class="question-title">
+        Question ${questionCount}
+      </div>
+
+      <div class="question-badge">
+        20 Marks
+      </div>
+
+    </div>
+
 
     <div class="marks-row">
-      <input class="qmarks" type="number" min="0" value="0">
-      <span>/ 20</span>
+
+      <div>
+
+        <label>Marks Obtained</label>
+
+        <div class="marks-box">
+
+          <input
+            class="qmarks"
+            type="number"
+            min="0"
+            value="0"
+          >
+
+          <span>/ 20</span>
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <label>Maximum Marks</label>
+
+        <input
+          class="qmax"
+          type="number"
+          min="1"
+          value="20"
+        >
+
+      </div>
+
     </div>
+
 
     <label>Examiner Remark</label>
 
-    <textarea class="qremark"
-      placeholder="Write remark..."></textarea>
+    <textarea
+      class="qremark"
+      placeholder="Write examiner remark..."
+    ></textarea>
+
+
+    <button
+      class="remove-question"
+      onclick="this.parentElement.remove()"
+    >
+      ✕ Remove Question
+    </button>
+
   `;
 
+
   questions.appendChild(div);
+
 }
 
+
+
+/* GENERATE RESULT */
 
 function generateChecker(){
 
   const name =
-    document.getElementById("studentName").value || "Student";
+    document.getElementById("studentName")
+    .value.trim() || "Student";
+
 
   const subject =
-    document.getElementById("subject").value;
+    document.getElementById("subject")
+    .value;
+
 
   const exam =
-    document.getElementById("examName").value || "CA Examination";
+    document.getElementById("examName")
+    .value.trim() || "CA Examination";
+
 
   const totalMarks =
-    Number(document.getElementById("totalMarks").value) || 100;
+    Number(
+      document.getElementById("totalMarks")
+      .value
+    ) || 100;
 
-  const marks =
-    [...document.querySelectorAll(".qmarks")];
+
+  const questionBoxes =
+    [...document.querySelectorAll(".question")];
+
 
   let obtained = 0;
 
-  marks.forEach(input => {
+  let maximum = 0;
 
-    let value = Number(input.value) || 0;
 
-    if(value < 0) value = 0;
+  questionBoxes.forEach(box => {
 
-    if(value > 20) value = 20;
+    const marksInput =
+      box.querySelector(".qmarks");
 
-    input.value = value;
+    const maxInput =
+      box.querySelector(".qmax");
 
-    obtained += value;
+
+    let marks =
+      Number(marksInput.value) || 0;
+
+    let max =
+      Number(maxInput.value) || 20;
+
+
+    if(max < 1)
+      max = 1;
+
+
+    if(marks < 0)
+      marks = 0;
+
+
+    if(marks > max)
+      marks = max;
+
+
+    marksInput.value = marks;
+
+    maxInput.value = max;
+
+
+    obtained += marks;
+
+    maximum += max;
 
   });
 
 
-  const percentage =
-    totalMarks > 0
-    ? (obtained / totalMarks) * 100
+
+  /* SCALE TO TOTAL MARKS */
+
+  let finalScore =
+    maximum > 0
+    ? (obtained / maximum) * totalMarks
     : 0;
 
 
-  let status =
-    percentage >= 40 ? "PASS" : "FAIL";
+  finalScore =
+    Math.round(finalScore * 100) / 100;
 
+
+  const percentage =
+    totalMarks > 0
+    ? (finalScore / totalMarks) * 100
+    : 0;
+
+
+
+  /* STATUS */
+
+  const status =
+    percentage >= 40
+    ? "PASS"
+    : "FAIL";
+
+
+  /* GRADE */
 
   let grade;
 
+
   if(percentage >= 80)
     grade = "A+";
+
   else if(percentage >= 70)
     grade = "A";
+
   else if(percentage >= 60)
     grade = "B";
+
   else if(percentage >= 50)
     grade = "C";
+
   else if(percentage >= 40)
     grade = "D";
+
   else
     grade = "F";
 
 
+
+  /* UPDATE SCORE */
+
   document.getElementById("finalScore")
     .textContent =
-    obtained + " / " + totalMarks;
+    finalScore.toFixed(1)
+    + " / "
+    + totalMarks;
 
 
   document.getElementById("percentage")
     .textContent =
-    percentage.toFixed(1) + "%";
+    percentage.toFixed(1)
+    + "%";
 
 
-  document.getElementById("status")
-    .textContent =
+  const statusElement =
+    document.getElementById("status");
+
+
+  statusElement.textContent =
     status;
+
+
+  if(status === "FAIL")
+    statusElement.classList.add("fail");
+
+  else
+    statusElement.classList.remove("fail");
+
 
 
   document.getElementById("attempted")
     .textContent =
-    marks.length;
+    questionBoxes.length;
 
 
   document.getElementById("average")
     .textContent =
-    marks.length
-    ? (obtained / marks.length).toFixed(1)
+    questionBoxes.length
+    ? (obtained / questionBoxes.length)
+      .toFixed(1)
     : "0";
 
 
@@ -529,55 +1269,214 @@ function generateChecker(){
 
   document.getElementById("progress")
     .style.width =
-    Math.min(percentage,100) + "%";
+    Math.min(percentage,100)
+    + "%";
 
+
+
+  /* GENERAL REMARK */
 
   let remark =
-    document.getElementById("generalRemark").value;
+    document.getElementById("generalRemark")
+    .value.trim();
+
 
   if(!remark){
 
-    if(percentage >= 80)
-      remark =
-      "Excellent performance. Strong conceptual understanding and good exam presentation.";
+    if(percentage >= 80){
 
-    else if(percentage >= 60)
       remark =
-      "Good attempt. Concepts are mostly clear, but accuracy and presentation can be improved.";
+      "Excellent performance. Strong conceptual understanding, good accuracy and effective answer presentation.";
 
-    else if(percentage >= 40)
-      remark =
-      "Satisfactory attempt. More revision, practice and better answer presentation are recommended.";
+    }
 
-    else
+    else if(percentage >= 60){
+
       remark =
-      "Needs significant improvement. Focus on concepts, revision and question practice.";
+      "Good attempt. Concepts are mostly clear. Focus on accuracy, working notes and better presentation.";
+
+    }
+
+    else if(percentage >= 40){
+
+      remark =
+      "Satisfactory attempt. More revision and question practice is required. Improve conceptual clarity and answer presentation.";
+
+    }
+
+    else{
+
+      remark =
+      "Needs significant improvement. Focus on conceptual clarity, revision, question practice and proper exam presentation.";
+
+    }
 
   }
 
 
+
   document.getElementById("finalRemark")
     .innerHTML =
-    "<b>" + name + "</b> — " +
-    subject + " — " +
-    exam +
-    "<br><br>" +
-    remark;
+
+    "<b>"
+    + escapeHTML(name)
+    + "</b>"
+    + " — "
+    + escapeHTML(subject)
+    + " — "
+    + escapeHTML(exam)
+    + "<br><br>"
+    + escapeHTML(remark);
 
 
-  document.getElementById("result")
-    .style.display =
+
+  /* QUESTION SUMMARY */
+
+  const checkedList =
+    document.getElementById("checkedList");
+
+
+  checkedList.innerHTML =
+    "<h3 style='margin-bottom:10px;font-size:15px;'>Question-wise Result</h3>";
+
+
+  questionBoxes.forEach((box,index) => {
+
+    const marks =
+      Number(
+        box.querySelector(".qmarks").value
+      ) || 0;
+
+
+    const max =
+      Number(
+        box.querySelector(".qmax").value
+      ) || 20;
+
+
+    const qremark =
+      box.querySelector(".qremark")
+      .value.trim()
+      || "No specific remark provided.";
+
+
+    const item =
+      document.createElement("div");
+
+
+    item.className =
+      "checked-item";
+
+
+    item.innerHTML = `
+
+      <strong>
+        Question ${index + 1}
+      </strong>
+
+      <span style="float:right;color:#e2e8f0;">
+        ${marks} / ${max}
+      </span>
+
+      <p>
+        ${escapeHTML(qremark)}
+      </p>
+
+    `;
+
+
+    checkedList.appendChild(item);
+
+  });
+
+
+
+  /* SHOW RESULT */
+
+  const result =
+    document.getElementById("result");
+
+
+  result.style.display =
     "block";
 
 
-  document.getElementById("result")
-    .scrollIntoView({
-      behavior:"smooth"
-    });
+  result.scrollIntoView({
+    behavior:"smooth",
+    block:"start"
+  });
 
 }
 
-</script>
 
-</body>
-    </html>
+
+/* ESCAPE HTML */
+
+function escapeHTML(text){
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    text;
+
+  return div.innerHTML;
+
+}
+
+
+
+/* RESET */
+
+function resetChecker(){
+
+  if(
+    !confirm(
+      "Reset the complete checker?"
+    )
+  ){
+    return;
+  }
+
+
+  document
+    .getElementById("studentName")
+    .value = "";
+
+
+  document
+    .getElementById("examName")
+    .value = "";
+
+
+  document
+    .getElementById("generalRemark")
+    .value = "";
+
+
+  document
+    .getElementById("totalMarks")
+    .value = 100;
+
+
+  document
+    .getElementById("result")
+    .style.display = "none";
+
+
+  const questions =
+    document.getElementById("questions");
+
+
+  questions.innerHTML = "";
+
+
+  questionCount = 0;
+
+
+  for(let i=0;i<5;i++){
+
+    questionCount++;
+
+
+    const
