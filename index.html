@@ -6,12 +6,7 @@
 <title>CA Exam Checker</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial,Helvetica,sans-serif;
-}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
 
 body{
   background:#070b14;
@@ -20,27 +15,19 @@ body{
 }
 
 header{
-  background:
-    radial-gradient(circle at top,#312e81 0,transparent 42%),
-    linear-gradient(135deg,#0f172a,#111827);
-  padding:28px 18px;
+  padding:30px 18px;
   text-align:center;
+  background:
+    radial-gradient(circle at top,#312e81 0,transparent 45%),
+    linear-gradient(135deg,#0f172a,#111827);
   border-bottom:1px solid #26334d;
 }
 
-header h1{
-  font-size:30px;
-  font-weight:800;
-  margin-bottom:7px;
-}
-
-header p{
-  color:#94a3b8;
-  font-size:14px;
-}
+header h1{font-size:30px;margin-bottom:8px}
+header p{color:#94a3b8;font-size:14px}
 
 .container{
-  max-width:950px;
+  max-width:900px;
   margin:auto;
   padding:22px 15px 50px;
 }
@@ -51,37 +38,21 @@ header p{
   border-radius:18px;
   padding:22px;
   margin-bottom:18px;
-  box-shadow:0 12px 30px rgba(0,0,0,.25);
 }
 
-.card h2{
-  font-size:20px;
-  margin-bottom:17px;
-}
+h2{font-size:20px;margin-bottom:16px}
 
 .badge{
-  display:inline-flex;
+  display:inline-block;
   padding:6px 11px;
   border-radius:20px;
   font-size:12px;
   font-weight:bold;
-  margin-bottom:15px;
+  margin-bottom:14px;
 }
 
-.blue{
-  background:#1e3a8a;
-  color:#bfdbfe;
-}
-
-.green{
-  background:#14532d;
-  color:#bbf7d0;
-}
-
-.red{
-  background:#7f1d1d;
-  color:#fecaca;
-}
+.blue{background:#1e3a8a;color:#bfdbfe}
+.green{background:#14532d;color:#bbf7d0}
 
 .grid{
   display:grid;
@@ -96,9 +67,7 @@ label{
   margin:12px 0 7px;
 }
 
-input,
-select,
-textarea{
+input,select{
   width:100%;
   background:#080f1c;
   color:#fff;
@@ -106,44 +75,9 @@ textarea{
   border-radius:10px;
   padding:12px;
   outline:none;
-  font-size:14px;
 }
 
-input:focus,
-select:focus,
-textarea:focus{
-  border-color:#6366f1;
-}
-
-button{
-  border:0;
-  border-radius:10px;
-  padding:13px 18px;
-  font-weight:bold;
-  font-size:14px;
-  cursor:pointer;
-}
-
-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-.primary{
-  width:100%;
-  background:#6366f1;
-  color:white;
-  margin-top:18px;
-}
-
-.primary:hover{
-  background:#4f46e5;
-}
-
-.secondary{
-  background:#1e293b;
-  color:#fff;
-}
+input:focus,select:focus{border-color:#6366f1}
 
 .mode-grid{
   display:grid;
@@ -152,10 +86,10 @@ button:disabled{
 }
 
 .mode{
-  border:1px solid #334155;
-  background:#0b1220;
-  border-radius:13px;
   padding:16px;
+  border:1px solid #334155;
+  background:#080f1c;
+  border-radius:12px;
   cursor:pointer;
 }
 
@@ -178,167 +112,103 @@ button:disabled{
 .upload-box{
   border:2px dashed #334155;
   border-radius:15px;
-  padding:27px 18px;
+  padding:30px 18px;
   text-align:center;
   background:#080f1c;
 }
 
 .upload-icon{
-  font-size:38px;
-  margin-bottom:9px;
-}
-
-.upload-box h3{
-  margin-bottom:7px;
+  font-size:40px;
+  margin-bottom:10px;
 }
 
 .upload-box p{
   color:#94a3b8;
   font-size:13px;
-  margin-bottom:15px;
+  margin:8px 0 18px;
 }
 
 .file-label{
   display:inline-block;
-  background:#6366f1;
-  color:#fff;
   padding:12px 18px;
+  background:#6366f1;
   border-radius:10px;
   font-weight:bold;
   cursor:pointer;
 }
 
-.file-label:hover{
-  background:#4f46e5;
-}
+.file-label:hover{background:#4f46e5}
 
-input[type=file]{
-  display:none;
-}
+#answerFile{display:none}
 
 .file-info{
   display:none;
   margin-top:15px;
   padding:12px;
-  border-radius:10px;
   background:#111827;
   border:1px solid #26334d;
-  color:#cbd5e1;
-  font-size:13px;
+  border-radius:10px;
   text-align:left;
+  font-size:13px;
 }
 
-.info-box{
+button{
+  border:0;
+  border-radius:10px;
+  padding:13px 18px;
+  font-size:14px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.primary{
+  width:100%;
+  margin-top:18px;
+  background:#6366f1;
+  color:white;
+}
+
+.primary:hover{background:#4f46e5}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.info{
+  margin-top:15px;
+  padding:14px;
   background:#080f1c;
   border:1px solid #26334d;
-  border-radius:12px;
-  padding:15px;
-  margin-top:15px;
-}
-
-.info-box strong{
-  display:block;
-  margin-bottom:8px;
-}
-
-.info-box p{
+  border-radius:10px;
   color:#94a3b8;
   font-size:13px;
   line-height:1.6;
 }
 
-.marks{
-  color:#a5b4fc;
-  font-weight:bold;
-}
-
-.status-box{
+.status{
   display:none;
   margin-top:18px;
   padding:15px;
   border-radius:12px;
-  background:#0b1220;
-  border:1px solid #334155;
-}
-
-.status-title{
-  font-weight:bold;
-  margin-bottom:6px;
-}
-
-.status-text{
-  color:#94a3b8;
+  line-height:1.6;
   font-size:13px;
-  line-height:1.5;
 }
 
 .success{
-  border-color:#166534;
+  display:block;
   background:#052e16;
+  border:1px solid #166534;
 }
 
 .error{
-  border-color:#991b1b;
+  display:block;
   background:#450a0a;
+  border:1px solid #991b1b;
 }
 
 .checkin{
   display:none;
-}
-
-.admin{
-  display:none;
-}
-
-.section-line{
-  height:1px;
-  background:#26334d;
-  margin:20px 0;
-}
-
-.result-box{
-  display:none;
-}
-
-.result-score{
-  text-align:center;
-  padding:25px;
-  background:linear-gradient(135deg,#172554,#312e81);
-  border-radius:15px;
-}
-
-.result-score .big{
-  font-size:48px;
-  font-weight:800;
-  margin:8px 0;
-}
-
-.result-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin-top:15px;
-}
-
-.stat{
-  background:#080f1c;
-  border:1px solid #26334d;
-  border-radius:12px;
-  padding:15px;
-  text-align:center;
-}
-
-.stat strong{
-  display:block;
-  font-size:23px;
-  margin-bottom:5px;
-}
-
-.note{
-  color:#64748b;
-  font-size:12px;
-  line-height:1.5;
-  margin-top:12px;
 }
 
 footer{
@@ -349,19 +219,8 @@ footer{
 }
 
 @media(max-width:700px){
-  header h1{
-    font-size:25px;
-  }
-
-  .grid,
-  .mode-grid,
-  .result-grid{
-    grid-template-columns:1fr;
-  }
-
-  .card{
-    padding:18px;
-  }
+  .grid,.mode-grid{grid-template-columns:1fr}
+  header h1{font-size:25px}
 }
 </style>
 </head>
@@ -375,894 +234,776 @@ footer{
 
 <div class="container">
 
-<!-- ================= STUDENT ================= -->
+<!-- STUDENT DETAILS -->
 
-<div id="studentPanel">
+<div class="card">
 
-  <div class="card">
+<span class="badge blue">STUDENT CHECK-IN</span>
 
-    <span class="badge blue">STUDENT CHECK-IN</span>
+<h2>👤 Student Details</h2>
 
-    <h2>👤 Student Details</h2>
+<div class="grid">
 
-    <div class="grid">
+<div>
+<label>Student Name</label>
+<input
+ id="studentName"
+ type="text"
+ placeholder="Enter full name">
+</div>
 
-      <div>
-        <label>Student Name</label>
-        <input
-          id="studentName"
-          type="text"
-          placeholder="Enter full name">
-      </div>
+<div>
+<label>Registration Number</label>
+<input
+ id="registrationNumber"
+ type="text"
+ placeholder="Enter ICAI registration number">
+</div>
 
-      <div>
-        <label>Registration Number</label>
-        <input
-          id="registrationNumber"
-          type="text"
-          placeholder="Enter registration number">
-      </div>
+<div>
+<label>Subject</label>
 
-      <div>
-        <label>Subject</label>
+<select id="subject" onchange="updateSubject()">
 
-        <select id="subject" onchange="updateMarks()">
+<option value="">Select Subject</option>
 
-          <option value="">Select Subject</option>
+<option value="advanced_accounts">
+Advanced Accounting
+</option>
 
-          <option value="advanced_accounts">
-            Advanced Accounting
-          </option>
+<option value="law">
+Corporate & Other Laws
+</option>
 
-          <option value="law">
-            Corporate & Other Laws
-          </option>
+<option value="taxation">
+Taxation
+</option>
 
-          <option value="taxation">
-            Taxation
-          </option>
+<option value="income_tax">
+Income Tax
+</option>
 
-          <option value="income_tax">
-            Income Tax
-          </option>
+<option value="gst">
+GST
+</option>
 
-          <option value="gst">
-            GST
-          </option>
+<option value="costing">
+Cost & Management Accounting
+</option>
 
-          <option value="costing">
-            Cost & Management Accounting
-          </option>
+<option value="audit">
+Auditing
+</option>
 
-          <option value="audit">
-            Auditing
-          </option>
+<option value="fm">
+Financial Management
+</option>
 
-          <option value="fm">
-            Financial Management
-          </option>
+<option value="sm">
+Strategic Management
+</option>
 
-          <option value="sm">
-            Strategic Management
-          </option>
+<option value="fm_sm">
+FM + SM
+</option>
 
-          <option value="fm_sm">
-            FM + SM
-          </option>
+</select>
+</div>
 
-        </select>
-      </div>
+<div>
+<label>Exam / Test</label>
+<input
+ id="examName"
+ type="text"
+ placeholder="CA Inter MTP / Mock Test">
+</div>
 
-      <div>
-        <label>Exam / Test</label>
+</div>
 
-        <input
-          id="examName"
-          type="text"
-          placeholder="CA Inter MTP / Mock Test">
-      </div>
-
-    </div>
-
-    <div class="info-box" id="marksInfo">
-
-      <strong>📊 Checking Structure</strong>
-
-      <p>
-        Select a subject to see its descriptive
-        checking limit.
-      </p>
-
-    </div>
-
-  </div>
-
-
-  <!-- CHECKING MODE -->
-
-  <div class="card">
-
-    <span class="badge green">CHECKING MODE</span>
-
-    <h2>⚙️ Evaluation Standard</h2>
-
-    <div class="mode-grid">
-
-      <div
-        class="mode active"
-        id="strictMode"
-        onclick="selectMode('strict')">
-
-        <div class="mode-title">
-          🧑‍⚖️ ICAI Strict Checking
-        </div>
-
-        <div class="mode-text">
-          Strict evaluation based on correctness,
-          concepts, working, relevant points and
-          proper answer presentation.
-        </div>
-
-      </div>
-
-      <div
-        class="mode"
-        id="moderateMode"
-        onclick="selectMode('moderate')">
-
-        <div class="mode-title">
-          📝 Moderate Checking
-        </div>
-
-        <div class="mode-text">
-          Balanced examiner-style evaluation with
-          reasonable step marking.
-        </div>
-
-      </div>
-
-    </div>
-
-    <p class="note">
-      The system evaluates only the descriptive
-      portion. MCQs are not evaluated by the AI checker.
-    </p>
-
-  </div>
-
-
-  <!-- ANSWER SHEET -->
-
-  <div class="card">
-
-    <span class="badge blue">ANSWER SHEET</span>
-
-    <h2>📄 Upload Answer Sheet</h2>
-
-    <div class="upload-box">
-
-      <div class="upload-icon">📑</div>
-
-      <h3>Upload your answer sheet</h3>
-
-      <p>
-        PDF recommended • Maximum recommended size 4 MB
-      </p>
-
-      <label
-        class="file-label"
-        for="answerFile">
-        Choose Answer Sheet
-      </label>
-
-      <input
-        id="answerFile"
-        type="file"
-        accept=".pdf,image/jpeg,image/png">
-
-      <div
-        class="file-info"
-        id="fileInfo">
-      </div>
-
-    </div>
-
-    <p class="note">
-      Your answer sheet is uploaded to private storage.
-      Only the examination submission will be used for checking.
-    </p>
-
-    <button
-      class="primary"
-      id="uploadButton"
-      onclick="uploadAnswerSheet()">
-      🚀 Submit Answer Sheet
-    </button>
-
-    <div
-      class="status-box"
-      id="statusBox">
-
-      <div
-        class="status-title"
-        id="statusTitle">
-      </div>
-
-      <div
-        class="status-text"
-        id="statusText">
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- CHECK-IN -->
-
-  <div
-    class="card checkin"
-    id="checkinCard">
-
-    <span class="badge green">
-      CHECK-IN COMPLETE
-    </span>
-
-    <h2>✅ Submission Received</h2>
-
-    <p
-      id="checkinText"
-      class="status-text">
-    </p>
-
-  </div>
-
-
-  <!-- RESULT -->
-
-  <div
-    class="card result-box"
-    id="resultBox">
-
-    <span class="badge green">
-      CHECKING COMPLETE
-    </span>
-
-    <h2>📊 Checked Result</h2>
-
-    <div class="result-score">
-
-      <div>Descriptive Score</div>
-
-      <div
-        class="big"
-        id="resultScore">
-        —
-      </div>
-
-      <div id="resultPercent">
-        —
-      </div>
-
-    </div>
-
-    <div class="result-grid">
-
-      <div class="stat">
-        <strong id="resultCorrect">—</strong>
-        Questions
-      </div>
-
-      <div class="stat">
-        <strong id="resultGrade">—</strong>
-        Grade
-      </div>
-
-      <div class="stat">
-        <strong id="resultMode">—</strong>
-        Mode
-      </div>
-
-    </div>
-
-    <button
-      class="primary"
-      onclick="downloadCheckedCopy()">
-      📄 View / Download Checked Copy
-    </button>
-
-  </div>
+<div class="info" id="subjectInfo">
+Select a subject to see its descriptive checking marks.
+</div>
 
 </div>
 
 
-<!-- ================= ADMIN ================= -->
+<!-- CHECKING MODE -->
 
-<div id="adminPanel" class="admin">
+<div class="card">
 
-  <div class="card">
+<span class="badge green">CHECKING MODE</span>
 
-    <span class="badge red">ADMIN / CHECKER</span>
+<h2>⚙️ Evaluation Standard</h2>
 
-    <h2>🔐 Test Material</h2>
+<div class="mode-grid">
 
-    <p class="status-text">
-      Upload the Question Paper and Suggested Answer.
-      These materials are used by the AI checker as
-      the reference for descriptive evaluation.
-    </p>
+<div
+ class="mode active"
+ id="strictMode"
+ onclick="setMode('strict')">
 
-    <label>Subject</label>
+<div class="mode-title">
+🧑‍⚖️ ICAI Strict Checking
+</div>
 
-    <select id="adminSubject">
+<div class="mode-text">
+Strict evaluation of concepts, calculations,
+working notes, relevant provisions and
+answer presentation.
+</div>
 
-      <option value="">Select Subject</option>
+</div>
 
-      <option value="advanced_accounts">
-        Advanced Accounting
-      </option>
+<div
+ class="mode"
+ id="moderateMode"
+ onclick="setMode('moderate')">
 
-      <option value="law">
-        Corporate & Other Laws
-      </option>
+<div class="mode-title">
+📝 Moderate Checking
+</div>
 
-      <option value="taxation">
-        Taxation
-      </option>
+<div class="mode-text">
+Balanced examiner-style checking with
+reasonable step marking.
+</div>
 
-      <option value="income_tax">
-        Income Tax
-      </option>
+</div>
 
-      <option value="gst">
-        GST
-      </option>
+</div>
 
-      <option value="costing">
-        Cost & Management Accounting
-      </option>
+<div class="info">
+<b>Important:</b> AI checking will evaluate only
+the descriptive portion. MCQs are excluded.
+</div>
 
-      <option value="audit">
-        Auditing
-      </option>
-
-      <option value="fm">
-        Financial Management
-      </option>
-
-      <option value="sm">
-        Strategic Management
-      </option>
-
-      <option value="fm_sm">
-        FM + SM
-      </option>
-
-    </select>
+</div>
 
 
-    <label>Question Paper</label>
+<!-- UPLOAD -->
 
-    <input
-      id="questionPaper"
-      type="file"
-      accept=".pdf,image/jpeg,image/png"
-      style="display:block">
+<div class="card">
+
+<span class="badge blue">ANSWER SHEET</span>
+
+<h2>📄 Upload Answer Sheet</h2>
+
+<div class="upload-box">
+
+<div class="upload-icon">📑</div>
+
+<h3>Select your answer sheet</h3>
+
+<p>PDF recommended • Maximum 4 MB</p>
+
+<label class="file-label" for="answerFile">
+Choose PDF
+</label>
+
+<input
+ id="answerFile"
+ type="file"
+ accept=".pdf,application/pdf,image/jpeg,image/png">
+
+<div
+ id="fileInfo"
+ class="file-info">
+</div>
+
+</div>
+
+<button
+ id="submitButton"
+ class="primary"
+ onclick="submitAnswerSheet()">
+
+🚀 Submit Answer Sheet
+
+</button>
+
+<div
+ id="status"
+ class="status">
+</div>
+
+</div>
 
 
-    <label>Suggested Answer</label>
+<!-- CHECK-IN RESULT -->
 
-    <input
-      id="suggestedAnswer"
-      type="file"
-      accept=".pdf,image/jpeg,image/png"
-      style="display:block">
+<div
+ id="checkin"
+ class="card checkin">
 
+<span class="badge green">
+CHECK-IN COMPLETE
+</span>
 
-    <div class="info-box">
+<h2>✅ Submission Received</h2>
 
-      <strong>AI Checking Rule</strong>
-
-      <p>
-        Only descriptive questions will be evaluated.
-        MCQs will not be checked. The AI must follow
-        the marks actually assigned to each descriptive
-        question and must never exceed the applicable
-        descriptive maximum.
-      </p>
-
-    </div>
-
-    <button
-      class="primary"
-      onclick="createTest()">
-      📚 Save Test Material
-    </button>
-
-    <div
-      class="status-box"
-      id="adminStatus">
-    </div>
-
-  </div>
+<div id="checkinText" class="info"></div>
 
 </div>
 
 </div>
 
 <footer>
-  CA Exam Checker • Educational evaluation platform
+CA Exam Checker • Educational evaluation platform
 </footer>
 
 
 <script>
 
-/* =====================================================
-   SUBJECT MARKING CONFIGURATION
-   ===================================================== */
+/* ================================
+   SUBJECT CONFIG
+================================ */
 
 const SUBJECTS = {
 
-  advanced_accounts:{
-    name:"Advanced Accounting",
-    descriptive:70,
-    paper:100,
-    mcq:30
-  },
+advanced_accounts:{
+name:"Advanced Accounting",
+paper:100,
+mcq:30,
+descriptive:70
+},
 
-  law:{
-    name:"Corporate & Other Laws",
-    descriptive:70,
-    paper:100,
-    mcq:30
-  },
+law:{
+name:"Corporate & Other Laws",
+paper:100,
+mcq:30,
+descriptive:70
+},
 
-  taxation:{
-    name:"Taxation",
-    descriptive:70,
-    paper:100,
-    mcq:30,
-    sections:{
-      "Income Tax":35,
-      "GST":35
-    }
-  },
+taxation:{
+name:"Taxation",
+paper:100,
+mcq:30,
+descriptive:70,
+incomeTax:35,
+gst:35
+},
 
-  income_tax:{
-    name:"Income Tax",
-    descriptive:35,
-    paper:50,
-    mcq:15
-  },
+income_tax:{
+name:"Income Tax",
+paper:50,
+mcq:15,
+descriptive:35
+},
 
-  gst:{
-    name:"GST",
-    descriptive:35,
-    paper:50,
-    mcq:15
-  },
+gst:{
+name:"GST",
+paper:50,
+mcq:15,
+descriptive:35
+},
 
-  costing:{
-    name:"Cost & Management Accounting",
-    descriptive:70,
-    paper:100,
-    mcq:30
-  },
+costing:{
+name:"Cost & Management Accounting",
+paper:100,
+mcq:30,
+descriptive:70
+},
 
-  audit:{
-    name:"Auditing",
-    descriptive:70,
-    paper:100,
-    mcq:30
-  },
+audit:{
+name:"Auditing",
+paper:100,
+mcq:30,
+descriptive:70
+},
 
-  fm:{
-    name:"Financial Management",
-    descriptive:35,
-    paper:50,
-    mcq:15
-  },
+fm:{
+name:"Financial Management",
+paper:50,
+mcq:15,
+descriptive:35
+},
 
-  sm:{
-    name:"Strategic Management",
-    descriptive:35,
-    paper:50,
-    mcq:15
-  },
+sm:{
+name:"Strategic Management",
+paper:50,
+mcq:15,
+descriptive:35
+},
 
-  fm_sm:{
-    name:"FM + SM",
-    descriptive:70,
-    paper:100,
-    mcq:30,
-    sections:{
-      "Financial Management":35,
-      "Strategic Management":35
-    }
-  }
+fm_sm:{
+name:"FM + SM",
+paper:100,
+mcq:30,
+descriptive:70,
+fm:35,
+sm:35
+}
 
 };
 
 
-/* =====================================================
+/* ================================
    STATE
-   ===================================================== */
+================================ */
 
 let checkingMode = "strict";
 let selectedFile = null;
-let lastSubmissionId = null;
 
 
-/* =====================================================
-   SUBJECT MARKS
-   ===================================================== */
+/* ================================
+   SUBJECT DISPLAY
+================================ */
 
-function updateMarks(){
+function updateSubject(){
 
-  const key =
-    document.getElementById("subject").value;
+const key =
+document.getElementById("subject").value;
 
-  const box =
-    document.getElementById("marksInfo");
+const info =
+document.getElementById("subjectInfo");
 
-  if(!key){
+if(!key){
 
-    box.innerHTML = `
-      <strong>📊 Checking Structure</strong>
-      <p>Select a subject to see its descriptive checking limit.</p>
-    `;
+info.innerHTML =
+"Select a subject to see its descriptive checking marks.";
 
-    return;
-  }
+return;
 
-  const subject =
-    SUBJECTS[key];
+}
 
-  let sectionText = "";
+const s = SUBJECTS[key];
 
-  if(subject.sections){
+if(key === "taxation"){
 
-    sectionText =
-      Object.entries(subject.sections)
-        .map(
-          ([name,marks]) =>
-          `${name}: <span class="marks">${marks} descriptive</span>`
-        )
-        .join("<br>");
-  }
+info.innerHTML =
+`
+<b>Taxation</b><br>
+Total Paper: 100<br>
+MCQ: 30 — Not checked<br>
+Descriptive: <b>70</b><br>
+Income Tax: <b>35</b> + GST: <b>35</b>
+`;
 
-  box.innerHTML = `
-    <strong>📊 ${subject.name}</strong>
+return;
 
-    <p>
-      Paper: ${subject.paper} marks<br>
-      MCQ: ${subject.mcq} marks — <b>Not evaluated</b><br>
-      Descriptive: <span class="marks">
-      ${subject.descriptive} marks
-      </span>
-      ${sectionText ? "<br><br>"+sectionText : ""}
-    </p>
-  `;
+}
+
+if(key === "fm_sm"){
+
+info.innerHTML =
+`
+<b>FM + SM</b><br>
+Total Paper: 100<br>
+MCQ: 30 — Not checked<br>
+Descriptive: <b>70</b><br>
+FM: <b>35</b> + SM: <b>35</b>
+`;
+
+return;
+
+}
+
+info.innerHTML =
+`
+<b>${s.name}</b><br>
+Total Paper: ${s.paper}<br>
+MCQ: ${s.mcq} — Not checked<br>
+Descriptive Checking Maximum:
+<b>${s.descriptive}</b>
+`;
 
 }
 
 
-/* =====================================================
-   MODE
-   ===================================================== */
+/* ================================
+   CHECKING MODE
+================================ */
 
-function selectMode(mode){
+function setMode(mode){
 
-  checkingMode = mode;
-
-  document
-    .getElementById("strictMode")
-    .classList.toggle(
-      "active",
-      mode === "strict"
-    );
-
-  document
-    .getElementById("moderateMode")
-    .classList.toggle(
-      "active",
-      mode === "moderate"
-    );
-
-}
-
-
-/* =====================================================
-   FILE SELECT
-   ===================================================== */
+checkingMode = mode;
 
 document
-  .getElementById("answerFile")
-  .addEventListener(
-    "change",
-    function(){
-
-      selectedFile =
-        this.files.length
-        ? this.files[0]
-        : null;
-
-      if(selectedFile){
-
-        const info =
-          document.getElementById("fileInfo");
-
-        const size =
-          (
-            selectedFile.size /
-            1024 /
-            1024
-          ).toFixed(2);
-
-        info.style.display = "block";
-
-        info.innerHTML =
-          "📎 <b>" +
-          escapeHTML(selectedFile.name) +
-          "</b><br>" +
-          size +
-          " MB";
-      }
-
-    }
-  );
-
-
-/* =====================================================
-   STUDENT UPLOAD
-   ===================================================== */
-
-async function uploadAnswerSheet(){
-
-  const name =
-    document
-      .getElementById("studentName")
-      .value
-      .trim();
-
-  const registrationNumber =
-    document
-      .getElementById("registrationNumber")
-      .value
-      .trim();
-
-  const subjectKey =
-    document
-      .getElementById("subject")
-      .value;
-
-  const exam =
-    document
-      .getElementById("examName")
-      .value
-      .trim();
-
-
-  if(!name){
-
-    showStatus(
-      "error",
-      "Missing Student Name",
-      "Please enter the student's name."
-    );
-
-    return;
-  }
-
-
-  if(!registrationNumber){
-
-    showStatus(
-      "error",
-      "Missing Registration Number",
-      "Please enter the registration number."
-    );
-
-    return;
-  }
-
-
-  if(!subjectKey){
-
-    showStatus(
-      "error",
-      "Subject Required",
-      "Please select a subject."
-    );
-
-    return;
-  }
-
-
-  if(!exam){
-
-    showStatus(
-      "error",
-      "Exam/Test Required",
-      "Please enter the exam or test name."
-    );
-
-    return;
-  }
-
-
-  if(!selectedFile){
-
-    showStatus(
-      "error",
-      "No Answer Sheet",
-      "Please select the answer sheet."
-    );
-
-    return;
-  }
-
-
-  const subject =
-    SUBJECTS[subjectKey];
-
-
-  const button =
-    document.getElementById("uploadButton");
-
-  button.disabled = true;
-
-  button.textContent =
-    "⏳ Uploading...";
-
-
-  try{
-
-    const base64 =
-      await fileToBase64(selectedFile);
-
-
-    /*
-      Existing working Blob endpoint is preserved.
-    */
-
-    const response =
-      await fetch(
-        "/api/upload",
-        {
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
-
-          body:JSON.stringify({
-
-            filename:
-              selectedFile.name,
-
-            data:
-              base64,
-
-            contentType:
-              selectedFile.type ||
-              "application/pdf",
-
-            studentName:
-              name,
-
-            registrationNumber:
-              registrationNumber,
-
-            subject:
-              subject.name,
-
-            subjectKey:
-              subjectKey,
-
-            exam:
-              exam,
-
-            checkingMode:
-              checkingMode,
-
-            descriptiveMaximum:
-              subject.descriptive
-
-          })
-
-        }
-      );
-
-
-    const result =
-      await response.json();
-
-
-    if(!response.ok){
-
-      throw new Error(
-        result.error ||
-        "Upload failed"
-      );
-
-    }
-
-
-    lastSubmissionId =
-      result.submissionId ||
-      result.id ||
-      null;
-
-
-    showStatus(
-      "success",
-      "Answer Sheet Uploaded ✓",
-      "Your answer sheet has been securely submitted."
-    );
-
-
-    document
-      .getElementById("checkinCard")
-      .style.display = "block";
-
-
-    document
-      .getElementById("checkinText")
-      .innerHTML =
-
-      "<b>" +
-      escapeHTML(name) +
-      "</b>, your submission has been received.<br><br>" +
-
-      "Registration Number: <b>" +
-      escapeHTML(registrationNumber) +
-      "</b><br>" +
-
-      "Subject: <b>" +
-      escapeHTML(subject.name) +
-      "</b><br>" +
-
-      "Exam/Test: <b>" +
-      escapeHTML(exam) +
-      "</b><br>" +
-
-      "Descriptive Checking Maximum: <b>" +
-      subject.descriptive +
-      "</b><br>" +
-
-      "Checking Mode: <b>" +
-      (
-        checkingMode === "strict"
-        ? "ICAI Strict Checking"
-        : "Moderate Checking"
-      ) +
-      "</b><br><br>" +
-
-      "MCQs are not evaluated by the AI checker.";
-
-
-  }catch(error){
-
-    console.error(error);
-
-    showStatus(
-      "error",
-      "Upload Failed",
-      error.message ||
-      "Something went wrong while uploading."
-    );
-
-  }
-
-
-  button.disabled = false;
-
-  button.textContent =
-    "🚀 Submit Answer Sheet";
+.getElementById("strictMode")
+.classList.toggle(
+"active",
+mode === "strict"
+);
+
+document
+.getElementById("moderateMode")
+.classList.toggle(
+"active",
+mode === "moderate"
+);
 
 }
 
 
-/* ==========================
+/* ================================
+   FILE SELECT
+================================ */
+
+document
+.getElementById("answerFile")
+.addEventListener(
+"change",
+function(){
+
+selectedFile =
+this.files.length
+? this.files[0]
+: null;
+
+showFile();
+
+}
+);
+
+
+function showFile(){
+
+const info =
+document.getElementById("fileInfo");
+
+if(!selectedFile){
+
+info.style.display = "none";
+return;
+
+}
+
+const size =
+(
+selectedFile.size /
+1024 /
+1024
+).toFixed(2);
+
+info.style.display = "block";
+
+info.innerHTML =
+`
+📎 <b>${escapeHTML(selectedFile.name)}</b>
+<br>
+${size} MB
+`;
+
+}
+
+
+/* ================================
+   SUBMIT
+================================ */
+
+async function submitAnswerSheet(){
+
+const name =
+document
+.getElementById("studentName")
+.value
+.trim();
+
+const registration =
+document
+.getElementById("registrationNumber")
+.value
+.trim();
+
+const subjectKey =
+document
+.getElementById("subject")
+.value;
+
+const exam =
+document
+.getElementById("examName")
+.value
+.trim();
+
+
+if(!name){
+
+showError("Please enter your name.");
+return;
+
+}
+
+if(!registration){
+
+showError("Please enter your ICAI registration number.");
+return;
+
+}
+
+if(!subjectKey){
+
+showError("Please select a subject.");
+return;
+
+}
+
+if(!exam){
+
+showError("Please enter the exam/test name.");
+return;
+
+}
+
+if(!selectedFile){
+
+showError("Please select your answer sheet PDF.");
+return;
+
+}
+
+if(
+selectedFile.type !== "application/pdf" &&
+!selectedFile.name.toLowerCase().endsWith(".pdf")
+){
+
+showError("Please upload a PDF answer sheet.");
+return;
+
+}
+
+if(selectedFile.size > 4 * 1024 * 1024){
+
+showError("PDF must be smaller than 4 MB.");
+return;
+
+}
+
+
+const subject =
+SUBJECTS[subjectKey];
+
+const button =
+document.getElementById("submitButton");
+
+button.disabled = true;
+button.textContent = "⏳ Uploading...";
+
+
+try{
+
+const base64 =
+await fileToBase64(selectedFile);
+
+
+/*
+ IMPORTANT:
+ This calls the same endpoint used
+ by your existing Blob setup.
+*/
+
+const response =
+await fetch(
+"/api/upload",
+{
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:JSON.stringify({
+
+filename:
+selectedFile.name,
+
+data:
+base64,
+
+contentType:
+"application/pdf",
+
+studentName:
+name,
+
+registrationNumber:
+registration,
+
+subject:
+subject.name,
+
+subjectKey:
+subjectKey,
+
+exam:
+exam,
+
+checkingMode:
+checkingMode,
+
+descriptiveMaximum:
+subject.descriptive
+
+})
+}
+);
+
+
+const result =
+await response.json();
+
+
+if(!response.ok){
+
+throw new Error(
+result.error ||
+"Upload failed"
+);
+
+}
+
+
+showSuccess(
+"Answer sheet uploaded successfully."
+);
+
+
+document
+.getElementById("checkin")
+.style.display = "block";
+
+
+document
+.getElementById("checkinText")
+.innerHTML =
+`
+<b>Student:</b>
+${escapeHTML(name)}
+<br>
+
+<b>Registration Number:</b>
+${escapeHTML(registration)}
+<br>
+
+<b>Subject:</b>
+${escapeHTML(subject.name)}
+<br>
+
+<b>Exam:</b>
+${escapeHTML(exam)}
+<br>
+
+<b>Descriptive Maximum:</b>
+${subject.descriptive}
+<br>
+
+<b>Checking:</b>
+${
+checkingMode === "strict"
+? "ICAI Strict"
+: "Moderate"
+}
+
+<br><br>
+
+Your answer sheet has been received.
+MCQs will not be evaluated.
+`;
+
+}catch(error){
+
+console.error(error);
+
+showError(
+error.message ||
+"Unable to upload the answer sheet."
+);
+
+}
+
+
+button.disabled = false;
+button.textContent =
+"🚀 Submit Answer Sheet";
+
+}
+
+
+/* ================================
+   BASE64
+================================ */
+
+function fileToBase64(file){
+
+return new Promise(
+(resolve,reject)=>{
+
+const reader =
+new FileReader();
+
+reader.onload =
+function(){
+
+const result =
+reader.result;
+
+resolve(
+result.split(",")[1]
+);
+
+};
+
+reader.onerror =
+reject;
+
+reader.readAsDataURL(file);
+
+}
+);
+
+}
+
+
+/* ================================
+   STATUS
+================================ */
+
+function showError(message){
+
+const status =
+document.getElementById("status");
+
+status.className =
+"status error";
+
+status.innerHTML =
+"❌ <b>Upload Error</b><br>" +
+escapeHTML(message);
+
+}
+
+function showSuccess(message){
+
+const status =
+document.getElementById("status");
+
+status.className =
+"status success";
+
+status.innerHTML =
+"✅ <b>Success</b><br>" +
+escapeHTML(message);
+
+}
+
+
+/* ================================
+   SECURITY
+================================ */
+
+function escapeHTML(value){
+
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+</script>
+
+</body>
+</html>
