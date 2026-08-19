@@ -1680,7 +1680,127 @@ message;
 
 
 /* ==================================================
+   HELPERS
+================================================== */
+
+function fileToBase64(file){
+
+return new Promise(
+(resolve,reject)=>{
+
+const reader =
+new FileReader();
+
+reader.onload =
+function(){
+
+const result =
+reader.result;
+
+resolve(
+result.split(",")[1]
+);
+
+};
+
+reader.onerror =
+reject;
+
+reader.readAsDataURL(file);
+
+}
+);
+
+
+}
+
+
+function showStudentError(message){
+
+const box =
+document.getElementById("studentStatus");
+
+box.className =
+"status error";
+
+box.innerHTML =
+"❌ <b>Error</b><br>" +
+escapeHTML(message);
+
+}
+
+
+function showStudentSuccess(message){
+
+const box =
+document.getElementById("studentStatus");
+
+box.className =
+"status success";
+
+box.innerHTML =
+"✅ <b>Success</b><br>" +
+escapeHTML(message);
+
+}
+
+
+function showAdminError(message){
+
+const box =
+document.getElementById("adminStatus");
+
+box.className =
+"status error";
+
+box.innerHTML =
+"❌ <b>Error</b><br>" +
+escapeHTML(message);
+
+}
+
+
+function showAdminSuccess(message){
+
+const box =
+document.getElementById("adminStatus");
+
+box.className =
+"status success";
+
+box.innerHTML =
+"✅ <b>Success</b><br>" +
+message;
+
+}
+
+
+function escapeHTML(value){
+
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* ==================================================
    START PORTAL
 ================================================== */
 
-initializ
+document.addEventListener(
+"DOMContentLoaded",
+function(){
+
+initializePortal();
+
+}
+);
+
+</script>
+
+</body>
+</html>
