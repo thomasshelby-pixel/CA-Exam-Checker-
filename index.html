@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
 <title>CA Exam Checker</title>
 
 <style>
@@ -39,7 +40,7 @@ header p{
 }
 
 .container{
-  max-width:900px;
+  max-width:950px;
   margin:auto;
   padding:22px 15px 50px;
 }
@@ -50,6 +51,7 @@ header p{
   border-radius:18px;
   padding:22px;
   margin-bottom:18px;
+  box-shadow:0 12px 30px rgba(0,0,0,.2);
 }
 
 h2{
@@ -204,6 +206,11 @@ input[type=file]{
   line-height:1.6;
 }
 
+.info strong,
+.info b{
+  color:#fff;
+}
+
 button{
   border:0;
   border-radius:10px;
@@ -283,6 +290,23 @@ button:disabled{
   line-height:1.5;
 }
 
+.material-list{
+  margin-top:18px;
+}
+
+.material-item{
+  background:#111827;
+  border:1px solid #26334d;
+  border-radius:10px;
+  padding:12px;
+  margin-top:9px;
+  font-size:13px;
+}
+
+.material-item small{
+  color:#94a3b8;
+}
+
 footer{
   text-align:center;
   color:#64748b;
@@ -300,6 +324,10 @@ footer{
   header h1{
     font-size:25px;
   }
+
+  .card{
+    padding:18px;
+  }
 }
 </style>
 </head>
@@ -313,15 +341,11 @@ footer{
 
 <div class="container">
 
-
 <!-- ==================================================
      STUDENT PANEL
 ================================================== -->
 
 <div id="studentPanel">
-
-
-<!-- STUDENT DETAILS -->
 
 <div class="card">
 
@@ -342,7 +366,6 @@ STUDENT CHECK-IN
  placeholder="Enter full name">
 </div>
 
-
 <div>
 <label>Registration Number</label>
 
@@ -351,7 +374,6 @@ STUDENT CHECK-IN
  type="text"
  placeholder="Enter ICAI registration number">
 </div>
-
 
 <div>
 <label>Subject</label>
@@ -407,18 +429,16 @@ FM + SM
 </select>
 </div>
 
-
 <div>
 <label>Exam / Test</label>
 
 <input
  id="examName"
  type="text"
- placeholder="CA Inter MTP / Mock Test">
+ placeholder="MTP / RTP / Mock Test">
 </div>
 
 </div>
-
 
 <div
  id="subjectInfo"
@@ -444,7 +464,6 @@ CHECKING MODE
 
 <div class="mode-grid">
 
-
 <div
  id="strictMode"
  class="mode active"
@@ -455,16 +474,13 @@ CHECKING MODE
 </div>
 
 <div class="mode-text">
-
 Strict evaluation of concepts,
 calculations, working notes,
 relevant provisions and
 answer presentation.
-
 </div>
 
 </div>
-
 
 <div
  id="moderateMode"
@@ -476,22 +492,21 @@ answer presentation.
 </div>
 
 <div class="mode-text">
-
 Balanced examiner-style checking
 with reasonable step marking.
-
 </div>
 
 </div>
 
 </div>
-
 
 <div class="info">
 
 <b>AI Rule:</b>
 Only descriptive questions will be
 evaluated. MCQs will be ignored.
+Marks will be awarded only from the
+descriptive maximum.
 
 </div>
 
@@ -508,7 +523,6 @@ ANSWER SHEET
 
 <h2>📄 Upload Answer Sheet</h2>
 
-
 <div class="upload-box">
 
 <div class="upload-icon">
@@ -523,7 +537,6 @@ Select your answer sheet
 PDF recommended • Maximum 4 MB
 </p>
 
-
 <label
  class="file-label"
  for="answerFile">
@@ -532,12 +545,10 @@ Choose PDF
 
 </label>
 
-
 <input
  id="answerFile"
  type="file"
  accept=".pdf,application/pdf">
-
 
 <div
  id="fileInfo"
@@ -546,16 +557,14 @@ Choose PDF
 
 </div>
 
-
 <button
  id="submitButton"
  class="primary"
- onclick="submitAnswerSheet()">
+ onclick="submitAnswerSheet">
 
 🚀 Submit Answer Sheet
 
 </button>
-
 
 <div
  id="studentStatus"
@@ -565,18 +574,16 @@ Choose PDF
 </div>
 
 
-<!-- CHECK-IN -->
-
 <div
  id="checkin"
  class="card checkin">
 
 <span class="badge green">
-CHECK-IN COMPLETE
+SUBMISSION RECEIVED
 </span>
 
 <h2>
-✅ Submission Received
+✅ Answer Sheet Received
 </h2>
 
 <div
@@ -597,7 +604,6 @@ CHECK-IN COMPLETE
  id="adminPanel"
  class="admin">
 
-
 <div class="card">
 
 <span class="badge red">
@@ -608,20 +614,23 @@ ADMIN / CHECKER
 🔐 Test Material Management
 </h2>
 
-<p class="info">
+<div class="info">
 
-Admin uploads the Question Paper and
-Suggested Answer here. These files will
-later be used by the AI checker as the
-official reference material.
+Upload official examination material here.
+Multiple materials can be uploaded for the
+same subject.
 
-</p>
+<br><br>
+
+<b>AI will later use these files as reference
+material for checking.</b>
+
+</div>
 
 
 <label>
 Subject
 </label>
-
 
 <select id="adminSubject">
 
@@ -671,19 +680,16 @@ FM + SM
 
 </select>
 
-
 <div
  id="adminSubjectInfo"
  class="info">
 
-Select a subject to see the
-descriptive checking maximum.
+Select a subject.
 
 </div>
 
 
-<div class="admin-divider">
-</div>
+<div class="admin-divider"></div>
 
 
 <!-- QUESTION PAPER -->
@@ -695,7 +701,8 @@ descriptive checking maximum.
 </h3>
 
 <p>
-Upload the official question paper.
+Upload an official question paper.
+You can upload multiple question papers.
 </p>
 
 <input
@@ -716,12 +723,35 @@ Upload the official question paper.
 </h3>
 
 <p>
-Upload the official ICAI / reference
+Upload the corresponding official/reference
 suggested answer.
+Multiple suggested answers are supported.
 </p>
 
 <input
  id="suggestedAnswer"
+ class="admin-file"
+ type="file"
+ accept=".pdf,application/pdf,image/jpeg,image/png">
+
+</div>
+
+
+<!-- MODEL TEST PAPER -->
+
+<div class="material-card">
+
+<h3>
+📙 Model Test Paper</h3>
+
+<p>
+Upload model test papers containing multiple
+subjects. AI can later identify the relevant
+subject/question automatically.
+</p>
+
+<input
+ id="modelTestPaper"
  class="admin-file"
  type="file"
  accept=".pdf,application/pdf,image/jpeg,image/png">
@@ -744,6 +774,12 @@ suggested answer.
  class="status">
 </div>
 
+
+<div
+ id="materialList"
+ class="material-list">
+</div>
+
 </div>
 
 </div>
@@ -759,28 +795,28 @@ CA Exam Checker • Educational evaluation platform
 <script>
 
 /* ==================================================
-   SUBJECT CONFIG
+   SUBJECT CONFIGURATION
 ================================================== */
 
 const SUBJECTS = {
 
 advanced_accounts:{
 name:"Advanced Accounting",
-paper:100,
+total:100,
 mcq:30,
 descriptive:70
 },
 
 law:{
 name:"Corporate & Other Laws",
-paper:100,
+total:100,
 mcq:30,
 descriptive:70
 },
 
 taxation:{
 name:"Taxation",
-paper:100,
+total:100,
 mcq:30,
 descriptive:70,
 incomeTax:35,
@@ -789,49 +825,49 @@ gst:35
 
 income_tax:{
 name:"Income Tax",
-paper:50,
+total:50,
 mcq:15,
 descriptive:35
 },
 
 gst:{
 name:"GST",
-paper:50,
+total:50,
 mcq:15,
 descriptive:35
 },
 
 costing:{
 name:"Cost & Management Accounting",
-paper:100,
+total:100,
 mcq:30,
 descriptive:70
 },
 
 audit:{
 name:"Auditing",
-paper:100,
+total:100,
 mcq:30,
 descriptive:70
 },
 
 fm:{
 name:"Financial Management",
-paper:50,
-mcq:15,
-descriptive:35
+total:100,
+mcq:30,
+descriptive:70
 },
 
 sm:{
 name:"Strategic Management",
-paper:50,
-mcq:15,
-descriptive:35
+total:100,
+mcq:30,
+descriptive:70
 },
 
 fm_sm:{
 name:"FM + SM",
-paper:100,
+total:100,
 mcq:30,
 descriptive:70,
 fm:35,
@@ -850,7 +886,7 @@ let selectedFile = null;
 
 
 /* ==================================================
-   ADMIN MODE
+   ADMIN ACCESS
 ================================================== */
 
 const params =
@@ -884,7 +920,6 @@ const info =
 document
 .getElementById("subjectInfo");
 
-
 if(!key){
 
 info.innerHTML =
@@ -894,17 +929,15 @@ return;
 
 }
 
-
 const s =
 SUBJECTS[key];
-
 
 if(key === "taxation"){
 
 info.innerHTML = `
 <b>Taxation</b><br>
-Total Paper: 100<br>
-MCQ: 30 — Not checked<br>
+Total: <b>100</b><br>
+MCQ: <b>30</b> — Ignored by AI<br>
 Descriptive: <b>70</b><br>
 Income Tax: <b>35</b> + GST: <b>35</b>
 `;
@@ -913,13 +946,12 @@ return;
 
 }
 
-
 if(key === "fm_sm"){
 
 info.innerHTML = `
 <b>FM + SM</b><br>
-Total Paper: 100<br>
-MCQ: 30 — Not checked<br>
+Total: <b>100</b><br>
+MCQ: <b>30</b> — Ignored by AI<br>
 Descriptive: <b>70</b><br>
 FM: <b>35</b> + SM: <b>35</b>
 `;
@@ -928,11 +960,10 @@ return;
 
 }
 
-
 info.innerHTML = `
 <b>${s.name}</b><br>
-Total Paper: ${s.paper}<br>
-MCQ: ${s.mcq} — Not checked<br>
+Total: <b>${s.total}</b><br>
+MCQ: <b>${s.mcq}</b> — Ignored by AI<br>
 Descriptive Maximum:
 <b>${s.descriptive}</b>
 `;
@@ -956,25 +987,21 @@ const info =
 document
 .getElementById("adminSubjectInfo");
 
-
 if(!key){
 
 info.innerHTML =
-"Select a subject to see the descriptive checking maximum.";
+"Select a subject.";
 
 return;
 
 }
 
-
 const s =
 SUBJECTS[key];
 
-
 if(key === "taxation"){
 
-info.innerHTML =
-`
+info.innerHTML = `
 <b>Taxation</b><br>
 Descriptive Maximum: <b>70</b><br>
 Income Tax: <b>35</b> + GST: <b>35</b>
@@ -984,11 +1011,9 @@ return;
 
 }
 
-
 if(key === "fm_sm"){
 
-info.innerHTML =
-`
+info.innerHTML = `
 <b>FM + SM</b><br>
 Descriptive Maximum: <b>70</b><br>
 FM: <b>35</b> + SM: <b>35</b>
@@ -998,9 +1023,7 @@ return;
 
 }
 
-
-info.innerHTML =
-`
+info.innerHTML = `
 <b>${s.name}</b><br>
 Descriptive Maximum:
 <b>${s.descriptive}</b>
@@ -1050,10 +1073,8 @@ this.files.length
 ? this.files[0]
 : null;
 
-
 const info =
 document.getElementById("fileInfo");
-
 
 if(!selectedFile){
 
@@ -1062,7 +1083,6 @@ return;
 
 }
 
-
 const size =
 (
 selectedFile.size /
@@ -1070,9 +1090,7 @@ selectedFile.size /
 1024
 ).toFixed(2);
 
-
 info.style.display = "block";
-
 
 info.innerHTML =
 `
@@ -1116,7 +1134,6 @@ document
 .value
 .trim();
 
-
 if(!name){
 
 showStudentError(
@@ -1126,7 +1143,6 @@ showStudentError(
 return;
 
 }
-
 
 if(!registration){
 
@@ -1138,7 +1154,6 @@ return;
 
 }
 
-
 if(!subjectKey){
 
 showStudentError(
@@ -1148,7 +1163,6 @@ showStudentError(
 return;
 
 }
-
 
 if(!exam){
 
@@ -1160,7 +1174,6 @@ return;
 
 }
 
-
 if(!selectedFile){
 
 showStudentError(
@@ -1170,7 +1183,6 @@ showStudentError(
 return;
 
 }
-
 
 if(
 !selectedFile.name
@@ -1186,7 +1198,6 @@ return;
 
 }
 
-
 if(
 selectedFile.size >
 4 * 1024 * 1024
@@ -1200,21 +1211,17 @@ return;
 
 }
 
-
 const subject =
 SUBJECTS[subjectKey];
-
 
 const button =
 document
 .getElementById("submitButton");
 
-
 button.disabled = true;
 
 button.textContent =
 "⏳ Uploading...";
-
 
 try{
 
@@ -1222,12 +1229,6 @@ const base64 =
 await fileToBase64(
 selectedFile
 );
-
-
-/*
- IMPORTANT:
- Existing working Blob endpoint.
-*/
 
 const response =
 await fetch(
@@ -1269,6 +1270,12 @@ exam,
 checkingMode:
 checkingMode,
 
+totalMarks:
+subject.total,
+
+mcqMarks:
+subject.mcq,
+
 descriptiveMaximum:
 subject.descriptive
 
@@ -1276,10 +1283,8 @@ subject.descriptive
 }
 );
 
-
 const result =
 await response.json();
-
 
 if(!response.ok){
 
@@ -1290,16 +1295,13 @@ result.error ||
 
 }
 
-
 showStudentSuccess(
 "Answer sheet uploaded successfully."
 );
 
-
 document
 .getElementById("checkin")
 .style.display = "block";
-
 
 document
 .getElementById("checkinText")
@@ -1317,7 +1319,7 @@ ${escapeHTML(registration)}
 ${escapeHTML(subject.name)}
 <br>
 
-<b>Exam:</b>
+<b>Exam/Test:</b>
 ${escapeHTML(exam)}
 <br>
 
@@ -1334,8 +1336,8 @@ checkingMode === "strict"
 
 <br><br>
 
-Your answer sheet has been received.
 MCQs will not be evaluated.
+Only descriptive questions will be checked.
 `;
 
 }catch(error){
@@ -1348,7 +1350,6 @@ error.message ||
 );
 
 }
-
 
 button.disabled = false;
 
@@ -1379,6 +1380,10 @@ document
 .getElementById("suggestedAnswer")
 .files[0];
 
+const modelTestPaper =
+document
+.getElementById("modelTestPaper")
+.files[0];
 
 if(!subjectKey){
 
@@ -1390,91 +1395,111 @@ return;
 
 }
 
-
-if(!questionPaper){
+if(
+!questionPaper &&
+!suggestedAnswer &&
+!modelTestPaper
+){
 
 showAdminError(
-"Please select the Question Paper."
+"Please select at least one material."
 );
 
 return;
 
 }
-
-
-if(!suggestedAnswer){
-
-showAdminError(
-"Please select the Suggested Answer."
-);
-
-return;
-
-}
-
 
 const subject =
 SUBJECTS[subjectKey];
 
-
 const button =
 document
 .getElementById("materialButton");
-
 
 button.disabled = true;
 
 button.textContent =
 "⏳ Uploading Materials...";
 
-
 try{
 
-/* QUESTION PAPER */
+const uploads = [];
 
-await uploadMaterialFile(
+
+if(questionPaper){
+
+uploads.push(
+uploadMaterialFile(
 questionPaper,
 subjectKey,
 "question-paper"
+)
 );
 
+}
 
-/* SUGGESTED ANSWER */
 
-await uploadMaterialFile(
+if(suggestedAnswer){
+
+uploads.push(
+uploadMaterialFile(
 suggestedAnswer,
 subjectKey,
 "suggested-answer"
+)
 );
+
+}
+
+
+if(modelTestPaper){
+
+uploads.push(
+uploadMaterialFile(
+modelTestPaper,
+subjectKey,
+"model-test-paper"
+)
+);
+
+}
+
+
+const results =
+await Promise.all(uploads);
 
 
 showAdminSuccess(
 
 `
-Test material uploaded successfully. ✓
+Material upload completed successfully. ✓
+
 <br><br>
 
 <b>Subject:</b>
 ${escapeHTML(subject.name)}
+
 <br>
 
 <b>Descriptive Maximum:</b>
 ${subject.descriptive}
-<br>
-
-<b>Question Paper:</b>
-${escapeHTML(questionPaper.name)}
-<br>
-
-<b>Suggested Answer:</b>
-${escapeHTML(suggestedAnswer.name)}
 
 <br><br>
 
-The material is now stored in Blob
-and ready for the AI-checking layer.
+<b>${results.length}</b>
+material file(s) uploaded.
+
+<br><br>
+
+The files are stored in private Blob
+storage and will remain available
+for the AI-checking layer.
 `
 
+);
+
+renderUploadedMaterials(
+results
 );
 
 }catch(error){
@@ -1487,7 +1512,6 @@ error.message ||
 );
 
 }
-
 
 button.disabled = false;
 
@@ -1509,7 +1533,6 @@ type
 
 const base64 =
 await fileToBase64(file);
-
 
 const response =
 await fetch(
@@ -1544,10 +1567,8 @@ type
 }
 );
 
-
 const result =
 await response.json();
-
 
 if(!response.ok){
 
@@ -1558,123 +1579,65 @@ result.error ||
 
 }
 
-
-return result;
+return {
+...result,
+filename:file.name,
+type:type
+};
 
 }
 
 
 /* ==================================================
-   HELPERS
+   MATERIAL DISPLAY
 ================================================== */
 
-function fileToBase64(file){
+function renderUploadedMaterials(
+materials
+){
 
-return new Promise(
-(resolve,reject)=>{
-
-const reader =
-new FileReader();
-
-
-reader.onload =
-function(){
-
-const result =
-reader.result;
-
-resolve(
-result.split(",")[1]
+const list =
+document.getElementById(
+"materialList"
 );
 
-};
+if(!materials.length){
+return;
+}
 
+materials.forEach(
+material => {
 
-reader.onerror =
-reject;
+const item =
+document.createElement(
+"div"
+);
 
+item.className =
+"material-item";
 
-reader.readAsDataURL(file);
+item.innerHTML =
+`
+<b>✓ ${escapeHTML(
+material.filename
+)}</b>
+<br>
+
+<small>
+Type:
+${escapeHTML(material.type)}
+</small>
+`;
+
+list.prepend(item);
 
 }
 );
 
-
 }
 
 
-function showStudentError(message){
-
-const box =
-document.getElementById("studentStatus");
-
-box.className =
-"status error";
-
-box.innerHTML =
-"❌ <b>Error</b><br>" +
-escapeHTML(message);
-
-}
-
-
-function showStudentSuccess(message){
-
-const box =
-document.getElementById("studentStatus");
-
-box.className =
-"status success";
-
-box.innerHTML =
-"✅ <b>Success</b><br>" +
-escapeHTML(message);
-
-}
-
-
-function showAdminError(message){
-
-const box =
-document.getElementById("adminStatus");
-
-box.className =
-"status error";
-
-box.innerHTML =
-"❌ <b>Error</b><br>" +
-escapeHTML(message);
-
-}
-
-
-function showAdminSuccess(message){
-
-const box =
-document.getElementById("adminStatus");
-
-box.className =
-"status success";
-
-box.innerHTML =
-"✅ <b>Success</b><br>" +
-message;
-
-}
-
-
-function escapeHTML(value){
-
-return String(value)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
-}
-
-</script>
-
-</body>
-  </html>
+/* ==================================================
+   FILE → BASE64
+================================================== */
+  
