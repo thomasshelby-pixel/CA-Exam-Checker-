@@ -15,28 +15,53 @@ export default async function handler(req, res) {
       data,
       contentType,
       subject,
+      testType,
       type
     } = req.body;
 
-    if (!filename || !data || !subject || !type) {
+
+    if (
+      !filename ||
+      !data ||
+      !subject ||
+      !testType ||
+      !type
+    ) {
+
       return res.status(400).json({
         error:
-          "filename, data, subject and type are required"
+          "filename, data, subject, testType and type are required"
       });
+
     }
 
 
-    const allowedTypes = [
-      "question-paper",
-      "suggested-answer",
-      "model-test-paper"
-    ];
-
-
-    if (!allowedTypes.includes(type)) {
+    if (
+      type !== "question-paper" &&
+      type !== "suggested-answer"
+    ) {
 
       return res.status(400).json({
         error: "Invalid material type"
+      });
+
+    }
+
+
+    const allowedTestTypes = [
+      "MTP",
+      "RTP",
+      "MODEL_TEST",
+      "OTHER"
+    ];
+
+
+    if (
+      !allowedTestTypes.includes(testType)
+    ) {
+
+      return res.status(400).json({
+        error: "Invalid test type"
       });
 
     }
@@ -47,6 +72,12 @@ export default async function handler(req, res) {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
+
+
+    const safeTestType =
+      String(testType)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-");
 
 
     const safeFilename =
@@ -61,7 +92,7 @@ export default async function handler(req, res) {
     const blob =
       await put(
 
-        `test-material/${safeSubject}/${type}/${Date.now()}-${safeFilename}`,
+        `test-material/${safeSubject}/${safeTestType}/${type}/${Date.now()}-${safeFilename}`,
 
         buffer,
 
@@ -80,15 +111,20 @@ export default async function handler(req, res) {
 
       success: true,
 
-      url: blob.url,
+      url:
+        blob.url,
 
-      pathname: blob.pathname,
+      pathname:
+        blob.pathname,
 
-      subject: subject,
+      subject:
+        subject,
 
-      type: type,
+      testType:
+        testType,
 
-      filename: filename
+      type:
+        type
 
     });
 
@@ -97,8 +133,12 @@ export default async function handler(req, res) {
 
     console.error(error);
 
+
     return res.status(500).json({
-      error: "Material upload failed"
+
+      error:
+        "Material upload failed"
+
     });
 
   }
