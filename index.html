@@ -7,6 +7,7 @@
 <title>CA Exam Checker</title>
 
 <style>
+
 *{
 box-sizing:border-box;
 margin:0;
@@ -259,6 +260,76 @@ display:none;
 display:none;
 }
 
+.result{
+display:none;
+}
+
+.score-box{
+text-align:center;
+padding:25px;
+background:#080f1c;
+border:1px solid #334155;
+border-radius:15px;
+margin-bottom:18px;
+}
+
+.score{
+font-size:42px;
+font-weight:bold;
+color:#a5b4fc;
+}
+
+.question-result{
+padding:15px;
+background:#080f1c;
+border:1px solid #26334d;
+border-radius:12px;
+margin-top:12px;
+}
+
+.question-result h3{
+font-size:15px;
+margin-bottom:8px;
+}
+
+.question-meta{
+color:#94a3b8;
+font-size:12px;
+margin-bottom:8px;
+}
+
+.question-remarks{
+font-size:13px;
+line-height:1.6;
+color:#cbd5e1;
+}
+
+.correct{
+border-left:4px solid #22c55e;
+}
+
+.partial{
+border-left:4px solid #eab308;
+}
+
+.incorrect{
+border-left:4px solid #ef4444;
+}
+
+.unattempted{
+border-left:4px solid #64748b;
+}
+
+.unclear{
+border-left:4px solid #f97316;
+}
+
+.admin-divider{
+height:1px;
+background:#26334d;
+margin:20px 0;
+}
+
 .material-card{
 background:#080f1c;
 border:1px solid #26334d;
@@ -276,12 +347,6 @@ margin-bottom:6px;
 color:#94a3b8;
 font-size:12px;
 line-height:1.5;
-}
-
-.admin-divider{
-height:1px;
-background:#26334d;
-margin:20px 0;
 }
 
 footer{
@@ -303,14 +368,20 @@ font-size:25px;
 }
 
 }
+
 </style>
 </head>
 
 <body>
 
 <header>
+
 <h1>CA Exam Checker</h1>
-<p>CA Answer Sheet Evaluation & Examination Portal</p>
+
+<p>
+CA Answer Sheet Evaluation & Examination Portal
+</p>
+
 </header>
 
 <div class="container">
@@ -332,24 +403,29 @@ STUDENT CHECK-IN
 <div class="grid">
 
 <div>
+
 <label>Student Name</label>
 
 <input
 id="studentName"
 type="text"
 placeholder="Enter full name">
+
 </div>
 
 <div>
+
 <label>Registration Number</label>
 
 <input
 id="registrationNumber"
 type="text"
 placeholder="Enter ICAI registration number">
+
 </div>
 
 <div>
+
 <label>Subject</label>
 
 <select id="subject" onchange="updateSubject()">
@@ -399,9 +475,11 @@ FM + SM
 </option>
 
 </select>
+
 </div>
 
 <div>
+
 <label>Test / Paper Type</label>
 
 <select id="studentTestType">
@@ -427,12 +505,15 @@ Other
 </option>
 
 </select>
+
 </div>
 
 </div>
 
 <div id="subjectInfo" class="info">
+
 Select a subject to see its descriptive checking marks.
+
 </div>
 
 </div>
@@ -460,10 +541,12 @@ onclick="setMode('strict')">
 </div>
 
 <div class="mode-text">
+
 Strict evaluation of concepts,
 calculations, working notes,
-relevant provisions and
-answer presentation.
+relevant provisions and answer
+presentation.
+
 </div>
 
 </div>
@@ -478,8 +561,10 @@ onclick="setMode('moderate')">
 </div>
 
 <div class="mode-text">
+
 Balanced examiner-style checking
 with reasonable step marking.
+
 </div>
 
 </div>
@@ -489,6 +574,7 @@ with reasonable step marking.
 <div class="info">
 
 <b>AI Rule:</b>
+
 Only descriptive questions will be
 evaluated. MCQs will be ignored.
 
@@ -534,7 +620,10 @@ id="answerFile"
 type="file"
 accept=".pdf,application/pdf">
 
-<div id="fileInfo" class="file-info"></div>
+<div
+id="fileInfo"
+class="file-info">
+</div>
 
 </div>
 
@@ -547,12 +636,15 @@ onclick="submitAnswerSheet()">
 
 </button>
 
-<div id="studentStatus" class="status"></div>
+<div
+id="studentStatus"
+class="status">
+</div>
 
 </div>
 
 
-<!-- CHECK-IN COMPLETE -->
+<!-- CHECK-IN -->
 
 <div
 id="checkin"
@@ -573,6 +665,45 @@ class="info">
 
 </div>
 
+
+<!-- AI RESULT -->
+
+<div
+id="resultPanel"
+class="card result">
+
+<span class="badge green">
+AI EVALUATION COMPLETE
+</span>
+
+<h2>
+📊 Examination Result
+</h2>
+
+<div class="score-box">
+
+<div class="score" id="scoreText">
+0 / 0
+</div>
+
+<div id="percentageText">
+0%
+</div>
+
+</div>
+
+<div id="overallSummary" class="info">
+</div>
+
+<h2 style="margin-top:20px;">
+Question-wise Evaluation
+</h2>
+
+<div id="questionResults">
+</div>
+
+</div>
+
 </div>
 
 
@@ -580,7 +711,9 @@ class="info">
 ADMIN PANEL
 ================================================== -->
 
-<div id="adminPanel" class="admin">
+<div
+id="adminPanel"
+class="admin">
 
 <div class="card">
 
@@ -600,7 +733,6 @@ classification so the material can be
 identified later by the AI checker.
 
 </p>
-
 
 <label>
 Subject
@@ -654,7 +786,6 @@ FM + SM
 
 </select>
 
-
 <label>
 Test / Paper Type
 </label>
@@ -683,21 +814,15 @@ Other
 
 </select>
 
-
 <div
 id="adminSubjectInfo"
 class="info">
 
-Select a subject to see the
-descriptive checking maximum.
+Select a subject to see the descriptive checking maximum.
 
 </div>
 
-
 <div class="admin-divider"></div>
-
-
-<!-- QUESTION PAPER -->
 
 <div class="material-card">
 
@@ -717,9 +842,6 @@ accept=".pdf,application/pdf,image/jpeg,image/png">
 
 </div>
 
-
-<!-- SUGGESTED ANSWER -->
-
 <div class="material-card">
 
 <h3>
@@ -727,8 +849,7 @@ accept=".pdf,application/pdf,image/jpeg,image/png">
 </h3>
 
 <p>
-Upload the official ICAI / reference
-suggested answer.
+Upload the official ICAI / reference suggested answer.
 </p>
 
 <input
@@ -739,7 +860,6 @@ accept=".pdf,application/pdf,image/jpeg,image/png">
 
 </div>
 
-
 <button
 id="materialButton"
 class="primary"
@@ -749,17 +869,21 @@ onclick="uploadMaterials()">
 
 </button>
 
-<div id="adminStatus" class="status"></div>
-
+<div
+id="adminStatus"
+class="status">
 </div>
 
 </div>
 
 </div>
 
+</div>
 
 <footer>
+
 CA Exam Checker • Educational evaluation platform
+
 </footer>
 
 
@@ -857,7 +981,7 @@ let selectedFile = null;
 
 
 /* ==================================================
-ADMIN URL MODE
+PORTAL INITIALIZATION
 ================================================== */
 
 function initializePortal(){
@@ -890,25 +1014,6 @@ studentPanel.style.display = "block";
 adminPanel.style.display = "none";
 
 }
-
-}
-
-
-/* ==================================================
-TEST TYPE FORMAT
-================================================== */
-
-function formatTestType(type){
-
-if(type === "MODEL_TEST"){
-return "Model Test";
-}
-
-if(type === "OTHER"){
-return "Other";
-}
-
-return type;
 
 }
 
@@ -965,11 +1070,10 @@ return;
 }
 
 info.innerHTML = `
-<b>${s.name}</b><br>
+<b>${escapeHTML(s.name)}</b><br>
 Total Paper: ${s.paper}<br>
 MCQ: ${s.mcq} — Not checked<br>
-Descriptive Maximum:
-<b>${s.descriptive}</b>
+Descriptive Maximum: <b>${s.descriptive}</b>
 `;
 
 }
@@ -1030,11 +1134,10 @@ return;
 }
 
 info.innerHTML = `
-<b>${s.name}</b><br>
+<b>${escapeHTML(s.name)}</b><br>
 Total Paper: <b>${s.paper}</b><br>
 MCQ: <b>${s.mcq}</b> — Not checked<br>
-Descriptive Maximum:
-<b>${s.descriptive}</b>
+Descriptive Maximum: <b>${s.descriptive}</b>
 `;
 
 }
@@ -1101,9 +1204,7 @@ selectedFile.size /
 info.style.display = "block";
 
 info.innerHTML = `
-📎 <b>
-${escapeHTML(selectedFile.name)}
-</b>
+📎 <b>${escapeHTML(selectedFile.name)}</b>
 <br>
 ${size} MB
 `;
@@ -1139,7 +1240,6 @@ const testType =
 document
 .getElementById("studentTestType")
 .value;
-
 
 if(!name){
 
@@ -1225,22 +1325,24 @@ const button =
 document.getElementById("submitButton");
 
 button.disabled = true;
-
 button.textContent =
-"⏳ Uploading...";
-
+"⏳ Uploading Answer Sheet...";
 
 try{
 
 const base64 =
-await fileToBase64(
-selectedFile
-);
+await fileToBase64(selectedFile);
 
-const response =
+
+/* ==================================================
+STEP 1 — UPLOAD ANSWER SHEET
+================================================== */
+
+const uploadResponse =
 await fetch(
 "/api/upload",
 {
+
 method:"POST",
 
 headers:{
@@ -1281,247 +1383,35 @@ descriptiveMaximum:
 subject.descriptive
 
 })
+
 }
 );
 
-const result =
-await response.json();
+const uploadResult =
+await uploadResponse.json();
 
-if(!response.ok){
+if(!uploadResponse.ok){
 
 throw new Error(
-result.error ||
-"Upload failed"
+uploadResult.error ||
+"Answer sheet upload failed."
 );
-
-}
-
-showStudentSuccess(
-"Answer sheet uploaded successfully."
-);
-
-document
-.getElementById("checkin")
-.style.display = "block";
-
-document
-.getElementById("checkinText")
-.innerHTML = `
-<b>Student:</b>
-${escapeHTML(name)}
-<br>
-
-<b>Registration Number:</b>
-${escapeHTML(registration)}
-<br>
-
-<b>Subject:</b>
-${escapeHTML(subject.name)}
-<br>
-
-<b>Test Type:</b>
-${escapeHTML(formatTestType(testType))}
-<br>
-
-<b>Descriptive Maximum:</b>
-${subject.descriptive}
-<br>
-
-<b>Checking Mode:</b>
-${
-checkingMode === "strict"
-? "ICAI Strict"
-: "Moderate"
-}
-
-<br><br>
-
-Your answer sheet has been received.
-
-MCQs will not be evaluated.
-`;
-
-}catch(error){
-
-console.error(error);
-
-showStudentError(
-error.message ||
-"Unable to upload answer sheet."
-);
-
-}
-
-button.disabled = false;
-
-button.textContent =
-"🚀 Submit Answer Sheet";
 
 }
 
 
 /* ==================================================
-ADMIN MATERIAL UPLOAD
+STEP 2 — FIND TEST MATERIAL
 ================================================== */
 
-async function uploadMaterials(){
-
-const subjectKey =
-document
-.getElementById("adminSubject")
-.value;
-
-const testType =
-document
-.getElementById("adminTestType")
-.value;
-
-const questionPaper =
-document
-.getElementById("questionPaper")
-.files[0];
-
-const suggestedAnswer =
-document
-.getElementById("suggestedAnswer")
-.files[0];
-
-
-if(!subjectKey){
-
-showAdminError(
-"Please select a subject."
-);
-
-return;
-
-}
-
-if(!testType){
-
-showAdminError(
-"Please select the Test / Paper Type."
-);
-
-return;
-
-}
-
-if(!questionPaper){
-
-showAdminError(
-"Please select the Question Paper."
-);
-
-return;
-
-}
-
-if(!suggestedAnswer){
-
-showAdminError(
-"Please select the Suggested Answer."
-);
-
-return;
-
-}
-
-const subject =
-SUBJECTS[subjectKey];
-
-const button =
-document
-.getElementById("materialButton");
-
-button.disabled = true;
-
 button.textContent =
-"⏳ Uploading Materials...";
+"🔎 Loading Test Material...";
 
-
-try{
-
-await uploadMaterialFile(
-questionPaper,
-subjectKey,
-testType,
-"question-paper"
-);
-
-await uploadMaterialFile(
-suggestedAnswer,
-subjectKey,
-testType,
-"suggested-answer"
-);
-
-showAdminSuccess(`
-Test material uploaded successfully. ✓
-<br><br>
-
-<b>Subject:</b>
-${escapeHTML(subject.name)}
-<br>
-
-<b>Test Type:</b>
-${escapeHTML(formatTestType(testType))}
-<br>
-
-<b>Descriptive Maximum:</b>
-${subject.descriptive}
-<br>
-
-<b>Question Paper:</b>
-${escapeHTML(questionPaper.name)}
-<br>
-
-<b>Suggested Answer:</b>
-${escapeHTML(suggestedAnswer.name)}
-
-<br><br>
-
-Material classification has been saved
-for future AI checking.
-`);
-
-}catch(error){
-
-console.error(error);
-
-showAdminError(
-error.message ||
-"Material upload failed."
-);
-
-}
-
-button.disabled = false;
-
-button.textContent =
-"📚 Upload Test Material";
-
-}
-
-
-/* ==================================================
-SINGLE MATERIAL UPLOAD
-================================================== */
-
-async function uploadMaterialFile(
-file,
-subjectKey,
-testType,
-type
-){
-
-const base64 =
-await fileToBase64(file);
-
-const response =
+const materialResponse =
 await fetch(
-"/api/material",
+"/api/materials",
 {
+
 method:"POST",
 
 headers:{
@@ -1531,161 +1421,195 @@ headers:{
 
 body:JSON.stringify({
 
-filename:
-file.name,
-
-data:
-base64,
-
-contentType:
-file.type ||
-"application/pdf",
-
 subject:
 subjectKey,
 
 testType:
-testType,
-
-type:
-type
+testType
 
 })
+
 }
 );
 
-const result =
-await response.json();
+const materialResult =
+await materialResponse.json();
 
-if(!response.ok){
+if(!materialResponse.ok){
 
 throw new Error(
-result.error ||
-`${type} upload failed`
+materialResult.error ||
+"Unable to find test material."
 );
 
 }
 
-return result;
+if(
+!materialResult.questionPaper ||
+!materialResult.suggestedAnswer
+){
+
+throw new Error(
+"Question Paper or Suggested Answer not found for this Subject and Test Type."
+);
 
 }
 
 
 /* ==================================================
-HELPERS
+STEP 3 — DOWNLOAD MATERIAL FILES
 ================================================== */
 
-function fileToBase64(file){
+button.textContent =
+"📚 Preparing Test Material...";
 
-return new Promise(
-(resolve,reject)=>{
-
-const reader =
-new FileReader();
-
-reader.onload =
-function(){
-
-const result =
-reader.result;
-
-resolve(
-result.split(",")[1]
+const questionPaperBase64 =
+await fetchFileAsBase64(
+materialResult.questionPaper.url
 );
 
-};
-
-reader.onerror =
-reject;
-
-reader.readAsDataURL(file);
-
-}
+const suggestedAnswerBase64 =
+await fetchFileAsBase64(
+materialResult.suggestedAnswer.url
 );
 
 
-}
+/* ==================================================
+STEP 4 — AI CHECK
+================================================== */
 
+button.textContent =
+"🤖 AI Checking Answer Sheet...";
 
-function showStudentError(message){
+const checkResponse =
+await fetch(
+"/api/check",
+{
 
-const box =
-document.getElementById("studentStatus");
+method:"POST",
 
-box.className =
-"status error";
+headers:{
+"Content-Type":
+"application/json"
+},
 
-box.innerHTML =
-"❌ <b>Error</b><br>" +
-escapeHTML(message);
+body:JSON.stringify({
 
-}
+answerSheetBase64:
+base64,
 
+answerSheetName:
+selectedFile.name,
 
-function showStudentSuccess(message){
+questionPaperBase64:
+questionPaperBase64,
 
-const box =
-document.getElementById("studentStatus");
+questionPaperName:
+materialResult.questionPaper.name,
 
-box.className =
-"status success";
+suggestedAnswerBase64:
+suggestedAnswerBase64,
 
-box.innerHTML =
-"✅ <b>Success</b><br>" +
-escapeHTML(message);
+suggestedAnswerName:
+materialResult.suggestedAnswer.name,
 
-}
+subject:
+subject.name,
 
+testType:
+testType,
 
-function showAdminError(message){
+checkingMode:
+checkingMode,
 
-const box =
-document.getElementById("adminStatus");
+descriptiveMaximum:
+subject.descriptive
 
-box.className =
-"status error";
-
-box.innerHTML =
-"❌ <b>Error</b><br>" +
-escapeHTML(message);
-
-}
-
-
-function showAdminSuccess(message){
-
-const box =
-document.getElementById("adminStatus");
-
-box.className =
-"status success";
-
-box.innerHTML =
-"✅ <b>Success</b><br>" +
-message;
+})
 
 }
+);
 
+const checkResult =
+await checkResponse.json();
 
-function escapeHTML(value){
+if(!checkResponse.ok){
 
-return String(value)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
+throw new Error(
+checkResult.error ||
+"AI evaluation failed."
+);
+
+}
+
+if(
+!checkResult.evaluation
+){
+
+throw new Error(
+"AI returned an empty evaluation."
+);
 
 }
 
 
 /* ==================================================
-START PORTAL
+STEP 5 — SHOW SUBMISSION
 ================================================== */
 
-initializePortal();
+showStudentSuccess(
+"Answer sheet checked successfully by AI."
+);
 
-</script>
+document
+.getElementById("checkin")
+.style.display =
+"block";
 
-</body>
-</html>
+document
+.getElementById("checkinText")
+.innerHTML = `
+
+<b>Student:</b>
+${escapeHTML(name)}
+
+<br>
+
+<b>Registration Number:</b>
+${escapeHTML(registration)}
+
+<br>
+
+<b>Subject:</b>
+${escapeHTML(subject.name)}
+
+<br>
+
+<b>Test Type:</b>
+${escapeHTML(formatTestType(testType))}
+
+<br>
+
+<b>Checking Mode:</b>
+${checkingMode === "strict"
+? "ICAI Strict"
+: "Moderate"}
+
+<br>
+
+<b>Descriptive Maximum:</b>
+${subject.descriptive}
+
+<br><br>
+
+AI evaluation completed.
+
+`;
+
+
+/* ==================================================
+STEP 6 — DISPLAY RESULT
+================================================== */
+
+displayEvaluation(
+che
