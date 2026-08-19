@@ -19,126 +19,87 @@ export default async function handler(req, res) {
       type
     } = req.body;
 
-
-    if (
-      !filename ||
-      !data ||
-      !subject ||
-      !testType ||
-      !type
-    ) {
-
+    if (!filename || !data) {
       return res.status(400).json({
-        error:
-          "filename, data, subject, testType and type are required"
+        error: "File data missing"
       });
-
     }
 
-
-    if (
-      type !== "question-paper" &&
-      type !== "suggested-answer"
-    ) {
-
+    if (!subject) {
       return res.status(400).json({
-        error: "Invalid material type"
+        error: "Subject missing"
       });
-
     }
 
-
-    const allowedTestTypes = [
-      "MTP",
-      "RTP",
-      "MODEL_TEST",
-      "OTHER"
-    ];
-
-
-    if (
-      !allowedTestTypes.includes(testType)
-    ) {
-
+    if (!testType) {
       return res.status(400).json({
-        error: "Invalid test type"
+        error: "Test type missing"
       });
-
     }
 
+    if (!type) {
+      return res.status(400).json({
+        error: "Material type missing"
+      });
+    }
 
     const safeSubject =
       String(subject)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
-
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
 
     const safeTestType =
       String(testType)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-");
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
 
+    const safeType =
+      String(type)
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
 
     const safeFilename =
       String(filename)
-        .replace(/[^a-zA-Z0-9._-]/g, "-");
-
+        .replace(/[^a-zA-Z0-9._-]/g, "_");
 
     const buffer =
       Buffer.from(data, "base64");
 
+    const pathname =
+      `materials/${safeSubject}/${safeTestType}/${safeType}-${Date.now()}-${safeFilename}`;
 
     const blob =
       await put(
-
-        `test-material/${safeSubject}/${safeTestType}/${type}/${Date.now()}-${safeFilename}`,
-
+        pathname,
         buffer,
-
         {
           access: "private",
-
           contentType:
-            contentType ||
-            "application/pdf"
+            contentType || "application/pdf"
         }
-
       );
-
 
     return res.status(200).json({
 
       success: true,
 
-      url:
-        blob.url,
+      url: blob.url,
 
-      pathname:
-        blob.pathname,
+      pathname: blob.pathname,
 
-      subject:
+      classification: {
         subject,
-
-      testType:
         testType,
-
-      type:
-        type
+        materialType: type
+      }
 
     });
-
 
   } catch (error) {
 
     console.error(error);
 
-
     return res.status(500).json({
-
       error:
+        error.message ||
         "Material upload failed"
-
     });
 
   }
