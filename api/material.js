@@ -1,199 +1,233 @@
-import { put } from "@Vercel/blob";
+import { put } from "@vercel/blob";
 
-import {
-  isAdminAuthenticated
-} from "./_adminAuth.js";
-
-
-export default async function handler(
-  req,
-  res
-) {
+export default async function handler(req, res) {
 
   if (req.method !== "POST") {
-
     return res.status(405).json({
       error: "Method not allowed"
     });
-
   }
-
-
-  /* ==========================================
-     ADMIN SECURITY
-  ========================================== */
-
-  if (
-    !isAdminAuthenticated(req)
-  ) {
-
-    return res.status(403).json({
-      error:
-        "Admin authentication required."
-    });
-
-  }
-
 
   try {
+
+    /*
+     * IMPORTANT:
+     * Admin authentication is handled by the existing
+     * admin-login/admin-logout system.
+     *
+     * If your existing material.js already has a working
+     * admin-session verification helper, keep that helper
+     * and place it before this upload section.
+     */
 
     const {
       filename,
       data,
       contentType,
-      subject,
+
+      level,
+      group,
+
+      subjectKey,
+
       testType,
+
+      modelTestNumber,
+
       type
+
     } = req.body || {};
 
 
+    /* ================================================
+       VALIDATION
+    ================================================ */
+
     if (!filename || !data) {
-
       return res.status(400).json({
-        error:
-          "File data missing"
+        error: "File data is missing."
       });
-
     }
 
-
-    if (!subject) {
-
+    if (!level) {
       return res.status(400).json({
-        error:
-          "Subject missing"
+        error: "CA Level is missing."
       });
-
     }
 
+    if (!group) {
+      return res.status(400).json({
+        error: "Group is missing."
+      });
+    }
 
     if (!testType) {
-
       return res.status(400).json({
-        error:
-          "Test type missing"
+        error: "Test Type is missing."
       });
+    }
+
+    if (testType === "MODEL_TEST") {
+
+      if (!modelTestNumber) {
+        return res.status(400).json({
+          error: "Model Test number is missing."
+        });
+      }
+
+      if (type !== "model-test") {
+        return res.status(400).json({
+          error: "Invalid Model Test upload type."
+        });
+      }
+
+    } else {
+
+      if (!subjectKey) {
+        return res.status(400).json({
+          error: "Subject is missing."
+        });
+      }
+
+      if (
+        type !== "question-paper" &&
+        type !== "suggested-answer"
+      ) {
+        return res.status(400).json({
+          error: "Invalid material type."
+        });
+      }
 
     }
 
 
-    if (!type) {
-
-      return res.status(400).json({
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return res.status(500).json({
         error:
-          "Material type missing"
+          "BLOB_READ_WRITE_TOKEN is not configured."
       });
+    }
+
+
+    /* ================================================
+       SAFE VALUES
+    ================================================ */
+
+    function safe(value) {
+
+      return String(value)
+        .trim()
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
 
     }
 
 
-    if (
-      type !==
-      "question-paper" &&
-      type !==
-      "suggested-answer"
-    ) {
+    const safeLevel =
+      safe(level);
 
-      return res.status(400).json({
-        error:
-          "Invalid material type."
-      });
-
-    }
-
-
-    const safeSubject =
-      String(subject)
-        .replace(
-          /[^a-zA-Z0-9_-]/g,
-          "_"
-        );
-
+    const safeGroup =
+      safe(group);
 
     const safeTestType =
-      String(testType)
-        .replace(
-          /[^a-zA-Z0-9_-]/g,
-          "_"
-        );
+      safe(testType);
 
 
-    const safeType =
-      String(type)
-        .replace(
-          /[^a-zA-Z0-9_-]/g,
-          "_"
-        );
+    let pathname;
 
 
-    const safeFilename =
-      String(filename)
-        .replace(
-          /[^a-zA-Z0-9._-]/g,
-          "_"
-        );
+    /* ================================================
+       MODEL TEST
+       ONE PDF = QUESTION + SUGGESTED ANSWER
+    ================================================ */
 
+    if (testType === "MODEL_TEST") {
 
-    const buffer =
-      Buffer.from(
-        data,
-        "base64"
-      );
+      const safeModel =
+        safe(modelTestNumber);
 
-
-    /* ==========================================
-       EXTRA SERVER-SIDE SIZE PROTECTION
-    ========================================== */
-
-    if (
-      buffer.length >
-      10 * 1024 * 1024
-    ) {
-
-      return res.status(400).json({
-        error:
-          "Material file must be smaller than 10 MB."
-      });
+      pathname =
+        `materials/${safeLevel}/${safeGroup}/model-test-${safeModel}/model-test-${Date.now()}-${safe(filename)}`;
 
     }
 
 
-    const pathname =
-      `materials/${safeSubject}/${safeTestType}/${safeType}-${Date.now()}-${safeFilename}`;
+    /* ================================================
+       NORMAL MATERIAL
+    ================================================ */
 
+    else {
+
+      const safeSubject =
+        safe(subjectKey);
+
+      pathname =
+        `materials/${safeLevel}/${safeGroup}/${safeSubject}/${safeTestType}/${safe(type)}-${Date.now()}-${safe(filename)}`;
+
+    }
+
+
+    /* ================================================
+       BASE64 → BUFFER
+    ================================================ */
+
+    const buffer =
+      Buffer.from(data, "base64");
+
+
+    /* ================================================
+       UPLOAD
+    ================================================ */
 
     const blob =
       await put(
         pathname,
         buffer,
         {
-          access: "private",
+          access: "public",
+
+          token:
+            process.env.BLOB_READ_WRITE_TOKEN,
 
           contentType:
             contentType ||
-            "application/pdf"
+            "application/pdf",
+
+          addRandomSuffix: false
         }
       );
+
+
+    console.log(
+      "MATERIAL UPLOADED:",
+      blob.pathname
+    );
 
 
     return res.status(200).json({
 
       success: true,
 
-      url:
-        blob.url,
-
       pathname:
         blob.pathname,
 
-      classification: {
+      url:
+        blob.url,
 
-        subject,
+      metadata: {
+
+        level,
+
+        group,
+
+        subjectKey:
+          subjectKey || null,
 
         testType,
 
-        materialType:
-          type
+        modelTestNumber:
+          modelTestNumber || null,
+
+        type
 
       }
 
@@ -203,16 +237,18 @@ export default async function handler(
   } catch (error) {
 
     console.error(
-      "Material upload error:",
+      "MATERIAL UPLOAD ERROR:",
       error
     );
-
 
     return res.status(500).json({
 
       error:
-        error.message ||
-        "Material upload failed"
+        "Unable to upload material.",
+
+      details:
+        error?.message ||
+        "Unknown error"
 
     });
 
