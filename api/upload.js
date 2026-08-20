@@ -1,5 +1,11 @@
 import { put } from "@vercel/blob";
 
+function safe(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
@@ -10,44 +16,90 @@ export default async function handler(req, res) {
 
   try {
 
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return res.status(500).json({
+        error:
+          "BLOB_READ_WRITE_TOKEN is not configured."
+      });
+    }
+
     const {
       filename,
       data,
       contentType,
       studentName,
       registrationNumber,
+      level,
       subject,
       subjectKey,
       testType,
-      checkingMode,
-      descriptiveMaximum
-    } = req.body;
+      checkingMode
+    } = req.body || {};
 
-    if (!filename || !data) {
+    if (!data) {
       return res.status(400).json({
-        error: "File data missing"
+        error:
+          "Answer sheet data is missing."
       });
     }
 
-    const safeSubject =
-      String(subjectKey || "unknown")
-        .replace(/[^a-zA-Z0-9_-]/g, "_");
+    if (!filename) {
+      return res.status(400).json({
+        error:
+          "Answer sheet filename is missing."
+      });
+    }
 
-    const safeTestType =
-      String(testType || "OTHER")
-        .replace(/[^a-zA-Z0-9_-]/g, "_");
+    if (
+      !String(filename)
+        .toLowerCase()
+        .endsWith(".pdf")
+    ) {
+      return res.status(400).json({
+        error:
+          "Only PDF answer sheets are allowed."
+      });
+    }
 
-    const safeFilename =
-      String(filename)
-        .replace(/[^a-zA-Z0-9._-]/g, "_");
+    let cleanBase64 =
+      String(data);
 
-    const timestamp = Date.now();
+    if (
+      cleanBase64.includes(",")
+    ) {
+      cleanBase64 =
+        cleanBase64.split(",").pop();
+    }
 
     const buffer =
-      Buffer.from(data, "base64");
+      Buffer.from(
+        cleanBase64,
+        "base64"
+      );
+
+    if (!buffer.length) {
+      return res.status(400).json({
+        error:
+          "Invalid PDF data."
+      });
+    }
+
+    /*
+      Keep student files private.
+    */
 
     const pathname =
-      `answer-sheets/${safeSubject}/${safeTestType}/${timestamp}-${safeFilename}`;
+      [
+        "answer-sheets",
+        safe(level || "unknown"),
+        safe(subjectKey || "unknown"),
+        safe(testType || "unknown"),
+        `${Date.now()}-${safe(
+          studentName || "student"
+        )}-${safe(
+          registrationNumber || "unknown"
+        )}-${safe(filename)}`
+      ].join("/");
 
     const blob =
       await put(
@@ -55,8 +107,15 @@ export default async function handler(req, res) {
         buffer,
         {
           access: "private",
+
+          token:
+            process.env.BLOB_READ_WRITE_TOKEN,
+
           contentType:
-            contentType || "application/pdf"
+            contentType ||
+            "application/pdf",
+
+          addRandomSuffix: false
         }
       );
 
@@ -64,9 +123,11 @@ export default async function handler(req, res) {
 
       success: true,
 
-      url: blob.url,
+      message:
+        "Answer sheet uploaded successfully.",
 
-      pathname: blob.pathname,
+      pathname:
+        blob.pathname,
 
       metadata: {
         studentName:
@@ -75,6 +136,9 @@ export default async function handler(req, res) {
         registrationNumber:
           registrationNumber || "",
 
+        level:
+          level || "",
+
         subject:
           subject || "",
 
@@ -82,25 +146,30 @@ export default async function handler(req, res) {
           subjectKey || "",
 
         testType:
-          testType || "OTHER",
+          testType || "",
 
         checkingMode:
-          checkingMode || "strict",
-
-        descriptiveMaximum:
-          descriptiveMaximum || null
+          checkingMode || ""
       }
 
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "UPLOAD ERROR:",
+      error
+    );
 
     return res.status(500).json({
+
       error:
-        error.message ||
-        "Upload failed"
+        "Answer sheet upload failed.",
+
+      details:
+        error?.message ||
+        "Unknown error"
+
     });
 
   }
