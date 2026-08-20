@@ -1,19 +1,41 @@
 import { list } from "@vercel/blob";
 
+/*
+==================================================
+ VERCEL FUNCTION CONFIG
+==================================================
+*/
+export const config = {
+  maxDuration: 60
+};
+
 export default async function handler(req, res) {
+
   /*
-   * ALWAYS RETURN JSON
-   */
+  ==================================================
+   ALWAYS RETURN JSON
+  ==================================================
+  */
+
   res.setHeader("Content-Type", "application/json");
 
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      error: "Method not allowed"
+      error: "Method not allowed."
     });
   }
 
   try {
+
+    /*
+    ==================================================
+     READ REQUEST
+    ==================================================
+    */
+
+    const body = req.body || {};
+
     const {
       answerSheetBase64,
       answerSheetName,
@@ -22,11 +44,13 @@ export default async function handler(req, res) {
       testType,
       checkingMode,
       descriptiveMaximum
-    } = req.body || {};
+    } = body;
 
-    /* ==================================================
-       VALIDATION
-    ================================================== */
+    /*
+    ==================================================
+     VALIDATION
+    ==================================================
+    */
 
     if (!answerSheetBase64) {
       return res.status(400).json({
@@ -51,7 +75,10 @@ export default async function handler(req, res) {
 
     const maximumMarks = Number(descriptiveMaximum);
 
-    if (!Number.isFinite(maximumMarks) || maximumMarks <= 0) {
+    if (
+      !Number.isFinite(maximumMarks) ||
+      maximumMarks <= 0
+    ) {
       return res.status(400).json({
         success: false,
         error: "Invalid descriptive maximum marks."
@@ -59,27 +86,34 @@ export default async function handler(req, res) {
     }
 
     /*
-     * IMPORTANT:
-     * Support BOTH names so your existing Vercel variable
-     * AI_Gateway_API_KEY also works.
-     */
-    const AI_KEY =
-      process.env.AI_GATEWAY_API_KEY ||
-      process.env.AI_Gateway_API_KEY;
+    ==================================================
+     ENVIRONMENT VARIABLES
+    ==================================================
+    */
 
-    const BLOB_TOKEN =
-      process.env.BLOB_READ_WRITE_TOKEN ||
+    const gatewayKey =
+      process.env.AI_GATEWAY_API_KEY;
+
+    const blobToken =
       process.env.BLOB_READ_WRITE_TOKEN;
 
-    if (!AI_KEY) {
+    if (!gatewayKey) {
+      console.error(
+        "Missing AI_GATEWAY_API_KEY"
+      );
+
       return res.status(500).json({
         success: false,
         error:
-          "AI Gateway API key is not configured. Add AI_GATEWAY_API_KEY in Vercel Environment Variables."
+          "AI Gateway API key is not configured."
       });
     }
 
-    if (!BLOB_TOKEN) {
+    if (!blobToken) {
+      console.error(
+        "Missing BLOB_READ_WRITE_TOKEN"
+      );
+
       return res.status(500).json({
         success: false,
         error:
@@ -87,57 +121,92 @@ export default async function handler(req, res) {
       });
     }
 
-    /* ==================================================
-       SAFE PATH
-    ================================================== */
+    /*
+    ==================================================
+     SAFE PATH VALUES
+    ==================================================
+    */
 
-    const safeSubject = String(subjectKey)
-      .replace(/[^a-zA-Z0-9_-]/g, "_");
+    const safeSubject =
+      String(subjectKey)
+        .replace(
+          /[^a-zA-Z0-9_-]/g,
+          "_"
+        );
 
-    const safeTestType = String(testType)
-      .replace(/[^a-zA-Z0-9_-]/g, "_");
+    const safeTestType =
+      String(testType)
+        .replace(
+          /[^a-zA-Z0-9_-]/g,
+          "_"
+        );
 
-    /* ==================================================
-       FIND MATERIALS
-    ================================================== */
+    /*
+    ==================================================
+     FIND MATERIALS
+    ==================================================
+    */
 
     const materialPrefix =
       `materials/${safeSubject}/${safeTestType}/`;
 
-    const materialList = await list({
-      prefix: materialPrefix,
-      token: BLOB_TOKEN
-    });
+    console.log(
+      "Looking for materials:",
+      materialPrefix
+    );
 
-    const blobs = Array.isArray(materialList?.blobs)
-      ? materialList.blobs
-      : [];
+    const materialList =
+      await list({
+        prefix: materialPrefix,
+        token: blobToken
+      });
 
-    const questionPapers = blobs
-      .filter((blob) =>
-        String(blob.pathname).includes("/question-paper-")
-      )
-      .sort(
-        (a, b) =>
-          new Date(b.uploadedAt || 0) -
-          new Date(a.uploadedAt || 0)
-      );
+    const blobs =
+      Array.isArray(materialList.blobs)
+        ? materialList.blobs
+        : [];
 
-    const suggestedAnswers = blobs
-      .filter((blob) =>
-        String(blob.pathname).includes("/suggested-answer-")
-      )
-      .sort(
-        (a, b) =>
-          new Date(b.uploadedAt || 0) -
-          new Date(a.uploadedAt || 0)
-      );
+    const questionPapers =
+      blobs
+        .filter(blob =>
+          blob.pathname.includes(
+            "/question-paper-"
+          )
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.uploadedAt) -
+            new Date(a.uploadedAt)
+        );
+
+    const suggestedAnswers =
+      blobs
+        .filter(blob =>
+          blob.pathname.includes(
+            "/suggested-answer-"
+          )
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.uploadedAt) -
+            new Date(a.uploadedAt)
+        );
+
+    console.log(
+      "Question papers found:",
+      questionPapers.length
+    );
+
+    console.log(
+      "Suggested answers found:",
+      suggestedAnswers.length
+    );
 
     if (!questionPapers.length) {
       return res.status(404).json({
         success: false,
         error:
-          `No Question Paper found for ${subject || subjectKey} - ${testType}.`
+          `No Question Paper found for ${subject} - ${testType}.`
       });
     }
 
@@ -145,52 +214,95 @@ export default async function handler(req, res) {
       return res.status(404).json({
         success: false,
         error:
-          `No Suggested Answer found for ${subject || subjectKey} - ${testType}.`
+          `No Suggested Answer found for ${subject} - ${testType}.`
       });
     }
 
-    const questionPaper = questionPapers[0];
-    const suggestedAnswer = suggestedAnswers[0];
+    const questionPaper =
+      questionPapers[0];
 
-    /* ==================================================
-       DOWNLOAD PRIVATE BLOBS
-    ================================================== */
+    const suggestedAnswer =
+      suggestedAnswers[0];
+
+    /*
+    ==================================================
+     DOWNLOAD PRIVATE BLOBS
+    ==================================================
+    */
 
     async function downloadBlob(blob) {
-      if (!blob?.url) {
-        throw new Error(
-          `Blob URL missing for ${blob?.pathname || "unknown file"}`
-        );
-      }
 
-      const response = await fetch(blob.url, {
-        headers: {
-          Authorization: `Bearer ${BLOB_TOKEN}`
-        }
-      });
+      console.log(
+        "Downloading:",
+        blob.pathname
+      );
+
+      const response =
+        await fetch(
+          blob.url,
+          {
+            method: "GET",
+            headers: {
+              Authorization:
+                `Bearer ${blobToken}`
+            }
+          }
+        );
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => "");
+
+        const errorText =
+          await response.text()
+            .catch(() => "");
 
         throw new Error(
-          `Unable to download ${blob.pathname}. HTTP ${response.status}. ${errorText.slice(0, 300)}`
+          `Unable to download ${blob.pathname}. ` +
+          `HTTP ${response.status}. ` +
+          errorText.slice(0, 300)
         );
       }
 
-      const arrayBuffer = await response.arrayBuffer();
+      const arrayBuffer =
+        await response.arrayBuffer();
 
-      return Buffer.from(arrayBuffer).toString("base64");
+      if (!arrayBuffer.byteLength) {
+        throw new Error(
+          `Downloaded file is empty: ${blob.pathname}`
+        );
+      }
+
+      return Buffer
+        .from(arrayBuffer)
+        .toString("base64");
     }
 
+    /*
+    ==================================================
+     DOWNLOAD QUESTION PAPER
+    ==================================================
+    */
+
     const questionPaperBase64 =
-      await downloadBlob(questionPaper);
+      await downloadBlob(
+        questionPaper
+      );
+
+    /*
+    ==================================================
+     DOWNLOAD SUGGESTED ANSWER
+    ==================================================
+    */
 
     const suggestedAnswerBase64 =
-      await downloadBlob(suggestedAnswer);
+      await downloadBlob(
+        suggestedAnswer
+      );
 
-    /* ==================================================
-       TEST TYPE
-    ================================================== */
+    /*
+    ==================================================
+     TEST TYPE
+    ==================================================
+    */
 
     const formattedTestType =
       testType === "MODEL_TEST"
@@ -199,9 +311,11 @@ export default async function handler(req, res) {
         ? "Other"
         : testType;
 
-    /* ==================================================
-       CHECKING MODE
-    ================================================== */
+    /*
+    ==================================================
+     CHECKING MODE
+    ==================================================
+    */
 
     const checkingInstructions =
       checkingMode === "strict"
@@ -220,14 +334,16 @@ MODERATE EXAMINER-STYLE CHECKING:
 
 - Give reasonable step marking.
 - Give credit for substantially correct approaches.
-- Minor calculation errors may still receive partial marks.
+- Minor calculation errors may receive partial marks.
 - Conceptual errors must be penalised.
 - Missing essential workings should affect marks.
 `;
 
-    /* ==================================================
-       AI PROMPT
-    ================================================== */
+    /*
+    ==================================================
+     AI PROMPT
+    ==================================================
+    */
 
     const prompt = `
 You are an expert CA Intermediate examiner.
@@ -238,20 +354,20 @@ Evaluate the student's answer sheet against:
 2. Official/reference Suggested Answer
 3. Student Answer Sheet
 
-DO NOT evaluate the student answer independently.
+Do not evaluate from the student's answer alone.
 
-First identify ALL descriptive questions from the Question Paper.
+First identify every descriptive question from the Question Paper.
 
-Then locate the student's corresponding answers.
+Then locate the student's corresponding answer.
 
-Then compare each answer with the Suggested Answer.
+Then compare it with the Suggested Answer.
 
 ==================================================
 EXAM INFORMATION
 ==================================================
 
 SUBJECT:
-${subject || subjectKey}
+${subject}
 
 TEST / PAPER TYPE:
 ${formattedTestType}
@@ -261,13 +377,13 @@ ${maximumMarks}
 
 CHECKING MODE:
 ${checkingMode === "strict"
-  ? "ICAI STRICT"
-  : "MODERATE"}
+  ? "ICAI Strict"
+  : "Moderate"}
 
 ${checkingInstructions}
 
 ==================================================
-CORE RULES
+IMPORTANT RULES
 ==================================================
 
 1. Evaluate ONLY descriptive questions.
@@ -292,14 +408,14 @@ CORE RULES
    - workings
    - conclusions
 
-7. Compare the student's answer directly against the expected answer.
+7. Compare the student's answer directly.
 
-8. Award genuine partial and step marks.
+8. Give genuine partial/step marks.
 
 9. A wrong final answer with substantially correct working may receive
    appropriate partial marks.
 
-10. A wrong approach must NOT receive marks merely because it contains
+10. A wrong approach should not receive marks merely because it contains
     similar numbers or keywords.
 
 11. Theory questions must be checked for:
@@ -320,50 +436,34 @@ CORE RULES
     marks_awarded = 0
     status = "not_attempted"
 
-14. If handwriting/content cannot be reliably understood:
+14. Unclear handwriting:
     status = "unclear"
-    Do NOT confidently guess.
+    Do not confidently guess.
 
 15. Never award more than marks_available.
 
 16. Never award negative marks.
 
-17. Include every descriptive question found in the Question Paper.
+17. Include every descriptive question found.
 
 18. Exclude MCQs.
 
 19. Handle internal choices carefully.
-    Only evaluate questions actually attempted by the student.
-    Do not penalise an unselected internal choice.
 
-20. Remarks must explain actual marks lost.
+20. Remarks must explain actual lost marks.
 
 21. Do not give generic praise.
 
 22. Do not reveal hidden reasoning.
 
 ==================================================
-IMPORTANT MARKING
+FINAL CHECK
 ==================================================
 
-Marks must be awarded question-by-question.
-
-For each question:
-marks_awarded <= marks_available
-
-The sum of marks_awarded must equal total_marks.
-
-Do NOT artificially force the student to receive the maximum.
-
-==================================================
-FINAL VERIFICATION
-==================================================
-
-Before returning JSON verify:
+Before returning the result verify:
 
 - Every descriptive question is included.
 - MCQs are excluded.
-- Question numbers are correct.
 - Marks available are correct.
 - Awarded marks are correct.
 - Total marks are mathematically correct.
@@ -373,224 +473,300 @@ Before returning JSON verify:
 Return ONLY valid JSON.
 `;
 
-    /* ==================================================
-       AI REQUEST
-    ================================================== */
+    /*
+    ==================================================
+     AI REQUEST
+    ==================================================
+    */
 
-    const aiResponse = await fetch(
-      "https://ai-gateway.vercel.sh/v1/responses",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${AI_KEY}`
-        },
-
-        body: JSON.stringify({
-          model: "openai/gpt-5.6-sol",
-
-          reasoning: {
-            effort: "high"
-          },
-
-          max_output_tokens: 16000,
-
-          input: [
-            {
-              type: "message",
-
-              role: "user",
-
-              content: [
-                {
-                  type: "input_text",
-                  text: prompt
-                },
-
-                {
-                  type: "input_text",
-                  text:
-                    `QUESTION PAPER FILE: ${questionPaper.pathname}`
-                },
-
-                {
-                  type: "input_file",
-
-                  filename:
-                    questionPaper.pathname
-                      .split("/")
-                      .pop() || "question-paper.pdf",
-
-                  file_data:
-                    `data:application/pdf;base64,${questionPaperBase64}`
-                },
-
-                {
-                  type: "input_text",
-                  text:
-                    `SUGGESTED ANSWER FILE: ${suggestedAnswer.pathname}`
-                },
-
-                {
-                  type: "input_file",
-
-                  filename:
-                    suggestedAnswer.pathname
-                      .split("/")
-                      .pop() || "suggested-answer.pdf",
-
-                  file_data:
-                    `data:application/pdf;base64,${suggestedAnswerBase64}`
-                },
-
-                {
-                  type: "input_text",
-
-                  text:
-                    `STUDENT ANSWER SHEET: ${answerSheetName || "answer-sheet.pdf"}`
-                },
-
-                {
-                  type: "input_file",
-
-                  filename:
-                    answerSheetName || "answer-sheet.pdf",
-
-                  file_data:
-                    `data:application/pdf;base64,${answerSheetBase64}`
-                }
-              ]
-            }
-          ],
-
-          text: {
-            format: {
-              type: "json_schema",
-
-              name: "ca_exam_evaluation",
-
-              strict: true,
-
-              schema: {
-                type: "object",
-
-                properties: {
-                  overall_summary: {
-                    type: "string"
-                  },
-
-                  questions: {
-                    type: "array",
-
-                    items: {
-                      type: "object",
-
-                      properties: {
-                        question_number: {
-                          type: "string"
-                        },
-
-                        marks_available: {
-                          type: "number"
-                        },
-
-                        marks_awarded: {
-                          type: "number"
-                        },
-
-                        status: {
-                          type: "string",
-
-                          enum: [
-                            "correct",
-                            "partially_correct",
-                            "incorrect",
-                            "not_attempted",
-                            "unclear"
-                          ]
-                        },
-
-                        remarks: {
-                          type: "string"
-                        }
-                      },
-
-                      required: [
-                        "question_number",
-                        "marks_available",
-                        "marks_awarded",
-                        "status",
-                        "remarks"
-                      ],
-
-                      additionalProperties: false
-                    }
-                  },
-
-                  total_marks: {
-                    type: "number"
-                  },
-
-                  maximum_marks: {
-                    type: "number"
-                  },
-
-                  percentage: {
-                    type: "number"
-                  }
-                },
-
-                required: [
-                  "overall_summary",
-                  "questions",
-                  "total_marks",
-                  "maximum_marks",
-                  "percentage"
-                ],
-
-                additionalProperties: false
-              }
-            }
-          }
-        })
-      }
+    console.log(
+      "Sending evaluation request to AI Gateway..."
     );
 
-    /* ==================================================
-       READ AI RESPONSE SAFELY
-    ================================================== */
+    const controller =
+      new AbortController();
 
-    const responseText =
-      await aiResponse.text();
+    const timeout =
+      setTimeout(
+        () => controller.abort(),
+        52000
+      );
 
-    let rawResult = null;
+    let aiResponse;
 
     try {
-      rawResult = responseText
-        ? JSON.parse(responseText)
-        : null;
-    } catch {
+
+      aiResponse =
+        await fetch(
+          "https://ai-gateway.vercel.sh/v1/responses",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+
+              Authorization:
+                `Bearer ${gatewayKey}`
+            },
+
+            signal:
+              controller.signal,
+
+            body: JSON.stringify({
+
+              model:
+                "openai/gpt-5.6-sol",
+
+              reasoning: {
+                effort: "high"
+              },
+
+              input: [
+
+                {
+                  type: "message",
+
+                  role: "user",
+
+                  content: [
+
+                    {
+                      type: "input_text",
+
+                      text:
+                        prompt
+                    },
+
+                    {
+                      type: "input_file",
+
+                      filename:
+                        questionPaper.pathname
+                          .split("/")
+                          .pop(),
+
+                      file_data:
+                        `data:application/pdf;base64,${questionPaperBase64}`
+                    },
+
+                    {
+                      type: "input_file",
+
+                      filename:
+                        suggestedAnswer.pathname
+                          .split("/")
+                          .pop(),
+
+                      file_data:
+                        `data:application/pdf;base64,${suggestedAnswerBase64}`
+                    },
+
+                    {
+                      type: "input_file",
+
+                      filename:
+                        answerSheetName ||
+                        "answer-sheet.pdf",
+
+                      file_data:
+                        answerSheetBase64
+                          .startsWith("data:")
+                          ? answerSheetBase64
+                          : `data:application/pdf;base64,${answerSheetBase64}`
+                    }
+
+                  ]
+                }
+
+              ],
+
+              text: {
+
+                format: {
+
+                  type: "json_schema",
+
+                  name:
+                    "ca_exam_evaluation",
+
+                  strict: true,
+
+                  schema: {
+
+                    type: "object",
+
+                    properties: {
+
+                      overall_summary: {
+                        type: "string"
+                      },
+
+                      questions: {
+
+                        type: "array",
+
+                        items: {
+
+                          type: "object",
+
+                          properties: {
+
+                            question_number: {
+                              type: "string"
+                            },
+
+                            marks_available: {
+                              type: "number"
+                            },
+
+                            marks_awarded: {
+                              type: "number"
+                            },
+
+                            status: {
+
+                              type: "string",
+
+                              enum: [
+                                "correct",
+                                "partially_correct",
+                                "incorrect",
+                                "not_attempted",
+                                "unclear"
+                              ]
+
+                            },
+
+                            remarks: {
+                              type: "string"
+                            }
+
+                          },
+
+                          required: [
+                            "question_number",
+                            "marks_available",
+                            "marks_awarded",
+                            "status",
+                            "remarks"
+                          ],
+
+                          additionalProperties:
+                            false
+
+                        }
+
+                      },
+
+                      total_marks: {
+                        type: "number"
+                      },
+
+                      maximum_marks: {
+                        type: "number"
+                      },
+
+                      percentage: {
+                        type: "number"
+                      }
+
+                    },
+
+                    required: [
+                      "overall_summary",
+                      "questions",
+                      "total_marks",
+                      "maximum_marks",
+                      "percentage"
+                    ],
+
+                    additionalProperties:
+                      false
+
+                  }
+
+                }
+
+              }
+
+            })
+          }
+        );
+
+    } catch (error) {
+
+      clearTimeout(timeout);
+
+      if (
+        error?.name ===
+        "AbortError"
+      ) {
+
+        console.error(
+          "AI Gateway request timed out."
+        );
+
+        return res.status(504).json({
+          success: false,
+          error:
+            "AI evaluation timed out. Please try again."
+        });
+
+      }
+
       console.error(
-        "AI Gateway returned non-JSON:",
-        responseText?.slice(0, 2000)
+        "AI Gateway network error:",
+        error
       );
 
       return res.status(502).json({
         success: false,
         error:
-          "AI Gateway returned an invalid response.",
+          "Unable to connect to AI Gateway.",
         details:
-          responseText?.slice(0, 1000) ||
-          "Empty response"
+          error?.message ||
+          "Network error"
       });
     }
 
-    /* ==================================================
-       AI HTTP ERROR
-    ================================================== */
+    clearTimeout(timeout);
+
+    /*
+    ==================================================
+     READ AI RESPONSE
+    ==================================================
+    */
+
+    let rawResult;
+
+    try {
+
+      rawResult =
+        await aiResponse.json();
+
+    } catch (error) {
+
+      console.error(
+        "AI response was not JSON:",
+        error
+      );
+
+      return res.status(502).json({
+        success: false,
+        error:
+          "AI Gateway returned an invalid response."
+      });
+    }
+
+    /*
+    ==================================================
+     AI HTTP ERROR
+    ==================================================
+    */
 
     if (!aiResponse.ok) {
+
       console.error(
         "AI Gateway HTTP error:",
         aiResponse.status,
@@ -598,81 +774,87 @@ Return ONLY valid JSON.
       );
 
       return res.status(502).json({
+
         success: false,
+
         error:
           "AI evaluation failed.",
+
         details:
           rawResult?.error?.message ||
           rawResult?.message ||
           `AI Gateway HTTP ${aiResponse.status}`
+
       });
     }
 
-    /* ==================================================
-       EXTRACT OUTPUT TEXT
-    ================================================== */
+    /*
+    ==================================================
+     EXTRACT OUTPUT TEXT
+    ==================================================
+    */
 
     let outputText = "";
 
     if (
-      typeof rawResult?.output_text === "string"
+      typeof rawResult.output_text ===
+      "string"
     ) {
+
       outputText =
-        rawResult.output_text.trim();
+        rawResult.output_text;
+
     }
 
     if (
       !outputText &&
-      Array.isArray(rawResult?.output)
+      Array.isArray(
+        rawResult.output
+      )
     ) {
-      for (const item of rawResult.output) {
-        if (!Array.isArray(item?.content)) {
+
+      for (
+        const item
+        of rawResult.output
+      ) {
+
+        if (
+          !Array.isArray(
+            item.content
+          )
+        ) {
           continue;
         }
 
-        for (const content of item.content) {
+        for (
+          const content
+          of item.content
+        ) {
+
           if (
-            typeof content?.text === "string"
+            typeof content.text ===
+            "string"
           ) {
-            outputText += content.text;
+
+            outputText +=
+              content.text;
+
           }
+
         }
+
       }
 
-      outputText =
-        outputText.trim();
     }
 
-    /*
-     * Some Responses API responses may expose
-     * the structured JSON in output content.
-     */
-    if (!outputText && rawResult?.output) {
-      try {
-        const possibleJson =
-          JSON.stringify(rawResult.output);
-
-        if (
-          possibleJson &&
-          possibleJson !== "[]"
-        ) {
-          const match =
-            possibleJson.match(
-              /\{[\s\S]*\}/
-            );
-
-          if (match) {
-            outputText =
-              match[0];
-          }
-        }
-      } catch {}
-    }
+    outputText =
+      outputText.trim();
 
     if (!outputText) {
+
       console.error(
         "Empty AI output:",
-        JSON.stringify(rawResult).slice(0, 5000)
+        rawResult
       );
 
       return res.status(502).json({
@@ -682,49 +864,42 @@ Return ONLY valid JSON.
       });
     }
 
-    /* ==================================================
-       PARSE EVALUATION JSON
-    ================================================== */
+    /*
+    ==================================================
+     PARSE AI JSON
+    ==================================================
+    */
 
     let evaluation;
 
     try {
-      evaluation =
-        JSON.parse(outputText);
-    } catch {
-      /*
-       * Remove accidental markdown fences if model
-       * ever returns them.
-       */
-      try {
-        const cleaned =
-          outputText
-            .replace(/^```json\s*/i, "")
-            .replace(/^```\s*/i, "")
-            .replace(/\s*```$/i, "")
-            .trim();
 
-        evaluation =
-          JSON.parse(cleaned);
-      } catch {
-        console.error(
-          "Invalid AI JSON:",
-          outputText.slice(0, 5000)
+      evaluation =
+        JSON.parse(
+          outputText
         );
 
-        return res.status(502).json({
-          success: false,
-          error:
-            "AI returned invalid evaluation format.",
-          details:
-            outputText.slice(0, 1000)
-        });
-      }
+    } catch (error) {
+
+      console.error(
+        "AI returned invalid JSON:",
+        outputText.slice(0, 2000)
+      );
+
+      return res.status(502).json({
+        success: false,
+        error:
+          "AI returned an invalid evaluation format.",
+        details:
+          "The AI response was not valid JSON."
+      });
     }
 
-    /* ==================================================
-       STRUCTURE VALIDATION
-    ================================================== */
+    /*
+    ==================================================
+     VALIDATE STRUCTURE
+    ==================================================
+    */
 
     if (
       !evaluation ||
@@ -732,16 +907,19 @@ Return ONLY valid JSON.
         evaluation.questions
       )
     ) {
+
       return res.status(502).json({
         success: false,
         error:
-          "AI returned an invalid evaluation structure."
+          "Invalid evaluation structure returned by AI."
       });
     }
 
-    /* ==================================================
-       SCORE VALIDATION
-    ================================================== */
+    /*
+    ==================================================
+     SCORE VALIDATION
+    ==================================================
+    */
 
     let total = 0;
 
@@ -749,6 +927,7 @@ Return ONLY valid JSON.
       const question
       of evaluation.questions
     ) {
+
       let available =
         Number(
           question.marks_available
@@ -765,7 +944,12 @@ Return ONLY valid JSON.
         ) ||
         available < 0
       ) {
-        available = 0;
+
+        return res.status(502).json({
+          success: false,
+          error:
+            "Invalid marks returned by AI."
+        });
       }
 
       if (
@@ -780,7 +964,10 @@ Return ONLY valid JSON.
         awarded = 0;
       }
 
-      if (awarded > available) {
+      if (
+        awarded >
+        available
+      ) {
         awarded = available;
       }
 
@@ -798,22 +985,32 @@ Return ONLY valid JSON.
       total += awarded;
     }
 
+    /*
+    ==================================================
+     FINAL SCORE
+    ==================================================
+    */
+
     total =
       Math.round(
         total * 100
       ) / 100;
 
-    /*
-     * Never allow total above declared maximum.
-     */
-    if (total > maximumMarks) {
-      total = maximumMarks;
+    if (
+      total >
+      maximumMarks
+    ) {
+      total =
+        maximumMarks;
     }
 
     const percentage =
       Math.round(
-        (total / maximumMarks) *
-          10000
+        (
+          total /
+          maximumMarks
+        ) *
+        10000
       ) / 100;
 
     evaluation.total_marks =
@@ -825,18 +1022,29 @@ Return ONLY valid JSON.
     evaluation.percentage =
       percentage;
 
-    /* ==================================================
-       FINAL RESPONSE
-    ================================================== */
+    /*
+    ==================================================
+     SUCCESS
+    ==================================================
+    */
+
+    console.log(
+      "Evaluation completed:",
+      total,
+      "/",
+      maximumMarks
+    );
 
     return res.status(200).json({
+
       success: true,
 
       evaluation,
 
       metadata: {
+
         subject:
-          subject || subjectKey,
+          subject || "",
 
         subjectKey,
 
@@ -857,4 +1065,44 @@ Return ONLY valid JSON.
         suggestedAnswer:
           suggestedAnswer.pathname,
 
-   
+        answerSheet:
+          answerSheetName ||
+          "answer-sheet.pdf"
+
+      }
+
+    });
+
+  } catch (error) {
+
+    /*
+    ==================================================
+     FINAL SAFETY NET
+    ==================================================
+    */
+
+    console.error(
+      "CHECK ERROR:",
+      error
+    );
+
+    if (!res.headersSent) {
+
+      return res.status(500).json({
+
+        success: false,
+
+        error:
+          "Unable to evaluate answer sheet.",
+
+        details:
+          error?.message ||
+          "Unknown server error."
+
+      });
+
+    }
+
+  }
+
+}
