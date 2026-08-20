@@ -561,12 +561,11 @@ Return ONLY valid JSON.
     }
 
     if (!outputText) {
-      return res.status(500).json({
-        error:
-          "AI returned an empty evaluation.",
-        details: JSON.stringify(rawResult)
-      });
-    }
+     return res.status(500).json({
+  error: "AI evaluation failed.",
+  gatewayStatus: aiResponse.status,
+  gatewayResponse: rawResult
+});
 
     // ==================================================
     // PARSE JSON
