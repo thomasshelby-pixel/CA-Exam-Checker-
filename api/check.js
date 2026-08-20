@@ -1,3 +1,5 @@
+import { list } from "@vercel/blob";
+
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
@@ -11,10 +13,6 @@ export default async function handler(req, res) {
     const {
       answerSheetBase64,
       answerSheetName,
-      questionPaperBase64,
-      questionPaperName,
-      suggestedAnswerBase64,
-      suggestedAnswerName,
       subject,
       subjectKey,
       testType,
@@ -29,18 +27,6 @@ export default async function handler(req, res) {
     if (!answerSheetBase64) {
       return res.status(400).json({
         error: "Answer sheet is missing."
-      });
-    }
-
-    if (!questionPaperBase64) {
-      return res.status(400).json({
-        error: "Question Paper is missing."
-      });
-    }
-
-    if (!suggestedAnswerBase64) {
-      return res.status(400).json({
-        error: "Suggested Answer is missing."
       });
     }
 
@@ -74,8 +60,172 @@ export default async function handler(req, res) {
       });
     }
 
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return res.status(500).json({
+        error: "BLOB_READ_WRITE_TOKEN is not configured."
+      });
+    }
+
     /* ==================================================
-       FORMAT TEST TYPE
+       SAFE PATH
+    ================================================== */
+
+    const safeSubject =
+      String(subjectKey)
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
+
+    const safeTestType =
+      String(testType)
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
+
+    const materialPrefix =
+      `materials/${safeSubject}/${safeTestType}/`;
+
+    /* ==================================================
+       FIND MATERIALS
+    ================================================== */
+
+    const materialList =
+      await list({
+        prefix: materialPrefix,
+        token: process.env.BLOB_READ_WRITE_TOKEN
+      });
+
+    const blobs =
+      materialList?.blobs || [];
+
+    console.log(
+      "MATERIAL PREFIX:",
+      materialPrefix
+    );
+
+    console.log(
+      "FOUND BLOBS:",
+      blobs.map(
+        blob => blob.pathname
+      )
+    );
+
+    const questionPapers =
+      blobs
+        .filter(blob =>
+          blob.pathname
+            .toLowerCase()
+            .includes(
+              "/question-paper-"
+            )
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.uploadedAt) -
+            new Date(a.uploadedAt)
+        );
+
+    const suggestedAnswers =
+      blobs
+        .filter(blob =>
+          blob.pathname
+            .toLowerCase()
+            .includes(
+              "/suggested-answer-"
+            )
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.uploadedAt) -
+            new Date(a.uploadedAt)
+        );
+
+    if (!questionPapers.length) {
+
+      return res.status(404).json({
+
+        error:
+          "Question Paper is missing.",
+
+        details:
+          `No Question Paper found inside ${materialPrefix}`,
+
+        availableFiles:
+          blobs.map(
+            blob => blob.pathname
+          )
+
+      });
+
+    }
+
+    if (!suggestedAnswers.length) {
+
+      return res.status(404).json({
+
+        error:
+          "Suggested Answer is missing.",
+
+        details:
+          `No Suggested Answer found inside ${materialPrefix}`,
+
+        availableFiles:
+          blobs.map(
+            blob => blob.pathname
+          )
+
+      });
+
+    }
+
+    const questionPaper =
+      questionPapers[0];
+
+    const suggestedAnswer =
+      suggestedAnswers[0];
+
+    /* ==================================================
+       DOWNLOAD PRIVATE BLOB
+    ================================================== */
+
+    async function downloadBlob(blob) {
+
+      const response =
+        await fetch(
+          blob.url,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`
+            }
+          }
+        );
+
+      if (!response.ok) {
+
+        throw new Error(
+          `Unable to download ${blob.pathname}. HTTP ${response.status}`
+        );
+
+      }
+
+      const arrayBuffer =
+        await response.arrayBuffer();
+
+      return Buffer
+        .from(arrayBuffer)
+        .toString("base64");
+
+    }
+
+    const questionPaperBase64 =
+      await downloadBlob(
+        questionPaper
+      );
+
+    const suggestedAnswerBase64 =
+      await downloadBlob(
+        suggestedAnswer
+      );
+
+    /* ==================================================
+       TEST TYPE
     ================================================== */
 
     const formattedTestType =
@@ -91,17 +241,20 @@ export default async function handler(req, res) {
 
     const checkingInstructions =
       checkingMode === "strict"
+
         ? `
 STRICT ICAI-STYLE CHECKING:
 
 - Be conservative with marks.
-- Award marks only for demonstrated knowledge.
+- Award marks only where the student demonstrates
+  the required knowledge.
 - Penalise wrong concepts, provisions and calculations.
 - Give step marks only for genuinely correct steps.
-- Missing required workings should lose marks.
-- Theory must contain relevant provision/concept,
-  application and conclusion where applicable.
+- Missing workings should lose marks where required.
+- For theory, check provision, concept, application
+  and conclusion.
 `
+
         : `
 MODERATE EXAMINER-STYLE CHECKING:
 
@@ -113,7 +266,7 @@ MODERATE EXAMINER-STYLE CHECKING:
 `;
 
     /* ==================================================
-       PROMPT
+       AI PROMPT
     ================================================== */
 
     const prompt = `
@@ -125,29 +278,21 @@ Evaluate the student's answer sheet against:
 2. Official/reference Suggested Answer
 3. Student Answer Sheet
 
-The Question Paper determines:
-- question numbers
-- sub-parts
-- marks
-- question structure
-- which questions are descriptive
+Do not evaluate from the student's answer alone.
 
-The Suggested Answer determines:
-- expected concepts
-- provisions
-- calculations
-- workings
-- conclusions
-- answer requirements
+First identify every descriptive question from the
+Question Paper.
 
-Do NOT evaluate from the student's answer alone.
+Then locate the corresponding student answers.
+
+Then compare them directly with the Suggested Answer.
 
 ==================================================
 EXAM INFORMATION
 ==================================================
 
 SUBJECT:
-${subject || subjectKey}
+${subject}
 
 TEST TYPE:
 ${formattedTestType}
@@ -163,80 +308,93 @@ ${checkingMode === "strict"
 ${checkingInstructions}
 
 ==================================================
-MANDATORY RULES
+IMPORTANT RULES
 ==================================================
 
 1. Evaluate ONLY descriptive questions.
 
-2. IGNORE ALL MCQs COMPLETELY.
+2. IGNORE MCQs completely.
 
 3. Do not invent questions.
 
 4. Do not invent marks.
 
-5. Include every descriptive question present in
-   the Question Paper.
+5. Question Paper is the authority for:
+   - question numbers
+   - sub-parts
+   - marks
+   - question structure
 
-6. For every descriptive question, locate the
-   corresponding student answer.
+6. Suggested Answer is the main reference for:
+   - expected answer
+   - calculations
+   - provisions
+   - concepts
+   - workings
+   - conclusions
 
-7. If a question is not attempted:
-   marks_awarded = 0
-   status = "not_attempted"
+7. Compare the student's answer directly.
 
-8. If handwriting/content cannot be confidently read:
-   status = "unclear"
+8. Give genuine partial/step marks.
 
-9. Never award more than marks_available.
+9. Wrong final answer with substantially correct
+   working may receive appropriate partial marks.
 
-10. Never award negative marks.
+10. Wrong approach should not receive marks merely
+    for containing similar numbers or keywords.
 
-11. Wrong final answer with substantially correct
-    working can receive appropriate partial marks.
-
-12. Wrong approach should NOT receive marks simply
-    because some numbers or keywords match.
-
-13. Theory answers must be checked for:
-    - provision
+11. Theory questions must be checked for:
+    - relevant provision
     - concept
     - application
     - conclusion
-    - relevant keywords
+    - important keywords
 
-14. Practical answers must be checked for:
+12. Practical questions must be checked for:
     - formula
     - working
     - calculations
     - adjustments
     - final answer
 
-15. Internal choices must be handled correctly.
-    Do not award marks for both alternatives when
-    only one was required.
+13. Unattempted question:
+    marks_awarded = 0
+    status = "not_attempted"
 
-16. Remarks must specifically explain why marks
-    were awarded or lost.
+14. Unclear handwriting:
+    status = "unclear"
 
-17. Do not give generic praise.
+15. Never award more than marks_available.
 
-18. Do not reveal hidden reasoning.
+16. Never award negative marks.
+
+17. Include every descriptive question.
+
+18. Exclude MCQs.
+
+19. Handle internal choices carefully.
+
+20. Remarks must explain actual lost marks.
+
+21. Do not give generic praise.
+
+22. Do not reveal hidden reasoning.
 
 ==================================================
-FINAL VERIFICATION
+FINAL CHECK
 ==================================================
 
-Before returning the answer verify:
+Verify:
 
-- MCQs are excluded.
 - Every descriptive question is included.
-- Question marks match the Question Paper.
-- Each awarded mark is <= available mark.
-- Total marks equal the sum of awarded marks.
+- MCQs are excluded.
+- Marks available are correct.
+- Awarded marks are correct.
+- Total marks are mathematically correct.
 - Total does not exceed ${maximumMarks}.
 - Percentage is mathematically correct.
 
-Return ONLY the requested JSON structure.
+Return ONLY valid JSON.
 `;
 
     /* ==================================================
@@ -250,8 +408,10 @@ Return ONLY the requested JSON structure.
           method: "POST",
 
           headers: {
-            "Content-Type": "application/json",
-            "Authorization":
+            "Content-Type":
+              "application/json",
+
+            Authorization:
               `Bearer ${process.env.AI_GATEWAY_API_KEY}`
           },
 
@@ -275,57 +435,33 @@ Return ONLY the requested JSON structure.
 
                   {
                     type: "input_text",
-                    text: prompt
-                  },
 
-                  {
-                    type: "input_text",
                     text:
-                      `QUESTION PAPER: ${
-                        questionPaperName ||
-                        "question-paper.pdf"
-                      }`
+                      prompt
                   },
 
                   {
                     type: "input_file",
 
                     filename:
-                      questionPaperName ||
-                      "question-paper.pdf",
+                      questionPaper.pathname
+                        .split("/")
+                        .pop(),
 
                     file_data:
                       `data:application/pdf;base64,${questionPaperBase64}`
                   },
 
                   {
-                    type: "input_text",
-                    text:
-                      `SUGGESTED ANSWER: ${
-                        suggestedAnswerName ||
-                        "suggested-answer.pdf"
-                      }`
-                  },
-
-                  {
                     type: "input_file",
 
                     filename:
-                      suggestedAnswerName ||
-                      "suggested-answer.pdf",
+                      suggestedAnswer.pathname
+                        .split("/")
+                        .pop(),
 
                     file_data:
                       `data:application/pdf;base64,${suggestedAnswerBase64}`
-                  },
-
-                  {
-                    type: "input_text",
-
-                    text:
-                      `STUDENT ANSWER SHEET: ${
-                        answerSheetName ||
-                        "answer-sheet.pdf"
-                      }`
                   },
 
                   {
@@ -340,6 +476,7 @@ Return ONLY the requested JSON structure.
                   }
 
                 ]
+
               }
 
             ],
@@ -446,6 +583,7 @@ Return ONLY the requested JSON structure.
 
                   additionalProperties:
                     false
+
                 }
 
               }
@@ -457,7 +595,7 @@ Return ONLY the requested JSON structure.
       );
 
     /* ==================================================
-       READ AI RESPONSE
+       AI RESPONSE
     ================================================== */
 
     const rawResult =
@@ -471,10 +609,7 @@ Return ONLY the requested JSON structure.
       );
 
       return res.status(
-        aiResponse.status >= 400 &&
-        aiResponse.status < 600
-          ? aiResponse.status
-          : 500
+        aiResponse.status
       ).json({
 
         error:
@@ -482,16 +617,17 @@ Return ONLY the requested JSON structure.
 
         details:
           rawResult?.error?.message ||
-          rawResult?.error ||
           rawResult?.message ||
-          JSON.stringify(rawResult)
+          JSON.stringify(
+            rawResult
+          )
 
       });
 
     }
 
     /* ==================================================
-       EXTRACT OUTPUT TEXT
+       EXTRACT OUTPUT
     ================================================== */
 
     let outputText = "";
@@ -508,7 +644,9 @@ Return ONLY the requested JSON structure.
 
     if (
       !outputText &&
-      Array.isArray(rawResult.output)
+      Array.isArray(
+        rawResult.output
+      )
     ) {
 
       for (
@@ -547,18 +685,15 @@ Return ONLY the requested JSON structure.
 
     if (!outputText) {
 
-      console.error(
-        "EMPTY AI RESPONSE:",
-        rawResult
-      );
-
       return res.status(500).json({
 
         error:
           "AI returned an empty evaluation.",
 
         details:
-          JSON.stringify(rawResult)
+          JSON.stringify(
+            rawResult
+          )
 
       });
 
@@ -579,25 +714,23 @@ Return ONLY the requested JSON structure.
 
     } catch (error) {
 
-      console.error(
-        "INVALID AI JSON:",
-        outputText
-      );
-
       return res.status(500).json({
 
         error:
-          "AI returned invalid evaluation JSON.",
+          "AI returned invalid JSON.",
 
         details:
-          outputText.slice(0, 2000)
+          outputText.slice(
+            0,
+            2000
+          )
 
       });
 
     }
 
     /* ==================================================
-       VALIDATE STRUCTURE
+       VALIDATE
     ================================================== */
 
     if (
@@ -617,7 +750,7 @@ Return ONLY the requested JSON structure.
     }
 
     /* ==================================================
-       SCORE VALIDATION
+       SCORE
     ================================================== */
 
     let total = 0;
@@ -640,14 +773,13 @@ Return ONLY the requested JSON structure.
       if (
         !Number.isFinite(
           available
-        ) ||
-        available < 0
+        )
       ) {
 
         return res.status(500).json({
 
           error:
-            "Invalid marks_available returned by AI."
+            "Invalid marks returned by AI."
 
         });
 
@@ -667,8 +799,14 @@ Return ONLY the requested JSON structure.
         awarded = 0;
       }
 
-      if (awarded > available) {
-        awarded = available;
+      if (
+        awarded >
+        available
+      ) {
+
+        awarded =
+          available;
+
       }
 
       awarded =
@@ -717,7 +855,7 @@ Return ONLY the requested JSON structure.
       percentage;
 
     /* ==================================================
-       SUCCESS
+       FINAL RESPONSE
     ================================================== */
 
     return res.status(200).json({
@@ -728,8 +866,7 @@ Return ONLY the requested JSON structure.
 
       metadata: {
 
-        subject:
-          subject || "",
+        subject,
 
         subjectKey,
 
@@ -745,12 +882,10 @@ Return ONLY the requested JSON structure.
           maximumMarks,
 
         questionPaper:
-          questionPaperName ||
-          "question-paper.pdf",
+          questionPaper.pathname,
 
         suggestedAnswer:
-          suggestedAnswerName ||
-          "suggested-answer.pdf",
+          suggestedAnswer.pathname,
 
         answerSheet:
           answerSheetName ||
@@ -763,7 +898,7 @@ Return ONLY the requested JSON structure.
   } catch (error) {
 
     console.error(
-      "CHECK ROUTE ERROR:",
+      "CHECK ERROR:",
       error
     );
 
