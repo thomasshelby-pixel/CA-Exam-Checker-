@@ -2,8 +2,7 @@
   "name": "ca-exam-checker",
   "version": "3.0.0",
   "private": true,
-  "type": "module",
   "dependencies": {
-    "@vercel/blob": "^2.3.0"
+    "@vercel/blob": "latest"
   }
 }
