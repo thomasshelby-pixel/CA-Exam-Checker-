@@ -395,6 +395,12 @@ footer{
   font-size:12px;
 }
 
+.warning-info{
+  border-color:#92400e;
+  background:#451a03;
+  color:#fed7aa;
+}
+
 @media(max-width:700px){
 
   .grid,
@@ -435,19 +441,23 @@ footer{
 
 <div>
 <label>Student Name</label>
+
 <input
 id="studentName"
 type="text"
 placeholder="Enter full name">
 </div>
 
+
 <div>
 <label>Registration Number</label>
+
 <input
 id="registrationNumber"
 type="text"
 placeholder="Enter ICAI registration number">
 </div>
+
 
 <div>
 <label>Level</label>
@@ -457,12 +467,22 @@ id="studentLevel"
 onchange="updateStudentLevel()">
 
 <option value="">Select Level</option>
-<option value="foundation">CA Foundation</option>
-<option value="inter">CA Intermediate</option>
-<option value="final">CA Final</option>
+
+<option value="foundation">
+CA Foundation
+</option>
+
+<option value="inter">
+CA Intermediate
+</option>
+
+<option value="final">
+CA Final
+</option>
 
 </select>
 </div>
+
 
 <div>
 <label>Test / Paper Type</label>
@@ -471,19 +491,64 @@ onchange="updateStudentLevel()">
 id="studentTestType"
 onchange="updateStudentTestType()">
 
-<option value="">Select Test Type</option>
-<option value="MTP">MTP</option>
-<option value="RTP">RTP</option>
-<option value="PYQ">PYQ</option>
-<option value="MODEL_TEST">Model Test</option>
-<option value="OTHER">Other</option>
+<option value="">
+Select Test Type
+</option>
+
+<option value="MTP">
+MTP
+</option>
+
+<option value="RTP">
+RTP
+</option>
+
+<option value="PYQ">
+PYQ
+</option>
+
+<option value="MODEL_TEST">
+Model Test
+</option>
+
+<option value="OTHER">
+Other
+</option>
 
 </select>
 </div>
 
-<div id="studentSubjectBox">
 
-<label>Subject</label>
+<!-- PYQ ATTEMPT -->
+
+<div
+id="studentAttemptBox"
+class="hidden">
+
+<label>
+PYQ Attempt / Session
+</label>
+
+<select
+id="studentAttempt">
+
+<option value="">
+Select PYQ Attempt
+</option>
+
+</select>
+
+</div>
+
+
+<!-- SUBJECT -->
+
+<div
+id="studentSubjectBox">
+
+<label>
+Subject
+</label>
 
 <select
 id="subject"
@@ -497,13 +562,20 @@ Select Level First
 
 </div>
 
+
+<!-- MODEL TYPE -->
+
 <div
 id="studentModelOptionBox"
 class="hidden">
 
-<label>Model Test Type</label>
+<label>
+Model Test Type
+</label>
 
-<select id="studentModelType">
+<select
+id="studentModelType"
+onchange="updateStudentModelType()">
 
 <option value="">
 Select Model Test Type
@@ -513,12 +585,32 @@ Select Model Test Type
 
 </div>
 
+
+<!-- STUDENT MODEL OTHER SUBJECT -->
+
+<div
+id="studentMultiSubjectBox"
+class="hidden">
+
+<label>
+Subjects Included in Model Test
+</label>
+
+<div
+id="studentSubjectCheckboxes"
+class="subject-checkboxes">
 </div>
+
+</div>
+
+</div>
+
 
 <div
 id="studentOtherSubjectInfo"
 class="info hidden">
 </div>
+
 
 <div
 id="subjectInfo"
@@ -562,6 +654,7 @@ provisions and presentation.
 
 </div>
 
+
 <div
 id="moderateMode"
 class="mode"
@@ -580,11 +673,14 @@ with reasonable step marking.
 
 </div>
 
-<div class="info">
+
+<div
+id="checkingRuleInfo"
+class="info">
 
 <b>AI Rule:</b>
-Only descriptive questions will be evaluated.
-MCQs will be ignored.
+Descriptive questions will be evaluated
+using ICAI-style marking.
 
 </div>
 
@@ -605,9 +701,13 @@ ANSWER SHEET
 
 <div class="upload-box">
 
-<div class="upload-icon">📑</div>
+<div class="upload-icon">
+📑
+</div>
 
-<h3>Select your answer sheet</h3>
+<h3>
+Select your answer sheet
+</h3>
 
 <p>
 PDF recommended • Maximum 4 MB
@@ -633,6 +733,7 @@ class="file-info">
 
 </div>
 
+
 <button
 id="submitButton"
 class="primary"
@@ -641,6 +742,7 @@ onclick="submitAnswerSheet()">
 🚀 Submit Answer Sheet
 
 </button>
+
 
 <div
 id="studentStatus"
@@ -704,10 +806,12 @@ class="score">
 
 </div>
 
+
 <div
 id="overallSummary"
 class="info">
 </div>
+
 
 <h2 style="margin-top:20px;">
 Question-wise Evaluation
@@ -792,6 +896,7 @@ ADMIN / CHECKER
 🔐 Test Material Management
 </h2>
 
+
 <div class="info">
 
 <b>Model Test:</b>
@@ -803,6 +908,13 @@ Suggested Answer.
 <b>MTP / RTP / PYQ / Other:</b>
 Question Paper and Suggested Answer
 are uploaded separately.
+
+<br><br>
+
+<b>PYQ:</b>
+Attempt / Session is mandatory so the
+student answer sheet can be matched with
+the exact same attempt.
 
 </div>
 
@@ -873,6 +985,24 @@ Other
 </select>
 
 
+<!-- PYQ ATTEMPT -->
+
+<div
+id="adminAttemptBox"
+class="hidden">
+
+<label>
+PYQ Attempt / Session
+</label>
+
+<input
+id="adminAttempt"
+type="text"
+placeholder="Example: May 2026">
+
+</div>
+
+
 <!-- MODEL TYPE -->
 
 <div
@@ -896,7 +1026,7 @@ Select Model Test Type
 </div>
 
 
-<!-- SUBJECT -->
+<!-- SINGLE SUBJECT -->
 
 <div
 id="adminSubjectBox"
@@ -919,7 +1049,7 @@ Select Subject
 </div>
 
 
-<!-- MULTI SUBJECT FOR MODEL OTHER -->
+<!-- MULTI SUBJECT -->
 
 <div
 id="adminMultiSubjectBox"
@@ -997,7 +1127,7 @@ accept=".pdf,application/pdf">
 </div>
 
 
-<!-- MODEL TEST FILE -->
+<!-- MODEL TEST -->
 
 <div
 id="modelMaterial"
@@ -1076,31 +1206,44 @@ foundation:[
 key:"accounting",
 name:"Accounting",
 paper:100,
-descriptive:70
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"business_laws",
 name:"Business Laws",
 paper:100,
-descriptive:70
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"quantitative_aptitude",
 name:"Quantitative Aptitude",
 paper:100,
-descriptive:70
+descriptive:0,
+mcqOnly:true,
+negativeMarking:true,
+negativeMarksPerWrong:0.25
 },
 
 {
 key:"business_economics",
 name:"Business Economics",
 paper:100,
-descriptive:70
+descriptive:0,
+mcqOnly:true,
+negativeMarking:true,
+negativeMarksPerWrong:0.25
 }
 
 ],
+
 
 inter:[
 
@@ -1108,52 +1251,81 @@ inter:[
 key:"advanced_accounts",
 name:"Advanced Accounting",
 group:1,
-descriptive:70
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"law",
 name:"Corporate & Other Laws",
 group:1,
-descriptive:70
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"taxation",
 name:"Taxation",
 group:1,
-descriptive:70
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"costing",
 name:"Cost & Management Accounting",
 group:2,
-descriptive:70
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"audit",
 name:"Auditing & Ethics",
 group:2,
-descriptive:70
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"fm",
 name:"Financial Management",
 group:2,
-descriptive:35
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"sm",
 name:"Strategic Management",
 group:2,
-descriptive:35
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 }
 
 ],
+
 
 final:[
 
@@ -1161,35 +1333,55 @@ final:[
 key:"financial_reporting",
 name:"Financial Reporting",
 group:1,
-descriptive:70
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"advanced_financial_management",
 name:"Advanced Financial Management",
 group:1,
-descriptive:70
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"advanced_auditing",
 name:"Advanced Auditing",
 group:1,
-descriptive:70
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"direct_tax",
 name:"Direct Tax Laws",
 group:2,
-descriptive:70
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 },
 
 {
 key:"indirect_tax",
 name:"Indirect Tax Laws",
 group:2,
-descriptive:70
+paper:100,
+descriptive:100,
+mcqOnly:false,
+negativeMarking:false,
+negativeMarksPerWrong:0
 }
 
 ]
@@ -1198,10 +1390,36 @@ descriptive:70
 
 
 /* ================================================= */
+/* PYQ ATTEMPTS */
+/* ================================================= */
+
+/*
+  Admin can type a custom attempt.
+  Student list contains common ICAI attempts.
+  Backend must still verify that the selected
+  attempt exists in uploaded material.
+*/
+
+const PYQ_ATTEMPTS = [
+
+"January 2025",
+"May 2025",
+"September 2025",
+"January 2026",
+"May 2026",
+"September 2026",
+"January 2027",
+"May 2027"
+
+];
+
+
+/* ================================================= */
 /* STATE */
 /* ================================================= */
 
 let checkingMode="strict";
+
 let selectedFile=null;
 
 
@@ -1229,6 +1447,43 @@ document.getElementById(
 ).style.display=
 isAdmin?"block":"none";
 
+renderStudentAttempts();
+
+}
+
+
+/* ================================================= */
+/* PYQ ATTEMPTS */
+/* ================================================= */
+
+function renderStudentAttempts(){
+
+const select=
+document.getElementById(
+"studentAttempt"
+);
+
+select.innerHTML=`
+
+<option value="">
+Select PYQ Attempt
+</option>
+
+`;
+
+PYQ_ATTEMPTS.forEach(
+attempt=>{
+
+select.innerHTML+=`
+
+<option value="${escapeHTML(attempt)}">
+${escapeHTML(attempt)}
+</option>
+
+`;
+
+});
+
 }
 
 
@@ -1252,10 +1507,14 @@ subject.innerHTML=
 `<option value="">Select Subject</option>`;
 
 if(!level){
+
+updateStudentTestType();
+
 return;
 }
 
-SUBJECTS[level].forEach(s=>{
+SUBJECTS[level].forEach(
+s=>{
 
 subject.innerHTML+=`
 
@@ -1320,7 +1579,8 @@ if(!subject){
 return;
 }
 
-info.innerHTML=`
+
+let html=`
 
 <b>${escapeHTML(subject.name)}</b>
 
@@ -1331,10 +1591,44 @@ ${escapeHTML(level.toUpperCase())}
 
 <br>
 
+Paper Maximum:
+<b>${subject.paper}</b>
+
+<br>
+
+`;
+
+
+if(subject.mcqOnly){
+
+html+=`
+
+<span style="color:#fca5a5">
+
+<b>MCQ Only</b>
+
+<br>
+
+Negative Marking:
+<b>-0.25</b> for each wrong answer
+
+</span>
+
+`;
+
+}else{
+
+html+=`
+
 Descriptive Maximum:
 <b>${subject.descriptive}</b>
 
 `;
+
+}
+
+
+info.innerHTML=html;
 
 }
 
@@ -1375,12 +1669,60 @@ document.getElementById(
 "studentModelType"
 );
 
-modelBox.classList.add("hidden");
+const attemptBox=
+document.getElementById(
+"studentAttemptBox"
+);
 
-modelType.innerHTML=
-`<option value="">
+const multiBox=
+document.getElementById(
+"studentMultiSubjectBox"
+);
+
+
+/* RESET */
+
+attemptBox.classList.add(
+"hidden"
+);
+
+modelBox.classList.add(
+"hidden"
+);
+
+multiBox.classList.add(
+"hidden"
+);
+
+subjectBox.classList.remove(
+"hidden"
+);
+
+subject.disabled=false;
+
+modelType.innerHTML=`
+
+<option value="">
 Select Model Test Type
-</option>`;
+</option>
+
+`;
+
+document.getElementById(
+"subjectInfo"
+).innerHTML=
+"Select level and test type.";
+
+
+/* ============================================= */
+/* PYQ */
+/* ============================================= */
+
+if(type==="PYQ"){
+
+attemptBox.classList.remove(
+"hidden"
+);
 
 subjectBox.classList.remove(
 "hidden"
@@ -1389,19 +1731,27 @@ subjectBox.classList.remove(
 subject.disabled=false;
 
 document.getElementById(
-"studentOtherSubjectInfo"
-).classList.add(
-"hidden"
-);
+"subjectInfo"
+).innerHTML=
+"Select the exact PYQ attempt and subject.";
+
+return;
+
+}
 
 
+/* ============================================= */
 /* MODEL TEST */
+/* ============================================= */
 
 if(type==="MODEL_TEST"){
 
 modelBox.classList.remove(
 "hidden"
 );
+
+
+/* FOUNDATION */
 
 if(level==="foundation"){
 
@@ -1413,19 +1763,26 @@ Foundation Model Test
 
 `;
 
-subject.value="";
-subject.disabled=true;
-
 subjectBox.classList.add(
 "hidden"
 );
 
+subject.value="";
+subject.disabled=true;
+
 document.getElementById(
 "subjectInfo"
 ).innerHTML=
-"Foundation Model Test is a combined paper. Subject selection is not required.";
+"Foundation Model Test is a combined 4-subject paper. Subject selection is not required.";
 
-}else if(
+return;
+
+}
+
+
+/* INTER / FINAL */
+
+if(
 level==="inter"||
 level==="final"
 ){
@@ -1450,19 +1807,32 @@ Other
 
 `;
 
+subjectBox.classList.add(
+"hidden"
+);
+
+subject.value="";
+subject.disabled=true;
+
+return;
+
 }
 
 return;
 }
 
 
+/* ============================================= */
 /* OTHER */
+/* ============================================= */
 
 if(type==="OTHER"){
 
 subjectBox.classList.remove(
 "hidden"
 );
+
+subject.disabled=false;
 
 document.getElementById(
 "subjectInfo"
@@ -1473,12 +1843,13 @@ return;
 }
 
 
-/* MTP / RTP / PYQ */
+/* ============================================= */
+/* MTP / RTP */
+/* ============================================= */
 
 if(
 type==="MTP"||
-type==="RTP"||
-type==="PYQ"
+type==="RTP"
 ){
 
 subjectBox.classList.remove(
@@ -1494,6 +1865,171 @@ document.getElementById(
 
 return;
 }
+
+}
+
+
+/* ================================================= */
+/* STUDENT MODEL TYPE */
+/* ================================================= */
+
+function updateStudentModelType(){
+
+const level=
+document.getElementById(
+"studentLevel"
+).value;
+
+const modelType=
+document.getElementById(
+"studentModelType"
+).value;
+
+const multiBox=
+document.getElementById(
+"studentMultiSubjectBox"
+);
+
+multiBox.classList.add(
+"hidden"
+);
+
+
+/* GROUP 1 */
+
+if(modelType==="GROUP_1"){
+
+document.getElementById(
+"subjectInfo"
+).innerHTML=
+`
+
+<b>Group 1 selected.</b>
+
+<br>
+
+Subjects:
+
+${getGroupSubjects(level,1)
+.map(s=>escapeHTML(s.name))
+.join(", ")}
+
+<br><br>
+
+No individual subject selection is required.
+
+`;
+
+return;
+}
+
+
+/* GROUP 2 */
+
+if(modelType==="GROUP_2"){
+
+document.getElementById(
+"subjectInfo"
+).innerHTML=
+`
+
+<b>Group 2 selected.</b>
+
+<br>
+
+Subjects:
+
+${getGroupSubjects(level,2)
+.map(s=>escapeHTML(s.name))
+.join(", ")}
+
+<br><br>
+
+No individual subject selection is required.
+
+`;
+
+return;
+}
+
+
+/* OTHER */
+
+if(modelType==="OTHER"){
+
+multiBox.classList.remove(
+"hidden"
+);
+
+renderStudentModelSubjects();
+
+document.getElementById(
+"subjectInfo"
+).innerHTML=
+"Select all subjects included in this Model Test.";
+
+return;
+}
+
+
+/* FOUNDATION */
+
+if(modelType==="MODEL_TEST"){
+
+document.getElementById(
+"subjectInfo"
+).innerHTML=
+"Foundation Model Test is a combined paper of all four subjects.";
+
+}
+
+}
+
+
+/* ================================================= */
+/* STUDENT MODEL SUBJECTS */
+/* ================================================= */
+
+function renderStudentModelSubjects(){
+
+const level=
+document.getElementById(
+"studentLevel"
+).value;
+
+const box=
+document.getElementById(
+"studentSubjectCheckboxes"
+);
+
+box.innerHTML="";
+
+if(!level)
+return;
+
+SUBJECTS[level].forEach(
+subject=>{
+
+box.innerHTML+=`
+
+<div class="subject-check">
+
+<label>
+
+<input
+type="checkbox"
+value="${escapeHTML(subject.key)}"
+data-subject-name="${escapeHTML(subject.name)}">
+
+${escapeHTML(subject.name)}
+
+</label>
+
+</div>
+
+`;
+
+});
 
 }
 
@@ -1587,6 +2123,13 @@ document.getElementById(
 "studentModelType"
 ).value;
 
+const attempt=
+document.getElementById(
+"studentAttempt"
+).value;
+
+
+/* VALIDATION */
 
 if(!name)
 return showStudentError(
@@ -1608,21 +2151,71 @@ return showStudentError(
 "Please select Test / Paper Type."
 );
 
+
+/* PYQ ATTEMPT */
+
+if(
+testType==="PYQ" &&
+!attempt
+){
+
+return showStudentError(
+"Please select the PYQ Attempt / Session."
+);
+
+}
+
+
+/* MODEL TYPE */
+
 if(
 testType==="MODEL_TEST" &&
 !modelType
-)
+){
+
 return showStudentError(
 "Please select Model Test Type."
 );
 
+}
 
-/* Subject required except foundation model test */
+
+/* MODEL OTHER */
+
+let modelSubjects=[];
 
 if(
-!(
 testType==="MODEL_TEST" &&
-level==="foundation"
+modelType==="OTHER"
+){
+
+modelSubjects=[
+...document.querySelectorAll(
+"#studentSubjectCheckboxes input:checked"
+)
+].map(
+el=>el.value
+);
+
+if(!modelSubjects.length){
+
+return showStudentError(
+"Please select at least one subject for Model Test Other."
+);
+
+}
+
+}
+
+
+/* SUBJECT REQUIRED FOR NORMAL TYPES */
+
+if(
+(
+testType==="MTP"||
+testType==="RTP"||
+testType==="PYQ"||
+testType==="OTHER"
 ) &&
 !subjectKey
 ){
@@ -1653,6 +2246,10 @@ return showStudentError(
 );
 
 
+/* ============================================= */
+/* SUBJECT CONFIG */
+/* ============================================= */
+
 const subjectList=
 SUBJECTS[level]||[];
 
@@ -1668,7 +2265,15 @@ s=>s.key===subjectKey
 }
 
 
+/* ============================================= */
+/* EVALUATION CONFIG */
+/* ============================================= */
+
+let paperMaximum=0;
 let descriptiveMaximum=0;
+let mcqOnly=false;
+let negativeMarking=false;
+let negativeMarksPerWrong=0;
 
 
 /* FOUNDATION MODEL */
@@ -1678,15 +2283,103 @@ testType==="MODEL_TEST" &&
 level==="foundation"
 ){
 
-descriptiveMaximum=280;
+paperMaximum=400;
 
-}else if(subject){
+descriptiveMaximum=200;
+
+mcqOnly=false;
+
+negativeMarking=true;
+
+negativeMarksPerWrong=0.25;
+
+}
+
+
+/* INTER / FINAL GROUP */
+
+else if(
+testType==="MODEL_TEST" &&
+(
+modelType==="GROUP_1"||
+modelType==="GROUP_2"
+)
+){
+
+paperMaximum=
+getGroupSubjects(level,
+modelType==="GROUP_1"?1:2)
+.reduce(
+(sum,s)=>sum+s.paper,
+0
+);
+
+descriptiveMaximum=
+getGroupSubjects(level,
+modelType==="GROUP_1"?1:2)
+.reduce(
+(sum,s)=>sum+s.descriptive,
+0
+);
+
+}
+
+
+/* MODEL OTHER */
+
+else if(
+testType==="MODEL_TEST" &&
+modelType==="OTHER"
+){
+
+const selectedSubjects=
+modelSubjects.map(
+key=>
+subjectList.find(
+s=>s.key===key
+)
+).filter(Boolean);
+
+paperMaximum=
+selectedSubjects.reduce(
+(sum,s)=>sum+s.paper,
+0
+);
+
+descriptiveMaximum=
+selectedSubjects.reduce(
+(sum,s)=>sum+s.descriptive,
+0
+);
+
+}
+
+
+/* NORMAL SUBJECT */
+
+else if(subject){
+
+paperMaximum=
+subject.paper;
 
 descriptiveMaximum=
 subject.descriptive;
 
+mcqOnly=
+subject.mcqOnly;
+
+negativeMarking=
+subject.negativeMarking;
+
+negativeMarksPerWrong=
+subject.negativeMarksPerWrong;
+
 }
 
+
+/* ============================================= */
+/* BUTTON */
+/* ============================================= */
 
 const button=
 document.getElementById(
@@ -1701,6 +2394,7 @@ try{
 button.textContent=
 "📄 Reading Answer Sheet...";
 
+
 const base64=
 await fileToBase64(
 selectedFile
@@ -1710,6 +2404,10 @@ selectedFile
 button.textContent=
 "☁️ Uploading Answer Sheet...";
 
+
+/* ============================================= */
+/* UPLOAD ANSWER SHEET */
+/* ============================================= */
 
 const uploadResponse=
 await fetch(
@@ -1728,12 +2426,14 @@ body:JSON.stringify({
 filename:
 selectedFile.name,
 
-data:base64,
+data:
+base64,
 
 contentType:
 "application/pdf",
 
-studentName:name,
+studentName:
+name,
 
 registrationNumber:
 registration,
@@ -1748,13 +2448,26 @@ subjectKey:
 subjectKey||
 "combined",
 
+subjects:
+modelSubjects,
+
 testType,
 
 modelType,
 
+attempt,
+
 checkingMode,
 
-descriptiveMaximum
+paperMaximum,
+
+descriptiveMaximum,
+
+mcqOnly,
+
+negativeMarking,
+
+negativeMarksPerWrong
 
 })
 
@@ -1778,6 +2491,10 @@ uploadResult.error||
 button.textContent=
 "📚 Finding Test Material...";
 
+
+/* ============================================= */
+/* AI CHECK */
+/* ============================================= */
 
 const checkResponse=
 await fetch(
@@ -1809,13 +2526,26 @@ subjectKey:
 subjectKey||
 "combined",
 
+subjects:
+modelSubjects,
+
 testType,
 
 modelType,
 
+attempt,
+
 checkingMode,
 
-descriptiveMaximum
+paperMaximum,
+
+descriptiveMaximum,
+
+mcqOnly,
+
+negativeMarking,
+
+negativeMarksPerWrong
 
 })
 
@@ -1844,6 +2574,8 @@ throw new Error(
 
 }
 
+
+/* SUCCESS */
 
 showStudentSuccess(
 "Answer sheet checked successfully by AI."
@@ -1891,6 +2623,20 @@ formatTestType(testType)
 <br>
 
 ${
+testType==="PYQ"
+?
+`
+
+<b>PYQ Attempt:</b>
+${escapeHTML(attempt)}
+
+<br>
+
+`
+:""
+}
+
+${
 testType==="MODEL_TEST"
 ?
 `
@@ -1919,13 +2665,25 @@ checkingMode==="strict"
 "Moderate"
 }
 
-<br><br>
+<br>
 
-🤖 AI evaluation completed.
+${
+negativeMarking
+?
+`
+
+<b>Negative Marking:</b>
+-0.25 per wrong MCQ
 
 <br>
 
-MCQs were ignored.
+`
+:""
+}
+
+<br>
+
+🤖 AI evaluation completed.
 
 `;
 
@@ -2102,15 +2860,21 @@ document.getElementById(
 "adminLevel"
 ).value;
 
-const type=
 document.getElementById(
-"adminTestType"
-).value;
+"adminAttemptBox"
+).classList.add(
+"hidden"
+);
 
+document.getElementById(
+"adminAttempt"
+).value="";
 
-/*
-Reset subject controls
-*/
+document.getElementById(
+"adminModelTypeBox"
+).classList.add(
+"hidden"
+);
 
 document.getElementById(
 "adminSubjectBox"
@@ -2125,19 +2889,13 @@ document.getElementById(
 );
 
 document.getElementById(
-"adminModelTypeBox"
-).classList.add(
-"hidden"
-);
-
-document.getElementById(
 "adminSubject"
 ).innerHTML=
 `<option value="">
 Select Subject
 </option>`;
 
-if(level && type){
+if(level){
 
 updateAdminTestType();
 
@@ -2182,6 +2940,11 @@ document.getElementById(
 "adminMultiSubjectBox"
 );
 
+const attemptBox=
+document.getElementById(
+"adminAttemptBox"
+);
+
 const separate=
 document.getElementById(
 "separateMaterials"
@@ -2193,6 +2956,8 @@ document.getElementById(
 );
 
 
+/* RESET */
+
 modelBox.classList.add(
 "hidden"
 );
@@ -2202,6 +2967,10 @@ subjectBox.classList.add(
 );
 
 multiBox.classList.add(
+"hidden"
+);
+
+attemptBox.classList.add(
 "hidden"
 );
 
@@ -2218,26 +2987,48 @@ modelType.innerHTML=
 Select Model Test Type
 </option>`;
 
-
-if(!level || !type){
-
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
 "Select level and test type.";
+
+
+if(!level || !type)
+return;
+
+
+/* ============================================= */
+/* PYQ */
+/* ============================================= */
+
+if(type==="PYQ"){
+
+attemptBox.classList.remove(
+"hidden"
+);
+
+subjectBox.classList.remove(
+"hidden"
+);
+
+renderAdminSingleSubjects();
+
+document.getElementById(
+"adminSubjectInfo"
+).innerHTML=
+"Enter the exact PYQ attempt and select its subject.";
 
 return;
 }
 
 
 /* ============================================= */
-/* MTP / RTP / PYQ */
+/* MTP / RTP */
 /* ============================================= */
 
 if(
 type==="MTP"||
-type==="RTP"||
-type==="PYQ"
+type==="RTP"
 ){
 
 subjectBox.classList.remove(
@@ -2295,6 +3086,8 @@ separate.classList.add(
 );
 
 
+/* FOUNDATION */
+
 if(level==="foundation"){
 
 modelType.innerHTML=`
@@ -2308,11 +3101,13 @@ Foundation Model Test
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
-"Foundation Model Test is a combined paper. Subject selection is not required.";
+"Foundation Model Test is a combined 4-subject paper. Subject selection is not required.";
 
 return;
 }
 
+
+/* INTER / FINAL */
 
 if(
 level==="inter"||
@@ -2342,7 +3137,7 @@ Other
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
-"Select Group 1, Group 2 or Other.";
+"Select Group 1, Group 2 or Other. Individual subject selection is not required for Group 1/2.";
 
 }
 
@@ -2378,10 +3173,6 @@ document.getElementById(
 );
 
 
-/*
-Hide both first
-*/
-
 subjectBox.classList.add(
 "hidden"
 );
@@ -2391,47 +3182,65 @@ multiBox.classList.add(
 );
 
 
-/*
-GROUP 1
-*/
+/* GROUP 1 */
 
 if(modelType==="GROUP_1"){
 
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
-`Group 1 selected. Subjects covered:
+`
+
+<b>Group 1 selected.</b>
+
+<br>
+
+Subjects:
 
 ${getGroupSubjects(level,1)
-.map(s=>s.name)
-.join(", ")}.`;
+.map(s=>escapeHTML(s.name))
+.join(", ")}
+
+<br><br>
+
+No individual subject selection required.
+
+`;
 
 return;
 }
 
 
-/*
-GROUP 2
-*/
+/* GROUP 2 */
 
 if(modelType==="GROUP_2"){
 
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
-`Group 2 selected. Subjects covered:
+`
+
+<b>Group 2 selected.</b>
+
+<br>
+
+Subjects:
 
 ${getGroupSubjects(level,2)
-.map(s=>s.name)
-.join(", ")}.`;
+.map(s=>escapeHTML(s.name))
+.join(", ")}
+
+<br><br>
+
+No individual subject selection required.
+
+`;
 
 return;
 }
 
 
-/*
-MODEL OTHER
-*/
+/* MODEL OTHER */
 
 if(modelType==="OTHER"){
 
@@ -2450,16 +3259,14 @@ return;
 }
 
 
-/*
-FOUNDATION
-*/
+/* FOUNDATION */
 
 if(modelType==="MODEL_TEST"){
 
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
-"Foundation Model Test is a combined paper.";
+"Foundation Model Test is a combined paper of all four subjects.";
 
 }
 
@@ -2583,9 +3390,8 @@ s=>s.key===key
 if(!subject)
 return;
 
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=`
+
+let html=`
 
 Selected Subject:
 <b>
@@ -2594,12 +3400,51 @@ ${escapeHTML(subject.name)}
 
 <br>
 
+Paper Maximum:
+<b>
+${subject.paper}
+</b>
+
+<br>
+
+`;
+
+
+if(subject.mcqOnly){
+
+html+=`
+
+<span style="color:#fca5a5">
+
+<b>MCQ Only</b>
+
+<br>
+
+Negative Marking:
+<b>-0.25 per wrong answer</b>
+
+</span>
+
+`;
+
+}else{
+
+html+=`
+
 Descriptive Maximum:
 <b>
 ${subject.descriptive}
 </b>
 
 `;
+
+}
+
+
+document.getElementById(
+"adminSubjectInfo"
+).innerHTML=
+html;
 
 }
 
@@ -2649,6 +3494,13 @@ document.getElementById(
 "adminSubject"
 ).value;
 
+const attempt=
+document.getElementById(
+"adminAttempt"
+).value.trim();
+
+
+/* LEVEL */
 
 if(!level)
 return showAdminError(
@@ -2656,13 +3508,29 @@ return showAdminError(
 );
 
 
+/* TEST TYPE */
+
 if(!testType)
 return showAdminError(
 "Please select Test / Paper Type."
 );
 
 
-/* MODEL TYPE REQUIRED */
+/* PYQ ATTEMPT */
+
+if(
+testType==="PYQ" &&
+!attempt
+){
+
+return showAdminError(
+"Please enter PYQ Attempt / Session."
+);
+
+}
+
+
+/* MODEL TYPE */
 
 if(
 testType==="MODEL_TEST" &&
@@ -2683,9 +3551,7 @@ return showAdminError(
 let subjects=[];
 
 
-/*
-MTP / RTP / PYQ / OTHER
-*/
+/* MTP / RTP / PYQ / OTHER */
 
 if(
 testType==="MTP"||
@@ -2709,9 +3575,7 @@ subjectKey
 }
 
 
-/*
-MODEL GROUP 1
-*/
+/* MODEL GROUP 1 */
 
 if(
 testType==="MODEL_TEST" &&
@@ -2729,9 +3593,7 @@ s=>s.key
 }
 
 
-/*
-MODEL GROUP 2
-*/
+/* MODEL GROUP 2 */
 
 if(
 testType==="MODEL_TEST" &&
@@ -2749,9 +3611,7 @@ s=>s.key
 }
 
 
-/*
-MODEL OTHER
-*/
+/* MODEL OTHER */
 
 if(
 testType==="MODEL_TEST" &&
@@ -2773,6 +3633,22 @@ return showAdminError(
 );
 
 }
+
+}
+
+
+/* FOUNDATION MODEL */
+
+if(
+testType==="MODEL_TEST" &&
+level==="foundation" &&
+modelType==="MODEL_TEST"
+){
+
+subjects=
+SUBJECTS.foundation.map(
+s=>s.key
+);
 
 }
 
@@ -2832,14 +3708,17 @@ modelFile,
 level,
 testType,
 modelType,
-subjects
+subjects,
+attempt:""
 },
 "model-test"
 );
 
+
 showAdminSuccess(
 "Model Test PDF uploaded successfully."
 );
+
 
 }catch(error){
 
@@ -2888,17 +3767,22 @@ return showAdminError(
 
 try{
 
+/* QUESTION PAPER */
+
 await uploadMaterialFile(
 questionPaper,
 {
 level,
 testType,
 modelType:"",
-subjects
+subjects,
+attempt
 },
 "question-paper"
 );
 
+
+/* SUGGESTED ANSWER */
 
 await uploadMaterialFile(
 suggestedAnswer,
@@ -2906,14 +3790,15 @@ suggestedAnswer,
 level,
 testType,
 modelType:"",
-subjects
+subjects,
+attempt
 },
 "suggested-answer"
 );
 
 
 showAdminSuccess(
-`${formatTestType(testType)} material uploaded successfully for the selected subject.`
+`${formatTestType(testType)} material uploaded successfully${testType==="PYQ" ? ` for ${attempt}` : ""}.`
 );
 
 
@@ -2978,6 +3863,9 @@ metadata.modelType,
 
 subjects:
 metadata.subjects,
+
+attempt:
+metadata.attempt||"",
 
 type
 
@@ -3189,6 +4077,32 @@ panel.scrollIntoView({
 behavior:"smooth",
 block:"start"
 });
+
+}
+
+
+/* ================================================= */
+/* CHECKING MODE */
+/* ================================================= */
+
+function setMode(mode){
+
+checkingMode=
+mode;
+
+document.getElementById(
+"strictMode"
+).classList.toggle(
+"active",
+mode==="strict"
+);
+
+document.getElementById(
+"moderateMode"
+).classList.toggle(
+"active",
+mode==="moderate"
+);
 
 }
 
