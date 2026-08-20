@@ -1,16 +1,14 @@
-export default async function handler(req, res) {
+export default async function handler(req,res){
 
-  if (req.method !== "POST") {
+  if(req.method!=="POST"){
     return res.status(405).json({
-      error: "Method not allowed"
+      error:"Method not allowed"
     });
   }
 
-  return res.status(410).json({
-    error:
-      "Evaluation endpoint has been replaced.",
+  return res.status(200).json({
+    success:true,
     message:
-      "Use /api/check for answer-sheet evaluation."
+      "Evaluation is handled by /api/check."
   });
-
 }
