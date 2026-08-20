@@ -18,9 +18,9 @@ export default async function handler(req, res) {
       descriptiveMaximum
     } = req.body || {};
 
-    // ==================================================
+    // -----------------------------
     // VALIDATION
-    // ==================================================
+    // -----------------------------
 
     if (!answerSheetBase64) {
       return res.status(400).json({
@@ -60,26 +60,22 @@ export default async function handler(req, res) {
       });
     }
 
-    // ==================================================
-    // SAFE PATH
-    // ==================================================
+    // -----------------------------
+    // MATERIAL PATH
+    // -----------------------------
 
-    const safeSubject = String(subjectKey).replace(
-      /[^a-zA-Z0-9_-]/g,
-      "_"
-    );
+    const safeSubject = String(subjectKey)
+      .replace(/[^a-zA-Z0-9_-]/g, "_");
 
-    const safeTestType = String(testType).replace(
-      /[^a-zA-Z0-9_-]/g,
-      "_"
-    );
+    const safeTestType = String(testType)
+      .replace(/[^a-zA-Z0-9_-]/g, "_");
 
     const materialPrefix =
       `materials/${safeSubject}/${safeTestType}/`;
 
-    // ==================================================
+    // -----------------------------
     // FIND MATERIALS
-    // ==================================================
+    // -----------------------------
 
     const materialList = await list({
       prefix: materialPrefix,
@@ -88,17 +84,15 @@ export default async function handler(req, res) {
 
     const blobs = materialList?.blobs || [];
 
-    console.log("MATERIAL PREFIX:", materialPrefix);
+    console.log("CHECK MATERIAL PREFIX:", materialPrefix);
     console.log(
-      "FOUND BLOBS:",
-      blobs.map((blob) => blob.pathname)
+      "CHECK FOUND FILES:",
+      blobs.map(b => b.pathname)
     );
 
     const questionPapers = blobs
-      .filter((blob) =>
-        blob.pathname
-          .toLowerCase()
-          .includes("/question-paper-")
+      .filter(blob =>
+        blob.pathname.toLowerCase().includes("/question-paper-")
       )
       .sort(
         (a, b) =>
@@ -107,10 +101,8 @@ export default async function handler(req, res) {
       );
 
     const suggestedAnswers = blobs
-      .filter((blob) =>
-        blob.pathname
-          .toLowerCase()
-          .includes("/suggested-answer-")
+      .filter(blob =>
+        blob.pathname.toLowerCase().includes("/suggested-answer-")
       )
       .sort(
         (a, b) =>
@@ -123,9 +115,8 @@ export default async function handler(req, res) {
         error: "Question Paper is missing.",
         details:
           `No Question Paper found inside ${materialPrefix}`,
-        availableFiles: blobs.map(
-          (blob) => blob.pathname
-        )
+        availableFiles:
+          blobs.map(blob => blob.pathname)
       });
     }
 
@@ -134,18 +125,27 @@ export default async function handler(req, res) {
         error: "Suggested Answer is missing.",
         details:
           `No Suggested Answer found inside ${materialPrefix}`,
-        availableFiles: blobs.map(
-          (blob) => blob.pathname
-        )
+        availableFiles:
+          blobs.map(blob => blob.pathname)
       });
     }
 
     const questionPaper = questionPapers[0];
     const suggestedAnswer = suggestedAnswers[0];
 
-    // ==================================================
+    console.log(
+      "USING QUESTION PAPER:",
+      questionPaper.pathname
+    );
+
+    console.log(
+      "USING SUGGESTED ANSWER:",
+      suggestedAnswer.pathname
+    );
+
+    // -----------------------------
     // DOWNLOAD BLOB
-    // ==================================================
+    // -----------------------------
 
     async function downloadBlob(blob) {
       const response = await fetch(blob.url, {
@@ -161,9 +161,11 @@ export default async function handler(req, res) {
         );
       }
 
-      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(
+        await response.arrayBuffer()
+      );
 
-      return Buffer.from(arrayBuffer).toString("base64");
+      return buffer.toString("base64");
     }
 
     const questionPaperBase64 =
@@ -172,9 +174,9 @@ export default async function handler(req, res) {
     const suggestedAnswerBase64 =
       await downloadBlob(suggestedAnswer);
 
-    // ==================================================
+    // -----------------------------
     // TEST TYPE
-    // ==================================================
+    // -----------------------------
 
     const formattedTestType =
       testType === "MODEL_TEST"
@@ -183,9 +185,9 @@ export default async function handler(req, res) {
         ? "Other"
         : testType;
 
-    // ==================================================
+    // -----------------------------
     // CHECKING MODE
-    // ==================================================
+    // -----------------------------
 
     const checkingInstructions =
       checkingMode === "strict"
@@ -193,13 +195,11 @@ export default async function handler(req, res) {
 STRICT ICAI-STYLE CHECKING:
 
 - Be conservative with marks.
-- Award marks only where the student demonstrates
-  the required knowledge.
+- Award marks only for demonstrated knowledge.
 - Penalise wrong concepts, provisions and calculations.
 - Give step marks only for genuinely correct steps.
-- Missing workings should lose marks where required.
-- For theory, check provision, concept, application
-  and conclusion.
+- Missing workings should lose marks where relevant.
+- For theory, check provision, concept, application and conclusion.
 `
         : `
 MODERATE EXAMINER-STYLE CHECKING:
@@ -211,9 +211,9 @@ MODERATE EXAMINER-STYLE CHECKING:
 - Missing essential workings should affect marks.
 `;
 
-    // ==================================================
-    // AI PROMPT
-    // ==================================================
+    // -----------------------------
+    // PROMPT
+    // -----------------------------
 
     const prompt = `
 You are an expert CA Intermediate examiner.
@@ -224,18 +224,17 @@ Evaluate the student's answer sheet against:
 2. Official/reference Suggested Answer
 3. Student Answer Sheet
 
-Do not evaluate from the student's answer alone.
+You MUST use the Question Paper and Suggested Answer.
 
-First identify every descriptive question from the
-Question Paper.
+First identify every descriptive question from the Question Paper.
 
 Then locate the corresponding student answers.
 
-Then compare them directly with the Suggested Answer.
+Then compare each answer directly with the Suggested Answer.
 
-==================================================
+========================================
 EXAM INFORMATION
-==================================================
+========================================
 
 SUBJECT:
 ${subject}
@@ -247,17 +246,15 @@ DESCRIPTIVE MAXIMUM:
 ${maximumMarks}
 
 CHECKING MODE:
-${
-  checkingMode === "strict"
-    ? "ICAI STRICT"
-    : "MODERATE"
-}
+${checkingMode === "strict"
+  ? "ICAI STRICT"
+  : "MODERATE"}
 
 ${checkingInstructions}
 
-==================================================
+========================================
 IMPORTANT RULES
-==================================================
+========================================
 
 1. Evaluate ONLY descriptive questions.
 
@@ -267,7 +264,7 @@ IMPORTANT RULES
 
 4. Do not invent marks.
 
-5. Question Paper is the authority for:
+5. Question Paper is authoritative for:
    - question numbers
    - sub-parts
    - marks
@@ -285,8 +282,8 @@ IMPORTANT RULES
 
 8. Give genuine partial/step marks.
 
-9. Wrong final answer with substantially correct
-   working may receive appropriate partial marks.
+9. Wrong final answer with substantially correct working
+   may receive appropriate partial marks.
 
 10. Wrong approach should not receive marks merely
     for containing similar numbers or keywords.
@@ -305,7 +302,7 @@ IMPORTANT RULES
     - adjustments
     - final answer
 
-13. Unattempted question:
+13. Unattempted:
     marks_awarded = 0
     status = "not_attempted"
 
@@ -328,9 +325,9 @@ IMPORTANT RULES
 
 22. Do not reveal hidden reasoning.
 
-==================================================
+========================================
 FINAL CHECK
-==================================================
+========================================
 
 Verify:
 
@@ -345,9 +342,9 @@ Verify:
 Return ONLY valid JSON.
 `;
 
-    // ==================================================
-    // AI REQUEST
-    // ==================================================
+    // -----------------------------
+    // AI GATEWAY
+    // -----------------------------
 
     const aiResponse = await fetch(
       "https://ai-gateway.vercel.sh/v1/responses",
@@ -356,6 +353,7 @@ Return ONLY valid JSON.
 
         headers: {
           "Content-Type": "application/json",
+
           Authorization:
             `Bearer ${process.env.AI_GATEWAY_API_KEY}`
         },
@@ -369,7 +367,6 @@ Return ONLY valid JSON.
 
           input: [
             {
-              type: "message",
               role: "user",
 
               content: [
@@ -380,6 +377,7 @@ Return ONLY valid JSON.
 
                 {
                   type: "input_file",
+
                   filename:
                     questionPaper.pathname
                       .split("/")
@@ -391,6 +389,7 @@ Return ONLY valid JSON.
 
                 {
                   type: "input_file",
+
                   filename:
                     suggestedAnswer.pathname
                       .split("/")
@@ -402,6 +401,7 @@ Return ONLY valid JSON.
 
                 {
                   type: "input_file",
+
                   filename:
                     answerSheetName ||
                     "answer-sheet.pdf",
@@ -506,36 +506,41 @@ Return ONLY valid JSON.
       }
     );
 
-    // ==================================================
-    // AI RESPONSE
-    // ==================================================
+    // -----------------------------
+    // READ AI RESPONSE
+    // -----------------------------
 
     const rawResult = await aiResponse.json();
 
-    if (!aiResponse.ok) {
-      console.error(
-        "AI GATEWAY ERROR:",
-        rawResult
-      );
+    console.log(
+      "AI STATUS:",
+      aiResponse.status
+    );
 
+    console.log(
+      "AI RESPONSE:",
+      JSON.stringify(rawResult).slice(0, 5000)
+    );
+
+    if (!aiResponse.ok) {
       return res.status(aiResponse.status).json({
         error: "AI evaluation failed.",
         details:
           rawResult?.error?.message ||
+          rawResult?.error ||
           rawResult?.message ||
           JSON.stringify(rawResult)
       });
     }
 
-    // ==================================================
+    // -----------------------------
     // EXTRACT OUTPUT
-    // ==================================================
+    // -----------------------------
 
     let outputText = "";
 
     if (
-      typeof rawResult.output_text ===
-      "string"
+      typeof rawResult.output_text === "string"
     ) {
       outputText = rawResult.output_text;
     }
@@ -551,8 +556,7 @@ Return ONLY valid JSON.
 
         for (const content of item.content) {
           if (
-            typeof content.text ===
-            "string"
+            typeof content.text === "string"
           ) {
             outputText += content.text;
           }
@@ -561,15 +565,16 @@ Return ONLY valid JSON.
     }
 
     if (!outputText) {
-     return res.status(500).json({
-  error: "AI evaluation failed.",
-  gatewayStatus: aiResponse.status,
-  gatewayResponse: rawResult
-});
+      return res.status(500).json({
+        error: "AI returned an empty evaluation.",
+        details:
+          JSON.stringify(rawResult).slice(0, 5000)
+      });
+    }
 
-    // ==================================================
+    // -----------------------------
     // PARSE JSON
-    // ==================================================
+    // -----------------------------
 
     let evaluation;
 
@@ -578,26 +583,23 @@ Return ONLY valid JSON.
     } catch (error) {
       console.error(
         "JSON PARSE ERROR:",
-        error
+        outputText
       );
 
       return res.status(500).json({
-        error:
-          "AI returned invalid JSON.",
+        error: "AI returned invalid JSON.",
         details:
-          outputText.slice(0, 3000)
+          outputText.slice(0, 5000)
       });
     }
 
-    // ==================================================
+    // -----------------------------
     // VALIDATE
-    // ==================================================
+    // -----------------------------
 
     if (
       !evaluation ||
-      !Array.isArray(
-        evaluation.questions
-      )
+      !Array.isArray(evaluation.questions)
     ) {
       return res.status(500).json({
         error:
@@ -605,22 +607,26 @@ Return ONLY valid JSON.
       });
     }
 
-    // ==================================================
-    // SCORE
-    // ==================================================
+    // -----------------------------
+    // CALCULATE SCORE SERVER-SIDE
+    // -----------------------------
 
     let total = 0;
 
-    for (const question of evaluation.questions) {
-      const available = Number(
-        question.marks_available
-      );
+    for (
+      const question
+      of evaluation.questions
+    ) {
+      const available =
+        Number(question.marks_available);
 
-      let awarded = Number(
-        question.marks_awarded
-      );
+      let awarded =
+        Number(question.marks_awarded);
 
-      if (!Number.isFinite(available)) {
+      if (
+        !Number.isFinite(available) ||
+        available < 0
+      ) {
         return res.status(500).json({
           error:
             "Invalid marks returned by AI."
@@ -642,8 +648,7 @@ Return ONLY valid JSON.
       awarded =
         Math.round(awarded * 100) / 100;
 
-      question.marks_awarded =
-        awarded;
+      question.marks_awarded = awarded;
 
       total += awarded;
     }
@@ -657,19 +662,16 @@ Return ONLY valid JSON.
 
     const percentage =
       Math.round(
-        (total / maximumMarks) *
-          10000
+        (total / maximumMarks) * 10000
       ) / 100;
 
     evaluation.total_marks = total;
-    evaluation.maximum_marks =
-      maximumMarks;
-    evaluation.percentage =
-      percentage;
+    evaluation.maximum_marks = maximumMarks;
+    evaluation.percentage = percentage;
 
-    // ==================================================
-    // FINAL RESPONSE
-    // ==================================================
+    // -----------------------------
+    // SUCCESS
+    // -----------------------------
 
     return res.status(200).json({
       success: true,
@@ -703,13 +705,14 @@ Return ONLY valid JSON.
 
   } catch (error) {
     console.error(
-      "CHECK ERROR:",
+      "CHECK FATAL ERROR:",
       error
     );
 
     return res.status(500).json({
       error:
         "Unable to evaluate answer sheet.",
+
       details:
         error?.message ||
         "Unknown error"
