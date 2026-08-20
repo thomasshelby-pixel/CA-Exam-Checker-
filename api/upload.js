@@ -1,22 +1,16 @@
 import { put } from "@vercel/blob";
 
-function safe(value) {
-  return String(value || "")
-    .trim()
-    .replace(/[^a-zA-Z0-9_-]/g, "_");
-}
+export default async function handler(req,res){
 
-export default async function handler(req, res) {
-
-  if (req.method !== "POST") {
+  if(req.method!=="POST"){
     return res.status(405).json({
-      error: "Method not allowed"
+      error:"Method not allowed"
     });
   }
 
-  try {
+  try{
 
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    if(!process.env.BLOB_READ_WRITE_TOKEN){
       return res.status(500).json({
         error:
           "BLOB_READ_WRITE_TOKEN is not configured."
@@ -27,151 +21,138 @@ export default async function handler(req, res) {
       filename,
       data,
       contentType,
+
       studentName,
       registrationNumber,
+
       level,
       subject,
       subjectKey,
+
       testType,
-      checkingMode
+      modelType,
+
+      checkingMode,
+      descriptiveMaximum
+
     } = req.body || {};
 
-    if (!data) {
+    if(!data){
       return res.status(400).json({
-        error:
-          "Answer sheet data is missing."
+        error:"Answer sheet is missing."
       });
     }
 
-    if (!filename) {
+    if(!level){
       return res.status(400).json({
-        error:
-          "Answer sheet filename is missing."
+        error:"Level is missing."
       });
     }
 
-    if (
-      !String(filename)
-        .toLowerCase()
-        .endsWith(".pdf")
-    ) {
+    if(!testType){
       return res.status(400).json({
-        error:
-          "Only PDF answer sheets are allowed."
+        error:"Test type is missing."
       });
-    }
-
-    let cleanBase64 =
-      String(data);
-
-    if (
-      cleanBase64.includes(",")
-    ) {
-      cleanBase64 =
-        cleanBase64.split(",").pop();
     }
 
     const buffer =
-      Buffer.from(
-        cleanBase64,
-        "base64"
-      );
+      Buffer.from(data,"base64");
 
-    if (!buffer.length) {
+    if(buffer.length > 4 * 1024 * 1024){
       return res.status(400).json({
         error:
-          "Invalid PDF data."
+          "Answer sheet must be smaller than 4 MB."
       });
     }
 
-    /*
-      Keep student files private.
-    */
+    const safeLevel =
+      String(level)
+        .replace(/[^a-zA-Z0-9_-]/g,"_");
+
+    const safeTestType =
+      String(testType)
+        .replace(/[^a-zA-Z0-9_-]/g,"_");
+
+    const timestamp =
+      Date.now();
+
+    const safeFilename =
+      String(filename || "answer-sheet.pdf")
+        .replace(/[^a-zA-Z0-9._-]/g,"_");
 
     const pathname =
-      [
-        "answer-sheets",
-        safe(level || "unknown"),
-        safe(subjectKey || "unknown"),
-        safe(testType || "unknown"),
-        `${Date.now()}-${safe(
-          studentName || "student"
-        )}-${safe(
-          registrationNumber || "unknown"
-        )}-${safe(filename)}`
-      ].join("/");
+      `answers/${safeLevel}/${safeTestType}/${timestamp}-${safeFilename}`;
 
     const blob =
       await put(
         pathname,
         buffer,
         {
-          access: "private",
-
-          token:
-            process.env.BLOB_READ_WRITE_TOKEN,
+          access:"private",
 
           contentType:
             contentType ||
             "application/pdf",
 
-          addRandomSuffix: false
+          token:
+            process.env.BLOB_READ_WRITE_TOKEN,
+
+          addRandomSuffix:false,
+
+          metadata:{
+            studentName:
+              studentName || "",
+
+            registrationNumber:
+              registrationNumber || "",
+
+            level,
+
+            subject:
+              subject || "",
+
+            subjectKey:
+              subjectKey || "",
+
+            testType,
+
+            modelType:
+              modelType || "",
+
+            checkingMode:
+              checkingMode || "",
+
+            descriptiveMaximum:
+              String(
+                descriptiveMaximum || ""
+              )
+          }
         }
       );
 
     return res.status(200).json({
 
-      success: true,
-
-      message:
-        "Answer sheet uploaded successfully.",
+      success:true,
 
       pathname:
         blob.pathname,
 
-      metadata: {
-        studentName:
-          studentName || "",
-
-        registrationNumber:
-          registrationNumber || "",
-
-        level:
-          level || "",
-
-        subject:
-          subject || "",
-
-        subjectKey:
-          subjectKey || "",
-
-        testType:
-          testType || "",
-
-        checkingMode:
-          checkingMode || ""
-      }
+      url:
+        blob.url
 
     });
 
-  } catch (error) {
+  }catch(error){
 
     console.error(
-      "UPLOAD ERROR:",
+      "ANSWER UPLOAD ERROR:",
       error
     );
 
     return res.status(500).json({
-
       error:
-        "Answer sheet upload failed.",
-
-      details:
         error?.message ||
-        "Unknown error"
-
+        "Answer sheet upload failed."
     });
-
   }
-
 }
