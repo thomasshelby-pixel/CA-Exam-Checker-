@@ -1478,3 +1478,10 @@ function formatModelType(type){
   return map[type] || type;
 
 }
+attempt
+
+paperMaximum
+descriptiveMaximum
+mcqOnly
+negativeMarking
+negativeMarksPerWrong
