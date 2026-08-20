@@ -1,4 +1,80 @@
 import { put } from "@vercel/blob";
+import {
+  isAdminAuthenticated
+} from "./_adminAuth.js";
+
+const LEVELS = {
+  foundation: "Foundation",
+  inter: "Intermediate",
+  final: "Final"
+};
+
+const SUBJECTS = {
+  foundation: [
+    "accounting",
+    "business_laws",
+    "quantitative_aptitude",
+    "business_economics"
+  ],
+
+  inter: [
+    "advanced_accounts",
+    "law",
+    "taxation",
+    "costing",
+    "audit",
+    "fm",
+    "sm"
+  ],
+
+  final: [
+    "financial_reporting",
+    "advanced_financial_management",
+    "advanced_auditing",
+    "direct_tax",
+    "indirect_tax",
+    "international_tax",
+    "strategic_cost_management",
+    "multidisciplinary_case_study"
+  ]
+};
+
+function safe(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
+function validateModelType(
+  level,
+  modelType
+) {
+
+  if (level === "foundation") {
+
+    return [
+      "model_test",
+      "other"
+    ].includes(modelType);
+
+  }
+
+  if (
+    level === "inter" ||
+    level === "final"
+  ) {
+
+    return [
+      "group_1",
+      "group_2",
+      "other"
+    ].includes(modelType);
+
+  }
+
+  return false;
+}
 
 export default async function handler(req, res) {
 
@@ -8,98 +84,25 @@ export default async function handler(req, res) {
     });
   }
 
-  try {
+  if (!isAdminAuthenticated(req)) {
+    return res.status(403).json({
+      error: "Admin authentication required."
+    });
+  }
 
-    /*
-     * IMPORTANT:
-     * Admin authentication is handled by the existing
-     * admin-login/admin-logout system.
-     *
-     * If your existing material.js already has a working
-     * admin-session verification helper, keep that helper
-     * and place it before this upload section.
-     */
+  try {
 
     const {
       filename,
       data,
       contentType,
-
       level,
-      group,
-
+      modelType,
+      subjects,
       subjectKey,
-
       testType,
-
-      modelTestNumber,
-
       type
-
     } = req.body || {};
-
-
-    /* ================================================
-       VALIDATION
-    ================================================ */
-
-    if (!filename || !data) {
-      return res.status(400).json({
-        error: "File data is missing."
-      });
-    }
-
-    if (!level) {
-      return res.status(400).json({
-        error: "CA Level is missing."
-      });
-    }
-
-    if (!group) {
-      return res.status(400).json({
-        error: "Group is missing."
-      });
-    }
-
-    if (!testType) {
-      return res.status(400).json({
-        error: "Test Type is missing."
-      });
-    }
-
-    if (testType === "MODEL_TEST") {
-
-      if (!modelTestNumber) {
-        return res.status(400).json({
-          error: "Model Test number is missing."
-        });
-      }
-
-      if (type !== "model-test") {
-        return res.status(400).json({
-          error: "Invalid Model Test upload type."
-        });
-      }
-
-    } else {
-
-      if (!subjectKey) {
-        return res.status(400).json({
-          error: "Subject is missing."
-        });
-      }
-
-      if (
-        type !== "question-paper" &&
-        type !== "suggested-answer"
-      ) {
-        return res.status(400).json({
-          error: "Invalid material type."
-        });
-      }
-
-    }
-
 
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
       return res.status(500).json({
@@ -108,82 +111,223 @@ export default async function handler(req, res) {
       });
     }
 
+    if (!filename || !data) {
+      return res.status(400).json({
+        error: "File data is missing."
+      });
+    }
 
-    /* ================================================
-       SAFE VALUES
-    ================================================ */
+    const safeLevel = safe(level);
 
-    function safe(value) {
+    if (!LEVELS[safeLevel]) {
+      return res.status(400).json({
+        error:
+          "Invalid level. Use foundation, inter or final."
+      });
+    }
 
-      return String(value)
-        .trim()
-        .replace(/[^a-zA-Z0-9_-]/g, "_");
+    const safeModelType = safe(modelType);
+
+    if (
+      !validateModelType(
+        safeLevel,
+        safeModelType
+      )
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Invalid Model Test type for selected level."
+      });
 
     }
 
+    const isModelTest =
+      testType === "MODEL_TEST";
 
-    const safeLevel =
-      safe(level);
+    const isSpecificOther =
+      safeModelType === "other";
 
-    const safeGroup =
-      safe(group);
+    let selectedSubjects = [];
 
-    const safeTestType =
-      safe(testType);
+    if (Array.isArray(subjects)) {
 
-
-    let pathname;
-
-
-    /* ================================================
-       MODEL TEST
-       ONE PDF = QUESTION + SUGGESTED ANSWER
-    ================================================ */
-
-    if (testType === "MODEL_TEST") {
-
-      const safeModel =
-        safe(modelTestNumber);
-
-      pathname =
-        `materials/${safeLevel}/${safeGroup}/model-test-${safeModel}/model-test-${Date.now()}-${safe(filename)}`;
+      selectedSubjects =
+        subjects
+          .map((item) => safe(item))
+          .filter(Boolean);
 
     }
 
+    /*
+      For Model Test:
+      Admin must specify subjects.
 
-    /* ================================================
-       NORMAL MATERIAL
-    ================================================ */
+      Foundation:
+      Model Test = all 4 subjects can be selected.
 
-    else {
+      Inter / Final:
+      Group 1 / Group 2 / Other
+    */
 
-      const safeSubject =
-        safe(subjectKey);
+    if (
+      isModelTest ||
+      isSpecificOther
+    ) {
 
-      pathname =
-        `materials/${safeLevel}/${safeGroup}/${safeSubject}/${safeTestType}/${safe(type)}-${Date.now()}-${safe(filename)}`;
+      if (!selectedSubjects.length) {
+
+        return res.status(400).json({
+          error:
+            "Please specify at least one subject."
+        });
+
+      }
 
     }
 
+    /*
+      Validate subjects for the selected level.
+    */
 
-    /* ================================================
-       BASE64 → BUFFER
-    ================================================ */
+    if (
+      selectedSubjects.length &&
+      LEVELS[safeLevel]
+    ) {
+
+      const allowed =
+        SUBJECTS[safeLevel] || [];
+
+      const invalid =
+        selectedSubjects.filter(
+          (item) =>
+            !allowed.includes(item)
+        );
+
+      if (invalid.length) {
+
+        return res.status(400).json({
+          error:
+            "Invalid subject(s) for selected level.",
+          invalid
+        });
+
+      }
+
+    }
+
+    /*
+      File type
+    */
+
+    const lowerName =
+      String(filename).toLowerCase();
+
+    if (
+      !lowerName.endsWith(".pdf")
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Only PDF files are allowed."
+      });
+
+    }
+
+    /*
+      Convert base64 to Buffer
+    */
+
+    let cleanBase64 = String(data);
+
+    if (
+      cleanBase64.includes(",")
+    ) {
+      cleanBase64 =
+        cleanBase64.split(",").pop();
+    }
 
     const buffer =
-      Buffer.from(data, "base64");
+      Buffer.from(
+        cleanBase64,
+        "base64"
+      );
 
+    if (!buffer.length) {
+      return res.status(400).json({
+        error:
+          "Invalid PDF data."
+      });
+    }
 
-    /* ================================================
-       UPLOAD
-    ================================================ */
+    /*
+      Model Test:
+      One PDF contains both Question Paper
+      and Suggested Answer.
+    */
+
+    let materialType = type;
+
+    if (isModelTest) {
+
+      materialType =
+        "model-test-combined";
+
+    } else if (
+      type === "question-paper"
+    ) {
+
+      materialType =
+        "question-paper";
+
+    } else if (
+      type === "suggested-answer"
+    ) {
+
+      materialType =
+        "suggested-answer";
+
+    } else {
+
+      materialType =
+        "question-paper";
+
+    }
+
+    /*
+      Create subject path.
+    */
+
+    const subjectFolder =
+      selectedSubjects.length
+        ? selectedSubjects.join("+")
+        : safe(subjectKey || "general");
+
+    const timestamp =
+      Date.now();
+
+    const safeFilename =
+      lowerName
+        .replace(
+          /[^a-z0-9._-]/g,
+          "_"
+        );
+
+    const pathname =
+      [
+        "materials",
+        safeLevel,
+        safeModelType,
+        subjectFolder,
+        `${materialType}-${timestamp}-${safeFilename}`
+      ].join("/");
 
     const blob =
       await put(
         pathname,
         buffer,
         {
-          access: "public",
+          access: "private",
 
           token:
             process.env.BLOB_READ_WRITE_TOKEN,
@@ -196,55 +340,53 @@ export default async function handler(req, res) {
         }
       );
 
-
-    console.log(
-      "MATERIAL UPLOADED:",
-      blob.pathname
-    );
-
-
     return res.status(200).json({
 
       success: true,
 
-      pathname:
-        blob.pathname,
+      message:
+        isModelTest
+          ? "Combined Model Test uploaded successfully."
+          : "Material uploaded successfully.",
 
-      url:
-        blob.url,
+      material: {
 
-      metadata: {
+        level:
+          LEVELS[safeLevel],
 
-        level,
+        levelKey:
+          safeLevel,
 
-        group,
+        modelType:
+          safeModelType,
 
-        subjectKey:
-          subjectKey || null,
+        testType:
+          testType || null,
 
-        testType,
+        subjects:
+          selectedSubjects,
 
-        modelTestNumber:
-          modelTestNumber || null,
+        type:
+          materialType,
 
-        type
+        pathname:
+          blob.pathname
 
       }
 
     });
 
-
   } catch (error) {
 
     console.error(
-      "MATERIAL UPLOAD ERROR:",
+      "MATERIAL ERROR:",
       error
     );
 
     return res.status(500).json({
 
       error:
-        "Unable to upload material.",
+        "Material upload failed.",
 
       details:
         error?.message ||
