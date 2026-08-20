@@ -1,18 +1,84 @@
-import { list } from "@vercel/blob";
+import {
+  list
+} from "@vercel/blob";
 
+const LEVELS = [
+  "foundation",
+  "inter",
+  "final"
+];
 
-export default async function handler(req,res){
+function safe(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9_-]/g, "_");
+}
 
-  if(req.method !== "POST"){
+async function downloadBlob(
+  blob,
+  token
+) {
 
-    return res.status(405).json({
-      error:"Method not allowed"
-    });
+  const response =
+    await fetch(
+      blob.url,
+      {
+        headers: {
+          Authorization:
+            `Bearer ${token}`
+        }
+      }
+    );
+
+  if (!response.ok) {
+
+    throw new Error(
+      `Unable to download ${blob.pathname}. HTTP ${response.status}`
+    );
 
   }
 
+  const arrayBuffer =
+    await response.arrayBuffer();
 
-  try{
+  return Buffer
+    .from(arrayBuffer)
+    .toString("base64");
+}
+
+function findLatest(
+  blobs,
+  keyword
+) {
+
+  return blobs
+    .filter(
+      (blob) =>
+        blob.pathname
+          .toLowerCase()
+          .includes(keyword)
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.uploadedAt) -
+        new Date(a.uploadedAt)
+    )[0];
+
+}
+
+export default async function handler(
+  req,
+  res
+) {
+
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      error: "Method not allowed"
+    });
+  }
+
+  try {
 
     const {
 
@@ -30,7 +96,9 @@ export default async function handler(req,res){
 
       testType,
 
-      modelTestNumber,
+      modelType,
+
+      subjects,
 
       checkingMode,
 
@@ -38,82 +106,15 @@ export default async function handler(req,res){
 
     } = req.body || {};
 
+    /*
+      ================================
+      ENVIRONMENT
+      ================================
+    */
 
-    /* ================================================
-       VALIDATION
-    ================================================ */
-
-    if(!answerSheetBase64){
-
-      return res.status(400).json({
-        error:"Answer sheet is missing."
-      });
-
-    }
-
-    if(!level){
-
-      return res.status(400).json({
-        error:"CA Level is missing."
-      });
-
-    }
-
-    if(!group){
-
-      return res.status(400).json({
-        error:"Group is missing."
-      });
-
-    }
-
-    if(!subjectKey){
-
-      return res.status(400).json({
-        error:"Subject is missing."
-      });
-
-    }
-
-    if(!testType){
-
-      return res.status(400).json({
-        error:"Test type is missing."
-      });
-
-    }
-
-
-    if(
-      testType === "MODEL_TEST" &&
-      !modelTestNumber
-    ){
-
-      return res.status(400).json({
-        error:"Model Test number is missing."
-      });
-
-    }
-
-
-    const maximumMarks =
-      Number(descriptiveMaximum);
-
-
-    if(
-      !Number.isFinite(maximumMarks) ||
-      maximumMarks <= 0
-    ){
-
-      return res.status(400).json({
-        error:
-          "Invalid descriptive maximum marks."
-      });
-
-    }
-
-
-    if(!process.env.AI_GATEWAY_API_KEY){
+    if (
+      !process.env.AI_GATEWAY_API_KEY
+    ) {
 
       return res.status(500).json({
         error:
@@ -122,8 +123,9 @@ export default async function handler(req,res){
 
     }
 
-
-    if(!process.env.BLOB_READ_WRITE_TOKEN){
+    if (
+      !process.env.BLOB_READ_WRITE_TOKEN
+    ) {
 
       return res.status(500).json({
         error:
@@ -132,57 +134,121 @@ export default async function handler(req,res){
 
     }
 
+    /*
+      ================================
+      BASIC VALIDATION
+      ================================
+    */
 
-    /* ================================================
-       SAFE PATH
-    ================================================ */
+    if (!answerSheetBase64) {
 
-    function safe(value){
-
-      return String(value)
-        .trim()
-        .replace(/[^a-zA-Z0-9_-]/g,"_");
+      return res.status(400).json({
+        error:
+          "Answer sheet is missing."
+      });
 
     }
-
 
     const safeLevel =
       safe(level);
 
-    const safeGroup =
-      safe(group);
+    if (
+      !LEVELS.includes(
+        safeLevel
+      )
+    ) {
 
+      return res.status(400).json({
+        error:
+          "Invalid level."
+      });
+
+    }
+
+    if (!subjectKey) {
+
+      return res.status(400).json({
+        error:
+          "Subject is missing."
+      });
+
+    }
+
+    if (!testType) {
+
+      return res.status(400).json({
+        error:
+          "Test type is missing."
+      });
+
+    }
+
+    const maximumMarks =
+      Number(
+        descriptiveMaximum
+      );
+
+    if (
+      !Number.isFinite(
+        maximumMarks
+      ) ||
+      maximumMarks <= 0
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Invalid descriptive maximum marks."
+      });
+
+    }
+
+    /*
+      ================================
+      MATERIAL PATH
+      ================================
+    */
+
+    const safeGroup =
+      safe(group || "");
+
+    const safeModelType =
+      safe(modelType || "");
+
+    /*
+      For Model Test:
+      foundation -> model_test
+      inter/final -> group_1/group_2/other
+    */
 
     let materialPrefix;
 
-
-    /* ================================================
-       MODEL TEST MATERIAL
-    ================================================ */
-
-    if(testType === "MODEL_TEST"){
+    if (
+      testType === "MODEL_TEST"
+    ) {
 
       materialPrefix =
-        `materials/${safeLevel}/${safeGroup}/model-test-${safe(modelTestNumber)}/`;
+        [
+          "materials",
+          safeLevel,
+          safeModelType
+        ].join("/") + "/";
+
+    } else {
+
+      materialPrefix =
+        [
+          "materials",
+          safeLevel,
+          safeModelType || "other"
+        ].join("/") + "/";
 
     }
 
-
-    /* ================================================
-       NORMAL MATERIAL
-    ================================================ */
-
-    else{
-
-      materialPrefix =
-        `materials/${safeLevel}/${safeGroup}/${safe(subjectKey)}/${safe(testType)}/`;
-
-    }
-
-
-    /* ================================================
-       FIND MATERIALS
-    ================================================ */
+    /*
+      ================================
+      FIND MATERIALS
+      ================================
+    */
 
     const materialList =
       await list({
@@ -190,364 +256,298 @@ export default async function handler(req,res){
         prefix:
           materialPrefix,
 
+        limit:
+          1000,
+
         token:
           process.env.BLOB_READ_WRITE_TOKEN
 
       });
 
-
     const blobs =
       materialList?.blobs || [];
 
-
     console.log(
-      "MATERIAL PREFIX:",
+      "CHECK MATERIAL PREFIX:",
       materialPrefix
     );
 
-
     console.log(
-      "FOUND BLOBS:",
+      "AVAILABLE BLOBS:",
       blobs.map(
-        blob => blob.pathname
+        (b) => b.pathname
       )
     );
 
+    /*
+      ================================
+      MODEL TEST
+      ================================
+      One PDF = Question Paper +
+      Suggested Answer
+    */
 
     let questionPaper;
     let suggestedAnswer;
-    let modelTestPDF;
 
+    if (
+      testType === "MODEL_TEST"
+    ) {
 
-    /* ================================================
-       MODEL TEST
-    ================================================ */
+      const combined =
+        findLatest(
+          blobs,
+          "/model-test-combined-"
+        );
 
-    if(testType === "MODEL_TEST"){
-
-      const modelFiles =
-        blobs
-          .filter(blob =>
-            blob.pathname
-              .toLowerCase()
-              .includes("/model-test-")
-          )
-          .sort(
-            (a,b) =>
-              new Date(b.uploadedAt) -
-              new Date(a.uploadedAt)
-          );
-
-
-      if(!modelFiles.length){
+      if (!combined) {
 
         return res.status(404).json({
 
           error:
-            "Model Test PDF is missing.",
+            "Model Test material is missing.",
 
           details:
-            `No Model Test found inside ${materialPrefix}`,
+            `No combined Model Test PDF found in ${materialPrefix}`,
 
           availableFiles:
             blobs.map(
-              blob => blob.pathname
+              (b) => b.pathname
             )
 
         });
 
       }
-
-
-      modelTestPDF =
-        modelFiles[0];
-
-    }
-
-
-    /* ================================================
-       NORMAL TEST
-    ================================================ */
-
-    else{
-
-      const questionPapers =
-        blobs
-          .filter(blob =>
-            blob.pathname
-              .toLowerCase()
-              .includes(
-                "/question-paper-"
-              )
-          )
-          .sort(
-            (a,b) =>
-              new Date(b.uploadedAt) -
-              new Date(a.uploadedAt)
-          );
-
-
-      const suggestedAnswers =
-        blobs
-          .filter(blob =>
-            blob.pathname
-              .toLowerCase()
-              .includes(
-                "/suggested-answer-"
-              )
-          )
-          .sort(
-            (a,b) =>
-              new Date(b.uploadedAt) -
-              new Date(a.uploadedAt)
-          );
-
-
-      if(!questionPapers.length){
-
-        return res.status(404).json({
-
-          error:
-            "Question Paper is missing.",
-
-          details:
-            `No Question Paper found inside ${materialPrefix}`,
-
-          availableFiles:
-            blobs.map(
-              blob => blob.pathname
-            )
-
-        });
-
-      }
-
-
-      if(!suggestedAnswers.length){
-
-        return res.status(404).json({
-
-          error:
-            "Suggested Answer is missing.",
-
-          details:
-            `No Suggested Answer found inside ${materialPrefix}`,
-
-          availableFiles:
-            blobs.map(
-              blob => blob.pathname
-            )
-
-        });
-
-      }
-
 
       questionPaper =
-        questionPapers[0];
+        combined;
 
       suggestedAnswer =
-        suggestedAnswers[0];
+        combined;
 
-    }
+    } else {
 
-
-    /* ================================================
-       DOWNLOAD PRIVATE BLOB
-    ================================================ */
-
-    async function downloadBlob(blob){
-
-      const response =
-        await fetch(
-          blob.url
+      questionPaper =
+        findLatest(
+          blobs,
+          "/question-paper-"
         );
 
-
-      if(!response.ok){
-
-        throw new Error(
-          `Unable to download ${blob.pathname}. HTTP ${response.status}`
+      suggestedAnswer =
+        findLatest(
+          blobs,
+          "/suggested-answer-"
         );
+
+      if (!questionPaper) {
+
+        return res.status(404).json({
+          error:
+            "Question Paper is missing.",
+          availableFiles:
+            blobs.map(
+              (b) => b.pathname
+            )
+        });
 
       }
 
+      if (!suggestedAnswer) {
 
-      const arrayBuffer =
-        await response.arrayBuffer();
+        return res.status(404).json({
+          error:
+            "Suggested Answer is missing.",
+          availableFiles:
+            blobs.map(
+              (b) => b.pathname
+            )
+        });
 
-
-      return Buffer
-        .from(arrayBuffer)
-        .toString("base64");
+      }
 
     }
 
+    /*
+      ================================
+      DOWNLOAD FILES
+      ================================
+    */
 
-    let questionPaperBase64;
+    const questionPaperBase64 =
+      await downloadBlob(
+        questionPaper,
+        process.env.BLOB_READ_WRITE_TOKEN
+      );
+
     let suggestedAnswerBase64;
-    let modelTestBase64;
 
+    if (
+      suggestedAnswer.pathname ===
+      questionPaper.pathname
+    ) {
 
-    if(testType === "MODEL_TEST"){
+      suggestedAnswerBase64 =
+        questionPaperBase64;
 
-      modelTestBase64 =
-        await downloadBlob(
-          modelTestPDF
-        );
-
-    }else{
-
-      questionPaperBase64 =
-        await downloadBlob(
-          questionPaper
-        );
-
+    } else {
 
       suggestedAnswerBase64 =
         await downloadBlob(
-          suggestedAnswer
+          suggestedAnswer,
+          process.env.BLOB_READ_WRITE_TOKEN
         );
 
     }
 
-
-    /* ================================================
-       TEST TYPE
-    ================================================ */
-
-    const formattedTestType =
-      testType === "MODEL_TEST"
-      ? `Model Test ${modelTestNumber}`
-      : testType;
-
-
-    /* ================================================
-       CHECKING MODE
-    ================================================ */
+    /*
+      ================================
+      CHECKING MODE
+      ================================
+    */
 
     const checkingInstructions =
-
       checkingMode === "strict"
 
-      ?
-
-`STRICT ICAI-STYLE CHECKING:
+        ? `
+STRICT ICAI-STYLE CHECKING:
 
 - Be conservative with marks.
-- Award marks only where the student demonstrates required knowledge.
-- Penalise wrong concepts, provisions and calculations.
-- Give step marks only for genuinely correct steps.
-- Missing workings should lose marks where required.
-- Theory must be checked for provision, concept, application and conclusion.`
+- Award marks only for demonstrated knowledge.
+- Penalise wrong concepts and provisions.
+- Penalise wrong calculations.
+- Give step marks only for correct steps.
+- Missing essential workings should lose marks.
+- Theory requires provision, concept, application and conclusion.
+`
 
-      :
-
-`MODERATE EXAMINER-STYLE CHECKING:
+        : `
+MODERATE EXAMINER-STYLE CHECKING:
 
 - Give reasonable step marking.
 - Give credit for substantially correct approaches.
 - Minor calculation errors may receive partial marks.
-- Conceptual errors must be penalised.
-- Missing essential workings should affect marks.`;
+- Conceptual errors must still be penalised.
+- Missing essential workings should affect marks.
+`;
 
+    /*
+      ================================
+      MODEL TEST NOTE
+      ================================
+    */
 
-    /* ================================================
-       MODEL TEST SPECIAL INSTRUCTION
-    ================================================ */
-
-    const modelTestInstruction =
-
+    const materialInstruction =
       testType === "MODEL_TEST"
 
-      ?
+        ? `
+MODEL TEST MATERIAL:
 
-`THIS IS A COMBINED MODEL TEST PDF.
+The uploaded Model Test PDF contains BOTH:
+1. Question Paper
+2. Suggested Answer
 
-The uploaded Model Test PDF contains:
+Treat the first/appropriate section as the
+Question Paper and the corresponding
+Suggested Answer section as the reference.
 
-- Question Papers for multiple subjects in this group.
-- Suggested Answers for multiple subjects in this group.
+Do NOT require a second Suggested Answer file.
+`
 
-The selected student subject is:
+        : `
+NORMAL TEST MATERIAL:
 
-SUBJECT:
-${subject}
+Question Paper and Suggested Answer are
+provided as separate files.
+`;
 
-SUBJECT KEY:
-${subjectKey}
+    /*
+      ================================
+      SUBJECT CONTEXT
+      ================================
+    */
 
-You MUST locate ONLY the Question Paper and Suggested Answer belonging to the selected subject.
+    const subjectList =
+      Array.isArray(subjects)
+        ? subjects.join(", ")
+        : "";
 
-Ignore all other subjects.
-
-Do NOT mix another subject's questions or suggested answers with the selected subject.
-
-The Model Test PDF is the authority for identifying the relevant subject, questions, sub-parts and marks.`
-
-      :
-
-`THIS IS A NORMAL TEST.
-
-Question Paper and Suggested Answer are separate PDFs.
-
-Use the Question Paper as the authority for question numbers, sub-parts and marks.
-
-Use the Suggested Answer as the reference for expected answers, calculations, provisions, concepts and conclusions.`;
-
-
-    /* ================================================
-       PROMPT
-    ================================================ */
+    /*
+      ================================
+      PROMPT
+      ================================
+    */
 
     const prompt = `
 
 You are an expert CA examination evaluator.
 
-Evaluate the student's answer sheet against the official/reference examination material.
+You are evaluating a CA examination answer sheet.
 
-==================================================
-STUDENT EXAM INFORMATION
-==================================================
-
-CA LEVEL:
-${level}
+LEVEL:
+${safeLevel}
 
 GROUP:
-${group}
+${group || "Not applicable"}
 
 SUBJECT:
-${subject}
+${subject || subjectKey}
 
 SUBJECT KEY:
 ${subjectKey}
 
 TEST TYPE:
-${formattedTestType}
+${testType}
+
+MODEL TYPE:
+${modelType || "Not applicable"}
+
+SUBJECTS IN MATERIAL:
+${subjectList || "Not specified"}
 
 DESCRIPTIVE MAXIMUM:
 ${maximumMarks}
 
 CHECKING MODE:
-${checkingMode === "strict"
-  ? "ICAI STRICT"
-  : "MODERATE"}
-
-==================================================
-MATERIAL STRUCTURE
-==================================================
-
-${modelTestInstruction}
-
-==================================================
-CHECKING STANDARD
-==================================================
+${
+  checkingMode === "strict"
+    ? "ICAI STRICT"
+    : "MODERATE"
+}
 
 ${checkingInstructions}
 
-==================================================
-MANDATORY RULES
-==================================================
+${materialInstruction}
+
+========================================
+SOURCE PRIORITY
+========================================
+
+Use the documents in this order:
+
+1. Question Paper
+2. Suggested Answer
+3. Student Answer Sheet
+
+The Question Paper is authoritative for:
+
+- question numbers
+- sub-parts
+- marks
+- question structure
+- internal choices
+
+The Suggested Answer is authoritative for:
+
+- expected concepts
+- provisions
+- calculations
+- workings
+- conclusions
+- important points
+
+========================================
+IMPORTANT RULES
+========================================
 
 1. Evaluate ONLY descriptive questions.
 
@@ -557,60 +557,61 @@ MANDATORY RULES
 
 4. Do not invent marks.
 
-5. Question Paper is the authority for:
-   - question numbers
-   - sub-parts
-   - marks
-   - question structure
+5. Identify every descriptive question from
+   the Question Paper.
 
-6. Suggested Answer is the main reference for:
-   - expected answer
-   - calculations
-   - provisions
-   - concepts
-   - workings
-   - conclusions
+6. Locate the corresponding student answer.
 
-7. Compare the student's answer directly with the relevant expected answer.
+7. Compare the student answer directly with
+   the Suggested Answer.
 
-8. Give genuine partial/step marks.
+8. Give genuine partial marks.
 
-9. Wrong final answer with substantially correct working may receive appropriate partial marks.
+9. A wrong final answer with substantially
+   correct working can receive partial marks.
 
-10. Wrong approach should not receive marks merely because it contains similar numbers or keywords.
+10. Wrong approach should not receive marks
+    merely because some numbers or keywords
+    match.
 
 11. Theory questions must be checked for:
-   - relevant provision
-   - concept
-   - application
-   - conclusion
-   - important keywords
+
+    - relevant provision
+    - concept
+    - application
+    - conclusion
+    - important keywords
 
 12. Practical questions must be checked for:
-   - formula
-   - working
-   - calculations
-   - adjustments
-   - final answer
+
+    - formula
+    - working
+    - calculations
+    - adjustments
+    - final answer
 
 13. Unattempted question:
+
     marks_awarded = 0
     status = "not_attempted"
 
-14. Unclear handwriting:
+14. If handwriting/content is genuinely
+    impossible to read:
+
     status = "unclear"
 
 15. Never award more than marks_available.
 
 16. Never award negative marks.
 
-17. Include every descriptive question for the selected subject.
+17. Include every descriptive question.
 
 18. Exclude MCQs.
 
-19. Handle internal choices carefully.
+19. Handle internal choices correctly.
 
-20. Do not count both alternatives of an internal choice.
+20. Do not double-count internally chosen
+    alternatives.
 
 21. Remarks must explain actual lost marks.
 
@@ -618,114 +619,40 @@ MANDATORY RULES
 
 23. Do not reveal hidden reasoning.
 
-==================================================
-FINAL VERIFICATION
-==================================================
+24. Keep question numbering exactly as
+    found in the Question Paper.
+
+========================================
+FINAL VALIDATION
+========================================
 
 Verify:
 
-- Every descriptive question for the selected subject is included.
-- MCQs are excluded.
-- Marks available are correct.
-- Awarded marks are correct.
-- Total marks are mathematically correct.
+- Every descriptive question included.
+- MCQs excluded.
+- Correct marks available.
+- Correct marks awarded.
+- Total is mathematically correct.
 - Total does not exceed ${maximumMarks}.
 - Percentage is mathematically correct.
 
 Return ONLY valid JSON.
 `;
 
-
-    /* ================================================
-       AI CONTENT
-    ================================================ */
-
-    const content = [
-
-      {
-        type:"input_text",
-        text:prompt
-      }
-
-    ];
-
-
-    if(testType === "MODEL_TEST"){
-
-      content.push({
-
-        type:"input_file",
-
-        filename:
-          modelTestPDF.pathname
-            .split("/")
-            .pop(),
-
-        file_data:
-          `data:application/pdf;base64,${modelTestBase64}`
-
-      });
-
-    }else{
-
-      content.push({
-
-        type:"input_file",
-
-        filename:
-          questionPaper.pathname
-            .split("/")
-            .pop(),
-
-        file_data:
-          `data:application/pdf;base64,${questionPaperBase64}`
-
-      });
-
-
-      content.push({
-
-        type:"input_file",
-
-        filename:
-          suggestedAnswer.pathname
-            .split("/")
-            .pop(),
-
-        file_data:
-          `data:application/pdf;base64,${suggestedAnswerBase64}`
-
-      });
-
-    }
-
-
-    content.push({
-
-      type:"input_file",
-
-      filename:
-        answerSheetName ||
-        "answer-sheet.pdf",
-
-      file_data:
-        `data:application/pdf;base64,${answerSheetBase64}`
-
-    });
-
-
-    /* ================================================
-       AI REQUEST
-    ================================================ */
+    /*
+      ================================
+      AI REQUEST
+      ================================
+    */
 
     const aiResponse =
       await fetch(
         "https://ai-gateway.vercel.sh/v1/responses",
         {
 
-          method:"POST",
+          method: "POST",
 
-          headers:{
+          headers: {
 
             "Content-Type":
               "application/json",
@@ -735,155 +662,227 @@ Return ONLY valid JSON.
 
           },
 
-          body:JSON.stringify({
+          body:
+            JSON.stringify({
 
-            model:
-              "openai/gpt-5.6-sol",
+              model:
+                "openai/gpt-5.2",
 
-            reasoning:{
-              effort:"high"
-            },
+              reasoning: {
+                effort: "high"
+              },
 
-            input:[{
+              input: [
 
-              type:"message",
+                {
+                  type: "message",
 
-              role:"user",
+                  role: "user",
 
-              content
+                  content: [
 
-            }],
+                    {
+                      type:
+                        "input_text",
 
-
-            text:{
-
-              format:{
-
-                type:"json_schema",
-
-                name:
-                  "ca_exam_evaluation",
-
-                strict:true,
-
-                schema:{
-
-                  type:"object",
-
-                  properties:{
-
-                    overall_summary:{
-                      type:"string"
+                      text:
+                        prompt
                     },
 
-                    questions:{
+                    {
+                      type:
+                        "input_file",
 
-                      type:"array",
+                      filename:
+                        questionPaper.pathname
+                          .split("/")
+                          .pop(),
 
-                      items:{
+                      file_data:
+                        `data:application/pdf;base64,${questionPaperBase64}`
+                    },
 
-                        type:"object",
+                    {
+                      type:
+                        "input_file",
 
-                        properties:{
+                      filename:
+                        suggestedAnswer.pathname
+                          .split("/")
+                          .pop(),
 
-                          question_number:{
-                            type:"string"
+                      file_data:
+                        `data:application/pdf;base64,${suggestedAnswerBase64}`
+                    },
+
+                    {
+                      type:
+                        "input_file",
+
+                      filename:
+                        answerSheetName ||
+                        "answer-sheet.pdf",
+
+                      file_data:
+                        `data:application/pdf;base64,${answerSheetBase64}`
+                    }
+
+                  ]
+
+                }
+
+              ],
+
+              text: {
+
+                format: {
+
+                  type:
+                    "json_schema",
+
+                  name:
+                    "ca_exam_evaluation",
+
+                  strict:
+                    true,
+
+                  schema: {
+
+                    type:
+                      "object",
+
+                    properties: {
+
+                      overall_summary: {
+                        type:
+                          "string"
+                      },
+
+                      questions: {
+
+                        type:
+                          "array",
+
+                        items: {
+
+                          type:
+                            "object",
+
+                          properties: {
+
+                            question_number: {
+                              type:
+                                "string"
+                            },
+
+                            marks_available: {
+                              type:
+                                "number"
+                            },
+
+                            marks_awarded: {
+                              type:
+                                "number"
+                            },
+
+                            status: {
+
+                              type:
+                                "string",
+
+                              enum: [
+                                "correct",
+                                "partially_correct",
+                                "incorrect",
+                                "not_attempted",
+                                "unclear"
+                              ]
+
+                            },
+
+                            remarks: {
+                              type:
+                                "string"
+                            }
+
                           },
 
-                          marks_available:{
-                            type:"number"
-                          },
+                          required: [
 
-                          marks_awarded:{
-                            type:"number"
-                          },
+                            "question_number",
 
-                          status:{
+                            "marks_available",
 
-                            type:"string",
+                            "marks_awarded",
 
-                            enum:[
+                            "status",
 
-                              "correct",
-                              "partially_correct",
-                              "incorrect",
-                              "not_attempted",
-                              "unclear"
+                            "remarks"
 
-                            ]
+                          ],
 
-                          },
+                          additionalProperties:
+                            false
 
-                          remarks:{
-                            type:"string"
-                          }
+                        }
 
-                        },
+                      },
 
-                        required:[
+                      total_marks: {
+                        type:
+                          "number"
+                      },
 
-                          "question_number",
-                          "marks_available",
-                          "marks_awarded",
-                          "status",
-                          "remarks"
+                      maximum_marks: {
+                        type:
+                          "number"
+                      },
 
-                        ],
-
-                        additionalProperties:false
-
+                      percentage: {
+                        type:
+                          "number"
                       }
 
                     },
 
-                    total_marks:{
-                      type:"number"
-                    },
+                    required: [
 
-                    maximum_marks:{
-                      type:"number"
-                    },
+                      "overall_summary",
 
-                    percentage:{
-                      type:"number"
-                    }
+                      "questions",
 
-                  },
+                      "total_marks",
 
-                  required:[
+                      "maximum_marks",
 
-                    "overall_summary",
-                    "questions",
-                    "total_marks",
-                    "maximum_marks",
-                    "percentage"
+                      "percentage"
 
-                  ],
+                    ],
 
-                  additionalProperties:false
+                    additionalProperties:
+                      false
+
+                  }
 
                 }
 
               }
 
-            }
-
-          })
+            })
 
         }
-
       );
 
-
-    /* ================================================
-       AI RESPONSE
-    ================================================ */
+    /*
+      ================================
+      READ AI RESPONSE
+      ================================
+    */
 
     const rawResult =
       await aiResponse.json();
 
-
-    if(!aiResponse.ok){
+    if (!aiResponse.ok) {
 
       console.error(
         "AI GATEWAY ERROR:",
@@ -900,58 +899,64 @@ Return ONLY valid JSON.
         details:
           rawResult?.error?.message ||
           rawResult?.message ||
-          JSON.stringify(rawResult)
+          JSON.stringify(
+            rawResult
+          )
 
       });
 
     }
 
-
-    /* ================================================
-       EXTRACT TEXT
-    ================================================ */
+    /*
+      ================================
+      EXTRACT TEXT
+      ================================
+    */
 
     let outputText = "";
 
-
-    if(
+    if (
       typeof rawResult.output_text ===
       "string"
-    ){
+    ) {
 
       outputText =
         rawResult.output_text;
 
     }
 
-
-    if(
+    if (
       !outputText &&
-      Array.isArray(rawResult.output)
-    ){
+      Array.isArray(
+        rawResult.output
+      )
+    ) {
 
-      for(
-        const item of rawResult.output
-      ){
+      for (
+        const item
+        of rawResult.output
+      ) {
 
-        if(
-          !Array.isArray(item.content)
-        )
+        if (
+          !Array.isArray(
+            item.content
+          )
+        ) {
           continue;
+        }
 
-
-        for(
-          const contentItem
+        for (
+          const content
           of item.content
-        ){
+        ) {
 
-          if(
-            typeof contentItem.text ===
+          if (
+            typeof content.text ===
             "string"
-          ){
+          ) {
 
             outputText +=
-              contentItem.text;
+              content.text;
 
           }
 
@@ -961,8 +966,7 @@ Return ONLY valid JSON.
 
     }
 
-
-    if(!outputText){
+    if (!outputText) {
 
       return res.status(500).json({
 
@@ -970,26 +974,33 @@ Return ONLY valid JSON.
           "AI returned an empty evaluation.",
 
         details:
-          JSON.stringify(rawResult)
+          JSON.stringify(
+            rawResult
+          ).slice(
+            0,
+            4000
+          )
 
       });
 
     }
 
-
-    /* ================================================
-       PARSE JSON
-    ================================================ */
+    /*
+      ================================
+      PARSE JSON
+      ================================
+    */
 
     let evaluation;
 
-
-    try{
+    try {
 
       evaluation =
-        JSON.parse(outputText);
+        JSON.parse(
+          outputText
+        );
 
-    }catch(error){
+    } catch {
 
       return res.status(500).json({
 
@@ -997,17 +1008,27 @@ Return ONLY valid JSON.
           "AI returned invalid JSON.",
 
         details:
-          outputText.slice(0,3000)
+          outputText.slice(
+            0,
+            3000
+          )
 
       });
 
     }
 
+    /*
+      ================================
+      VALIDATION
+      ================================
+    */
 
-    if(
+    if (
       !evaluation ||
-      !Array.isArray(evaluation.questions)
-    ){
+      !Array.isArray(
+        evaluation.questions
+      )
+    ) {
 
       return res.status(500).json({
 
@@ -1018,93 +1039,104 @@ Return ONLY valid JSON.
 
     }
 
-
-    /* ================================================
-       FINAL SCORE
-    ================================================ */
+    /*
+      ================================
+      SERVER-SIDE SCORE
+      ================================
+    */
 
     let total = 0;
 
-
-    for(
+    for (
       const question
       of evaluation.questions
-    ){
+    ) {
 
       const available =
         Number(
           question.marks_available
         );
 
-
       let awarded =
         Number(
           question.marks_awarded
         );
 
-
-      if(
-        !Number.isFinite(available)
-      ){
+      if (
+        !Number.isFinite(
+          available
+        )
+      ) {
 
         return res.status(500).json({
 
           error:
-            "Invalid marks returned by AI."
+            "Invalid marks_available returned by AI."
 
         });
 
       }
 
-
-      if(
-        !Number.isFinite(awarded)
-      ){
+      if (
+        !Number.isFinite(
+          awarded
+        )
+      ) {
 
         awarded = 0;
 
       }
 
-
-      if(awarded < 0)
+      if (awarded < 0) {
         awarded = 0;
+      }
 
+      if (
+        awarded >
+        available
+      ) {
 
-      if(awarded > available)
-        awarded = available;
+        awarded =
+          available;
 
+      }
 
       awarded =
         Math.round(
           awarded * 100
         ) / 100;
 
-
       question.marks_awarded =
         awarded;
 
-
-      total += awarded;
+      total +=
+        awarded;
 
     }
-
 
     total =
       Math.round(
         total * 100
       ) / 100;
 
+    if (
+      total >
+      maximumMarks
+    ) {
 
-    if(total > maximumMarks)
-      total = maximumMarks;
+      total =
+        maximumMarks;
 
+    }
 
     const percentage =
       Math.round(
-        (total / maximumMarks) *
+        (
+          total /
+          maximumMarks
+        ) *
         10000
       ) / 100;
-
 
     evaluation.total_marks =
       total;
@@ -1115,55 +1147,68 @@ Return ONLY valid JSON.
     evaluation.percentage =
       percentage;
 
-
-    /* ================================================
-       RESPONSE
-    ================================================ */
+    /*
+      ================================
+      FINAL RESPONSE
+      ================================
+    */
 
     return res.status(200).json({
 
-      success:true,
+      success:
+        true,
 
       evaluation,
 
-      metadata:{
+      metadata: {
 
-        level,
+        level:
+          safeLevel,
 
-        group,
+        group:
+          group || null,
 
-        subject,
+        subject:
+          subject || subjectKey,
 
         subjectKey,
 
-        testType:
-          formattedTestType,
+        testType,
+
+        modelType:
+          modelType || null,
 
         checkingMode:
           checkingMode === "strict"
-          ? "ICAI Strict"
-          : "Moderate",
+            ? "ICAI Strict"
+            : "Moderate",
 
         descriptiveMaximum:
           maximumMarks,
 
-        materialType:
-          testType === "MODEL_TEST"
-          ? "Combined Model Test PDF"
-          : "Separate Question Paper + Suggested Answer"
+        questionPaper:
+          questionPaper.pathname,
+
+        suggestedAnswer:
+          suggestedAnswer.pathname,
+
+        combinedModelTest:
+          testType === "MODEL_TEST",
+
+        answerSheet:
+          answerSheetName ||
+          "answer-sheet.pdf"
 
       }
 
     });
 
-
-  }catch(error){
+  } catch (error) {
 
     console.error(
       "CHECK ERROR:",
       error
     );
-
 
     return res.status(500).json({
 
