@@ -895,7 +895,7 @@ Return ONLY valid JSON.
 
     });
 
-  } catch (error) {
+   } catch (error) {
 
     console.error(
       "CHECK ERROR:",
@@ -903,16 +903,11 @@ Return ONLY valid JSON.
     );
 
     return res.status(500).json({
-
       error:
         "Unable to evaluate answer sheet.",
-
       details:
         error?.message ||
-        String(error)
-
+        "Unknown error"
     });
 
   }
-
-}
