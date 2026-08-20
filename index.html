@@ -8,410 +8,300 @@
 
 <style>
 *{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial,Helvetica,sans-serif;
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
-  background:#070b14;
-  color:#fff;
-  min-height:100vh;
+background:#070b14;
+color:#fff;
+min-height:100vh;
 }
 
 header{
-  padding:30px 18px;
-  text-align:center;
-  background:
-    radial-gradient(circle at top,#312e81 0,transparent 45%),
-    linear-gradient(135deg,#0f172a,#111827);
-  border-bottom:1px solid #26334d;
+padding:30px 18px;
+text-align:center;
+background:
+radial-gradient(circle at top,#312e81 0,transparent 45%),
+linear-gradient(135deg,#0f172a,#111827);
+border-bottom:1px solid #26334d;
 }
 
 header h1{
-  font-size:30px;
-  margin-bottom:8px;
+font-size:30px;
+margin-bottom:8px;
 }
 
 header p{
-  color:#94a3b8;
-  font-size:14px;
+color:#94a3b8;
+font-size:14px;
 }
 
 .container{
-  max-width:950px;
-  margin:auto;
-  padding:22px 15px 50px;
+max-width:900px;
+margin:auto;
+padding:22px 15px 50px;
 }
 
 .card{
-  background:#0f172a;
-  border:1px solid #26334d;
-  border-radius:18px;
-  padding:22px;
-  margin-bottom:18px;
+background:#0f172a;
+border:1px solid #26334d;
+border-radius:18px;
+padding:22px;
+margin-bottom:18px;
 }
 
 h2{
-  font-size:20px;
-  margin-bottom:16px;
+font-size:20px;
+margin-bottom:16px;
 }
 
 .badge{
-  display:inline-block;
-  padding:6px 11px;
-  border-radius:20px;
-  font-size:12px;
-  font-weight:bold;
-  margin-bottom:14px;
+display:inline-block;
+padding:6px 11px;
+border-radius:20px;
+font-size:12px;
+font-weight:bold;
+margin-bottom:14px;
 }
 
 .blue{
-  background:#1e3a8a;
-  color:#bfdbfe;
+background:#1e3a8a;
+color:#bfdbfe;
 }
 
 .green{
-  background:#14532d;
-  color:#bbf7d0;
+background:#14532d;
+color:#bbf7d0;
 }
 
 .red{
-  background:#7f1d1d;
-  color:#fecaca;
+background:#7f1d1d;
+color:#fecaca;
 }
 
 .grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
 }
 
 label{
-  display:block;
-  color:#cbd5e1;
-  font-size:13px;
-  margin:12px 0 7px;
+display:block;
+color:#cbd5e1;
+font-size:13px;
+margin:12px 0 7px;
 }
 
 input,
 select{
-  width:100%;
-  background:#080f1c;
-  color:#fff;
-  border:1px solid #334155;
-  border-radius:10px;
-  padding:12px;
-  outline:none;
+width:100%;
+background:#080f1c;
+color:#fff;
+border:1px solid #334155;
+border-radius:10px;
+padding:12px;
+outline:none;
 }
 
 input:focus,
 select:focus{
-  border-color:#6366f1;
+border-color:#6366f1;
 }
 
 .mode-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
 }
 
 .mode{
-  padding:16px;
-  border:1px solid #334155;
-  background:#080f1c;
-  border-radius:12px;
-  cursor:pointer;
+padding:16px;
+border:1px solid #334155;
+background:#080f1c;
+border-radius:12px;
+cursor:pointer;
 }
 
 .mode.active{
-  border-color:#6366f1;
-  background:#111a38;
+border-color:#6366f1;
+background:#111a38;
 }
 
 .mode-title{
-  font-weight:bold;
-  margin-bottom:6px;
+font-weight:bold;
+margin-bottom:6px;
 }
 
 .mode-text{
-  color:#94a3b8;
-  font-size:12px;
-  line-height:1.5;
+color:#94a3b8;
+font-size:12px;
+line-height:1.5;
 }
 
 .upload-box{
-  border:2px dashed #334155;
-  border-radius:15px;
-  padding:28px 18px;
-  text-align:center;
-  background:#080f1c;
+border:2px dashed #334155;
+border-radius:15px;
+padding:28px 18px;
+text-align:center;
+background:#080f1c;
 }
 
 .upload-icon{
-  font-size:38px;
-  margin-bottom:10px;
+font-size:38px;
+margin-bottom:10px;
 }
 
 .upload-box p{
-  color:#94a3b8;
-  font-size:13px;
-  margin:8px 0 18px;
+color:#94a3b8;
+font-size:13px;
+margin:8px 0 18px;
 }
 
 .file-label{
-  display:inline-block;
-  padding:12px 18px;
-  background:#6366f1;
-  border-radius:10px;
-  font-weight:bold;
-  cursor:pointer;
+display:inline-block;
+padding:12px 18px;
+background:#6366f1;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
 }
 
 .file-label:hover{
-  background:#4f46e5;
+background:#4f46e5;
 }
 
 input[type=file]{
-  display:none;
+display:none;
 }
 
 .admin-file{
-  display:block !important;
-  padding:10px;
-  cursor:pointer;
-  width:100%;
+display:block !important;
+padding:10px;
+cursor:pointer;
 }
 
 .file-info{
-  display:none;
-  margin-top:15px;
-  padding:12px;
-  background:#111827;
-  border:1px solid #26334d;
-  border-radius:10px;
-  text-align:left;
-  font-size:13px;
+display:none;
+margin-top:15px;
+padding:12px;
+background:#111827;
+border:1px solid #26334d;
+border-radius:10px;
+text-align:left;
+font-size:13px;
 }
 
 .info{
-  margin-top:15px;
-  padding:14px;
-  background:#080f1c;
-  border:1px solid #26334d;
-  border-radius:10px;
-  color:#94a3b8;
-  font-size:13px;
-  line-height:1.6;
+margin-top:15px;
+padding:14px;
+background:#080f1c;
+border:1px solid #26334d;
+border-radius:10px;
+color:#94a3b8;
+font-size:13px;
+line-height:1.6;
 }
 
 button{
-  border:0;
-  border-radius:10px;
-  padding:13px 18px;
-  font-size:14px;
-  font-weight:bold;
-  cursor:pointer;
+border:0;
+border-radius:10px;
+padding:13px 18px;
+font-size:14px;
+font-weight:bold;
+cursor:pointer;
 }
 
 .primary{
-  width:100%;
-  margin-top:18px;
-  background:#6366f1;
-  color:white;
+width:100%;
+margin-top:18px;
+background:#6366f1;
+color:white;
 }
 
 .primary:hover{
-  background:#4f46e5;
+background:#4f46e5;
 }
 
 button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
+opacity:.5;
+cursor:not-allowed;
 }
 
 .status{
-  display:none;
-  margin-top:18px;
-  padding:15px;
-  border-radius:12px;
-  line-height:1.6;
-  font-size:13px;
+display:none;
+margin-top:18px;
+padding:15px;
+border-radius:12px;
+line-height:1.6;
+font-size:13px;
 }
 
 .success{
-  display:block;
-  background:#052e16;
-  border:1px solid #166534;
+display:block;
+background:#052e16;
+border:1px solid #166534;
 }
 
 .error{
-  display:block;
-  background:#450a0a;
-  border:1px solid #991b1b;
+display:block;
+background:#450a0a;
+border:1px solid #991b1b;
 }
 
-.checkin,
-.admin,
-.result{
-  display:none;
+.checkin{
+display:none;
 }
 
-.score-box{
-  text-align:center;
-  padding:25px;
-  background:#080f1c;
-  border:1px solid #334155;
-  border-radius:15px;
-  margin-bottom:18px;
-}
-
-.score{
-  font-size:42px;
-  font-weight:bold;
-  color:#a5b4fc;
-}
-
-.question-result{
-  padding:15px;
-  background:#080f1c;
-  border:1px solid #26334d;
-  border-radius:12px;
-  margin-top:12px;
-}
-
-.question-result h3{
-  font-size:15px;
-  margin-bottom:8px;
-}
-
-.question-meta{
-  color:#94a3b8;
-  font-size:12px;
-  margin-bottom:8px;
-}
-
-.question-remarks{
-  font-size:13px;
-  line-height:1.6;
-  color:#cbd5e1;
-}
-
-.correct{
-  border-left:4px solid #22c55e;
-}
-
-.partial{
-  border-left:4px solid #eab308;
-}
-
-.incorrect{
-  border-left:4px solid #ef4444;
-}
-
-.unattempted{
-  border-left:4px solid #64748b;
-}
-
-.unclear{
-  border-left:4px solid #f97316;
-}
-
-.admin-divider{
-  height:1px;
-  background:#26334d;
-  margin:20px 0;
+.admin{
+display:none;
 }
 
 .material-card{
-  background:#080f1c;
-  border:1px solid #26334d;
-  border-radius:13px;
-  padding:16px;
-  margin-top:15px;
+background:#080f1c;
+border:1px solid #26334d;
+border-radius:13px;
+padding:16px;
+margin-top:15px;
 }
 
 .material-card h3{
-  font-size:15px;
-  margin-bottom:6px;
+font-size:15px;
+margin-bottom:6px;
 }
 
 .material-card p{
-  color:#94a3b8;
-  font-size:12px;
-  line-height:1.5;
+color:#94a3b8;
+font-size:12px;
+line-height:1.5;
 }
 
-.logout-button{
-  background:#7f1d1d;
-  color:#fecaca;
-  width:100%;
-  margin-top:10px;
+.admin-divider{
+height:1px;
+background:#26334d;
+margin:20px 0;
 }
 
 footer{
-  text-align:center;
-  color:#64748b;
-  padding:20px;
-  font-size:12px;
-}
-
-.hidden{
-  display:none !important;
-}
-
-.subject-checkboxes{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:10px;
-}
-
-.subject-check{
-  background:#080f1c;
-  border:1px solid #334155;
-  border-radius:10px;
-  padding:10px;
-}
-
-.subject-check label{
-  margin:0;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.subject-check input{
-  width:auto;
-}
-
-.group-info{
-  margin-top:10px;
-  padding:10px;
-  border-radius:9px;
-  background:#111827;
-  color:#94a3b8;
-  font-size:12px;
-}
-
-.warning-info{
-  border-color:#92400e;
-  background:#451a03;
-  color:#fed7aa;
+text-align:center;
+color:#64748b;
+padding:20px;
+font-size:12px;
 }
 
 @media(max-width:700px){
 
-  .grid,
-  .mode-grid,
-  .subject-checkboxes{
-    grid-template-columns:1fr;
-  }
+.grid,
+.mode-grid{
+grid-template-columns:1fr;
+}
 
-  header h1{
-    font-size:25px;
-  }
+header h1{
+font-size:25px;
+}
+
 }
 </style>
 </head>
@@ -425,15 +315,17 @@ footer{
 
 <div class="container">
 
-<!-- ================================================= -->
-<!-- STUDENT PORTAL -->
-<!-- ================================================= -->
+<!-- ==================================================
+STUDENT PANEL
+================================================== -->
 
 <div id="studentPanel">
 
 <div class="card">
 
-<span class="badge blue">STUDENT CHECK-IN</span>
+<span class="badge blue">
+STUDENT CHECK-IN
+</span>
 
 <h2>👤 Student Details</h2>
 
@@ -448,7 +340,6 @@ type="text"
 placeholder="Enter full name">
 </div>
 
-
 <div>
 <label>Registration Number</label>
 
@@ -458,38 +349,62 @@ type="text"
 placeholder="Enter ICAI registration number">
 </div>
 
-
 <div>
-<label>Level</label>
+<label>Subject</label>
 
-<select
-id="studentLevel"
-onchange="updateStudentLevel()">
+<select id="subject" onchange="updateSubject()">
 
-<option value="">Select Level</option>
-
-<option value="foundation">
-CA Foundation
+<option value="">
+Select Subject
 </option>
 
-<option value="inter">
-CA Intermediate
+<option value="advanced_accounts">
+Advanced Accounting
 </option>
 
-<option value="final">
-CA Final
+<option value="law">
+Corporate & Other Laws
+</option>
+
+<option value="taxation">
+Taxation
+</option>
+
+<option value="income_tax">
+Income Tax
+</option>
+
+<option value="gst">
+GST
+</option>
+
+<option value="costing">
+Cost & Management Accounting
+</option>
+
+<option value="audit">
+Auditing
+</option>
+
+<option value="fm">
+Financial Management
+</option>
+
+<option value="sm">
+Strategic Management
+</option>
+
+<option value="fm_sm">
+FM + SM
 </option>
 
 </select>
 </div>
 
-
 <div>
 <label>Test / Paper Type</label>
 
-<select
-id="studentTestType"
-onchange="updateStudentTestType()">
+<select id="studentTestType">
 
 <option value="">
 Select Test Type
@@ -503,10 +418,6 @@ MTP
 RTP
 </option>
 
-<option value="PYQ">
-PYQ
-</option>
-
 <option value="MODEL_TEST">
 Model Test
 </option>
@@ -518,114 +429,16 @@ Other
 </select>
 </div>
 
-
-<!-- PYQ ATTEMPT -->
-
-<div
-id="studentAttemptBox"
-class="hidden">
-
-<label>
-PYQ Attempt / Session
-</label>
-
-<select
-id="studentAttempt">
-
-<option value="">
-Select PYQ Attempt
-</option>
-
-</select>
-
 </div>
 
-
-<!-- SUBJECT -->
-
-<div
-id="studentSubjectBox">
-
-<label>
-Subject
-</label>
-
-<select
-id="subject"
-onchange="updateStudentSubject()">
-
-<option value="">
-Select Level First
-</option>
-
-</select>
-
-</div>
-
-
-<!-- MODEL TYPE -->
-
-<div
-id="studentModelOptionBox"
-class="hidden">
-
-<label>
-Model Test Type
-</label>
-
-<select
-id="studentModelType"
-onchange="updateStudentModelType()">
-
-<option value="">
-Select Model Test Type
-</option>
-
-</select>
-
-</div>
-
-
-<!-- STUDENT MODEL OTHER SUBJECT -->
-
-<div
-id="studentMultiSubjectBox"
-class="hidden">
-
-<label>
-Subjects Included in Model Test
-</label>
-
-<div
-id="studentSubjectCheckboxes"
-class="subject-checkboxes">
-</div>
-
+<div id="subjectInfo" class="info">
+Select a subject to see its descriptive checking marks.
 </div>
 
 </div>
 
 
-<div
-id="studentOtherSubjectInfo"
-class="info hidden">
-</div>
-
-
-<div
-id="subjectInfo"
-class="info">
-
-Select level and test type.
-
-</div>
-
-</div>
-
-
-<!-- ================================================= -->
 <!-- CHECKING MODE -->
-<!-- ================================================= -->
 
 <div class="card">
 
@@ -649,11 +462,11 @@ onclick="setMode('strict')">
 <div class="mode-text">
 Strict evaluation of concepts,
 calculations, working notes,
-provisions and presentation.
+relevant provisions and
+answer presentation.
 </div>
 
 </div>
-
 
 <div
 id="moderateMode"
@@ -673,23 +486,18 @@ with reasonable step marking.
 
 </div>
 
-
-<div
-id="checkingRuleInfo"
-class="info">
+<div class="info">
 
 <b>AI Rule:</b>
-Descriptive questions will be evaluated
-using ICAI-style marking.
+Only descriptive questions will be
+evaluated. MCQs will be ignored.
 
 </div>
 
 </div>
 
 
-<!-- ================================================= -->
 <!-- ANSWER SHEET -->
-<!-- ================================================= -->
 
 <div class="card">
 
@@ -726,13 +534,9 @@ id="answerFile"
 type="file"
 accept=".pdf,application/pdf">
 
-<div
-id="fileInfo"
-class="file-info">
-</div>
+<div id="fileInfo" class="file-info"></div>
 
 </div>
-
 
 <button
 id="submitButton"
@@ -743,18 +547,12 @@ onclick="submitAnswerSheet()">
 
 </button>
 
-
-<div
-id="studentStatus"
-class="status">
-</div>
+<div id="studentStatus" class="status"></div>
 
 </div>
 
 
-<!-- ================================================= -->
-<!-- CHECKIN -->
-<!-- ================================================= -->
+<!-- CHECK-IN COMPLETE -->
 
 <div
 id="checkin"
@@ -775,116 +573,14 @@ class="info">
 
 </div>
 
-
-<!-- ================================================= -->
-<!-- RESULT -->
-<!-- ================================================= -->
-
-<div
-id="resultPanel"
-class="card result">
-
-<span class="badge green">
-AI EVALUATION COMPLETE
-</span>
-
-<h2>
-📊 Examination Result
-</h2>
-
-<div class="score-box">
-
-<div
-id="scoreText"
-class="score">
-0 / 0
-</div>
-
-<div id="percentageText">
-0%
-</div>
-
 </div>
 
 
-<div
-id="overallSummary"
-class="info">
-</div>
+<!-- ==================================================
+ADMIN PANEL
+================================================== -->
 
-
-<h2 style="margin-top:20px;">
-Question-wise Evaluation
-</h2>
-
-<div
-id="questionResults">
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ================================================= -->
-<!-- ADMIN PORTAL -->
-<!-- ================================================= -->
-
-<div
-id="adminPanel"
-class="admin">
-
-
-<!-- ADMIN LOGIN -->
-
-<div
-id="adminLoginCard"
-class="card">
-
-<span class="badge red">
-ADMIN ACCESS
-</span>
-
-<h2>
-🔐 Admin Login
-</h2>
-
-<div class="info">
-This area is restricted to authorized administrators.
-</div>
-
-<label>
-Admin Password
-</label>
-
-<input
-id="adminPassword"
-type="password"
-placeholder="Enter admin password">
-
-<button
-id="adminLoginButton"
-class="primary"
-onclick="adminLogin()">
-
-🔓 Login as Admin
-
-</button>
-
-<div
-id="loginStatus"
-class="status">
-</div>
-
-</div>
-
-
-<!-- ADMIN CONTENT -->
-
-<div
-id="adminContent"
-style="display:none;">
-
+<div id="adminPanel" class="admin">
 
 <div class="card">
 
@@ -896,67 +592,74 @@ ADMIN / CHECKER
 🔐 Test Material Management
 </h2>
 
+<p class="info">
 
-<div class="info">
+Admin uploads the Question Paper and
+Suggested Answer. Select the paper
+classification so the material can be
+identified later by the AI checker.
 
-<b>Model Test:</b>
-One PDF containing Question Paper +
-Suggested Answer.
+</p>
 
-<br><br>
-
-<b>MTP / RTP / PYQ / Other:</b>
-Question Paper and Suggested Answer
-are uploaded separately.
-
-<br><br>
-
-<b>PYQ:</b>
-Attempt / Session is mandatory so the
-student answer sheet can be matched with
-the exact same attempt.
-
-</div>
-
-
-<!-- LEVEL -->
 
 <label>
-Level
+Subject
 </label>
 
-<select
-id="adminLevel"
-onchange="updateAdminLevel()">
+<select id="adminSubject">
 
 <option value="">
-Select Level
+Select Subject
 </option>
 
-<option value="foundation">
-CA Foundation
+<option value="advanced_accounts">
+Advanced Accounting
 </option>
 
-<option value="inter">
-CA Intermediate
+<option value="law">
+Corporate & Other Laws
 </option>
 
-<option value="final">
-CA Final
+<option value="taxation">
+Taxation
+</option>
+
+<option value="income_tax">
+Income Tax
+</option>
+
+<option value="gst">
+GST
+</option>
+
+<option value="costing">
+Cost & Management Accounting
+</option>
+
+<option value="audit">
+Auditing
+</option>
+
+<option value="fm">
+Financial Management
+</option>
+
+<option value="sm">
+Strategic Management
+</option>
+
+<option value="fm_sm">
+FM + SM
 </option>
 
 </select>
 
 
-<!-- TEST TYPE -->
-
 <label>
 Test / Paper Type
 </label>
 
-<select
-id="adminTestType"
-onchange="updateAdminTestType()">
+<select id="adminTestType">
 
 <option value="">
 Select Test Type
@@ -970,10 +673,6 @@ MTP
 RTP
 </option>
 
-<option value="PYQ">
-PYQ
-</option>
-
 <option value="MODEL_TEST">
 Model Test
 </option>
@@ -985,105 +684,20 @@ Other
 </select>
 
 
-<!-- PYQ ATTEMPT -->
-
-<div
-id="adminAttemptBox"
-class="hidden">
-
-<label>
-PYQ Attempt / Session
-</label>
-
-<input
-id="adminAttempt"
-type="text"
-placeholder="Example: May 2026">
-
-</div>
-
-
-<!-- MODEL TYPE -->
-
-<div
-id="adminModelTypeBox"
-class="hidden">
-
-<label>
-Model Test Type
-</label>
-
-<select
-id="adminModelType"
-onchange="updateAdminModelType()">
-
-<option value="">
-Select Model Test Type
-</option>
-
-</select>
-
-</div>
-
-
-<!-- SINGLE SUBJECT -->
-
-<div
-id="adminSubjectBox"
-class="hidden">
-
-<label>
-Select Subject
-</label>
-
-<select
-id="adminSubject"
-onchange="updateAdminSubject()">
-
-<option value="">
-Select Subject
-</option>
-
-</select>
-
-</div>
-
-
-<!-- MULTI SUBJECT -->
-
-<div
-id="adminMultiSubjectBox"
-class="hidden">
-
-<label>
-Select Subjects
-</label>
-
-<div
-id="adminSubjectCheckboxes"
-class="subject-checkboxes">
-</div>
-
-</div>
-
-
 <div
 id="adminSubjectInfo"
 class="info">
 
-Select level and test type.
+Select a subject to see the
+descriptive checking maximum.
 
 </div>
 
 
-<div class="admin-divider">
-</div>
+<div class="admin-divider"></div>
 
 
-<!-- SEPARATE FILES -->
-
-<div id="separateMaterials">
-
+<!-- QUESTION PAPER -->
 
 <div class="material-card">
 
@@ -1099,10 +713,12 @@ Upload the official question paper.
 id="questionPaper"
 class="admin-file"
 type="file"
-accept=".pdf,application/pdf">
+accept=".pdf,application/pdf,image/jpeg,image/png">
 
 </div>
 
+
+<!-- SUGGESTED ANSWER -->
 
 <div class="material-card">
 
@@ -1111,7 +727,7 @@ accept=".pdf,application/pdf">
 </h3>
 
 <p>
-Upload the official / reference
+Upload the official ICAI / reference
 suggested answer.
 </p>
 
@@ -1119,37 +735,7 @@ suggested answer.
 id="suggestedAnswer"
 class="admin-file"
 type="file"
-accept=".pdf,application/pdf">
-
-</div>
-
-
-</div>
-
-
-<!-- MODEL TEST -->
-
-<div
-id="modelMaterial"
-class="material-card hidden">
-
-<h3>
-📚 Model Test PDF
-</h3>
-
-<p>
-
-Upload ONE PDF containing the
-Model Test Question Paper and
-Suggested Answer.
-
-</p>
-
-<input
-id="modelTestFile"
-class="admin-file"
-type="file"
-accept=".pdf,application/pdf">
+accept=".pdf,application/pdf,image/jpeg,image/png">
 
 </div>
 
@@ -1163,22 +749,7 @@ onclick="uploadMaterials()">
 
 </button>
 
-
-<div
-id="adminStatus"
-class="status">
-</div>
-
-
-<button
-class="logout-button"
-onclick="adminLogout()">
-
-🔒 Logout Admin
-
-</button>
-
-</div>
+<div id="adminStatus" class="status"></div>
 
 </div>
 
@@ -1194,1226 +765,482 @@ CA Exam Checker • Educational evaluation platform
 
 <script>
 
-/* ================================================= */
-/* SUBJECT DATABASE */
-/* ================================================= */
+/* ==================================================
+SUBJECT CONFIG
+================================================== */
 
 const SUBJECTS = {
 
-foundation:[
-
-{
-key:"accounting",
-name:"Accounting",
-paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
-},
-
-{
-key:"business_laws",
-name:"Business Laws",
-paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
-},
-
-{
-key:"quantitative_aptitude",
-name:"Quantitative Aptitude",
-paper:100,
-descriptive:0,
-mcqOnly:true,
-negativeMarking:true,
-negativeMarksPerWrong:0.25
-},
-
-{
-key:"business_economics",
-name:"Business Economics",
-paper:100,
-descriptive:0,
-mcqOnly:true,
-negativeMarking:true,
-negativeMarksPerWrong:0.25
-}
-
-],
-
-
-inter:[
-
-{
-key:"advanced_accounts",
+advanced_accounts:{
 name:"Advanced Accounting",
-group:1,
 paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
+mcq:30,
+descriptive:70
 },
 
-{
-key:"law",
+law:{
 name:"Corporate & Other Laws",
-group:1,
 paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
+mcq:30,
+descriptive:70
 },
 
-{
-key:"taxation",
+taxation:{
 name:"Taxation",
-group:1,
 paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
+mcq:30,
+descriptive:70,
+incomeTax:35,
+gst:35
 },
 
-{
-key:"costing",
+income_tax:{
+name:"Income Tax",
+paper:50,
+mcq:15,
+descriptive:35
+},
+
+gst:{
+name:"GST",
+paper:50,
+mcq:15,
+descriptive:35
+},
+
+costing:{
 name:"Cost & Management Accounting",
-group:2,
 paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
+mcq:30,
+descriptive:70
 },
 
-{
-key:"audit",
-name:"Auditing & Ethics",
-group:2,
+audit:{
+name:"Auditing",
 paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
+mcq:30,
+descriptive:70
 },
 
-{
-key:"fm",
+fm:{
 name:"Financial Management",
-group:2,
-paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
+paper:50,
+mcq:15,
+descriptive:35
 },
 
-{
-key:"sm",
+sm:{
 name:"Strategic Management",
-group:2,
+paper:50,
+mcq:15,
+descriptive:35
+},
+
+fm_sm:{
+name:"FM + SM",
 paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
+mcq:30,
+descriptive:70,
+fm:35,
+sm:35
 }
-
-],
-
-
-final:[
-
-{
-key:"financial_reporting",
-name:"Financial Reporting",
-group:1,
-paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
-},
-
-{
-key:"advanced_financial_management",
-name:"Advanced Financial Management",
-group:1,
-paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
-},
-
-{
-key:"advanced_auditing",
-name:"Advanced Auditing",
-group:1,
-paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
-},
-
-{
-key:"direct_tax",
-name:"Direct Tax Laws",
-group:2,
-paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
-},
-
-{
-key:"indirect_tax",
-name:"Indirect Tax Laws",
-group:2,
-paper:100,
-descriptive:100,
-mcqOnly:false,
-negativeMarking:false,
-negativeMarksPerWrong:0
-}
-
-]
 
 };
 
 
-/* ================================================= */
-/* PYQ ATTEMPTS */
-/* ================================================= */
+/* ==================================================
+STATE
+================================================== */
 
-/*
-  Admin can type a custom attempt.
-  Student list contains common ICAI attempts.
-  Backend must still verify that the selected
-  attempt exists in uploaded material.
-*/
-
-const PYQ_ATTEMPTS = [
-
-"January 2025",
-"May 2025",
-"September 2025",
-"January 2026",
-"May 2026",
-"September 2026",
-"January 2027",
-"May 2027"
-
-];
+let checkingMode = "strict";
+let selectedFile = null;
 
 
-/* ================================================= */
-/* STATE */
-/* ================================================= */
-
-let checkingMode="strict";
-
-let selectedFile=null;
-
-
-/* ================================================= */
-/* INITIALIZE */
-/* ================================================= */
+/* ==================================================
+ADMIN URL MODE
+================================================== */
 
 function initializePortal(){
 
-const params=
+const params =
 new URLSearchParams(
 window.location.search
 );
 
-const isAdmin=
-params.get("admin")==="1";
+const isAdmin =
+params.get("admin") === "1";
 
-document.getElementById(
-"studentPanel"
-).style.display=
-isAdmin?"none":"block";
+const studentPanel =
+document.getElementById("studentPanel");
 
-document.getElementById(
-"adminPanel"
-).style.display=
-isAdmin?"block":"none";
+const adminPanel =
+document.getElementById("adminPanel");
 
-renderStudentAttempts();
+if(isAdmin){
 
-}
+studentPanel.style.display = "none";
+adminPanel.style.display = "block";
 
-
-/* ================================================= */
-/* PYQ ATTEMPTS */
-/* ================================================= */
-
-function renderStudentAttempts(){
-
-const select=
-document.getElementById(
-"studentAttempt"
-);
-
-select.innerHTML=`
-
-<option value="">
-Select PYQ Attempt
-</option>
-
-`;
-
-PYQ_ATTEMPTS.forEach(
-attempt=>{
-
-select.innerHTML+=`
-
-<option value="${escapeHTML(attempt)}">
-${escapeHTML(attempt)}
-</option>
-
-`;
-
-});
-
-}
-
-
-/* ================================================= */
-/* STUDENT LEVEL */
-/* ================================================= */
-
-function updateStudentLevel(){
-
-const level=
-document.getElementById(
-"studentLevel"
-).value;
-
-const subject=
-document.getElementById(
-"subject"
-);
-
-subject.innerHTML=
-`<option value="">Select Subject</option>`;
-
-if(!level){
-
-updateStudentTestType();
-
-return;
-}
-
-SUBJECTS[level].forEach(
-s=>{
-
-subject.innerHTML+=`
-
-<option value="${escapeHTML(s.key)}">
-
-${escapeHTML(s.name)}
-
-</option>
-
-`;
-
-});
-
-updateStudentTestType();
-
-}
-
-
-/* ================================================= */
-/* STUDENT SUBJECT */
-/* ================================================= */
-
-function updateStudentSubject(){
-
-const level=
-document.getElementById(
-"studentLevel"
-).value;
-
-const key=
-document.getElementById(
-"subject"
-).value;
-
-const info=
-document.getElementById(
-"subjectInfo"
-);
-
-if(!level){
-
-info.innerHTML=
-"Select level first.";
-
-return;
-}
-
-if(!key){
-
-info.innerHTML=
-"Select a subject.";
-
-return;
-}
-
-const subject=
-SUBJECTS[level].find(
-s=>s.key===key
-);
-
-if(!subject){
-return;
-}
-
-
-let html=`
-
-<b>${escapeHTML(subject.name)}</b>
-
-<br>
-
-Level:
-${escapeHTML(level.toUpperCase())}
-
-<br>
-
-Paper Maximum:
-<b>${subject.paper}</b>
-
-<br>
-
-`;
-
-
-if(subject.mcqOnly){
-
-html+=`
-
-<span style="color:#fca5a5">
-
-<b>MCQ Only</b>
-
-<br>
-
-Negative Marking:
-<b>-0.25</b> for each wrong answer
-
-</span>
-
-`;
+document.title =
+"CA Exam Checker - Admin";
 
 }else{
 
-html+=`
+studentPanel.style.display = "block";
+adminPanel.style.display = "none";
 
+}
+
+}
+
+
+/* ==================================================
+TEST TYPE FORMAT
+================================================== */
+
+function formatTestType(type){
+
+if(type === "MODEL_TEST"){
+return "Model Test";
+}
+
+if(type === "OTHER"){
+return "Other";
+}
+
+return type;
+
+}
+
+
+/* ==================================================
+SUBJECT DISPLAY
+================================================== */
+
+function updateSubject(){
+
+const key =
+document.getElementById("subject").value;
+
+const info =
+document.getElementById("subjectInfo");
+
+if(!key){
+
+info.innerHTML =
+"Select a subject to see its descriptive checking marks.";
+
+return;
+
+}
+
+const s = SUBJECTS[key];
+
+if(key === "taxation"){
+
+info.innerHTML = `
+<b>Taxation</b><br>
+Total Paper: 100<br>
+MCQ: 30 — Not checked<br>
+Descriptive: <b>70</b><br>
+Income Tax: <b>35</b> + GST: <b>35</b>
+`;
+
+return;
+
+}
+
+if(key === "fm_sm"){
+
+info.innerHTML = `
+<b>FM + SM</b><br>
+Total Paper: 100<br>
+MCQ: 30 — Not checked<br>
+Descriptive: <b>70</b><br>
+FM: <b>35</b> + SM: <b>35</b>
+`;
+
+return;
+
+}
+
+info.innerHTML = `
+<b>${s.name}</b><br>
+Total Paper: ${s.paper}<br>
+MCQ: ${s.mcq} — Not checked<br>
 Descriptive Maximum:
-<b>${subject.descriptive}</b>
-
+<b>${s.descriptive}</b>
 `;
 
 }
 
 
-info.innerHTML=html;
-
-}
-
-
-/* ================================================= */
-/* STUDENT TEST TYPE */
-/* ================================================= */
-
-function updateStudentTestType(){
-
-const level=
-document.getElementById(
-"studentLevel"
-).value;
-
-const type=
-document.getElementById(
-"studentTestType"
-).value;
-
-const subject=
-document.getElementById(
-"subject"
-);
-
-const subjectBox=
-document.getElementById(
-"studentSubjectBox"
-);
-
-const modelBox=
-document.getElementById(
-"studentModelOptionBox"
-);
-
-const modelType=
-document.getElementById(
-"studentModelType"
-);
-
-const attemptBox=
-document.getElementById(
-"studentAttemptBox"
-);
-
-const multiBox=
-document.getElementById(
-"studentMultiSubjectBox"
-);
-
-
-/* RESET */
-
-attemptBox.classList.add(
-"hidden"
-);
-
-modelBox.classList.add(
-"hidden"
-);
-
-multiBox.classList.add(
-"hidden"
-);
-
-subjectBox.classList.remove(
-"hidden"
-);
-
-subject.disabled=false;
-
-modelType.innerHTML=`
-
-<option value="">
-Select Model Test Type
-</option>
-
-`;
-
-document.getElementById(
-"subjectInfo"
-).innerHTML=
-"Select level and test type.";
-
-
-/* ============================================= */
-/* PYQ */
-/* ============================================= */
-
-if(type==="PYQ"){
-
-attemptBox.classList.remove(
-"hidden"
-);
-
-subjectBox.classList.remove(
-"hidden"
-);
-
-subject.disabled=false;
-
-document.getElementById(
-"subjectInfo"
-).innerHTML=
-"Select the exact PYQ attempt and subject.";
-
-return;
-
-}
-
-
-/* ============================================= */
-/* MODEL TEST */
-/* ============================================= */
-
-if(type==="MODEL_TEST"){
-
-modelBox.classList.remove(
-"hidden"
-);
-
-
-/* FOUNDATION */
-
-if(level==="foundation"){
-
-modelType.innerHTML=`
-
-<option value="MODEL_TEST">
-Foundation Model Test
-</option>
-
-`;
-
-subjectBox.classList.add(
-"hidden"
-);
-
-subject.value="";
-subject.disabled=true;
-
-document.getElementById(
-"subjectInfo"
-).innerHTML=
-"Foundation Model Test is a combined 4-subject paper. Subject selection is not required.";
-
-return;
-
-}
-
-
-/* INTER / FINAL */
-
-if(
-level==="inter"||
-level==="final"
-){
-
-modelType.innerHTML=`
-
-<option value="">
-Select Model Test Type
-</option>
-
-<option value="GROUP_1">
-Group 1
-</option>
-
-<option value="GROUP_2">
-Group 2
-</option>
-
-<option value="OTHER">
-Other
-</option>
-
-`;
-
-subjectBox.classList.add(
-"hidden"
-);
-
-subject.value="";
-subject.disabled=true;
-
-return;
-
-}
-
-return;
-}
-
-
-/* ============================================= */
-/* OTHER */
-/* ============================================= */
-
-if(type==="OTHER"){
-
-subjectBox.classList.remove(
-"hidden"
-);
-
-subject.disabled=false;
-
-document.getElementById(
-"subjectInfo"
-).innerHTML=
-"Select the subject covered by this paper.";
-
-return;
-}
-
-
-/* ============================================= */
-/* MTP / RTP */
-/* ============================================= */
-
-if(
-type==="MTP"||
-type==="RTP"
-){
-
-subjectBox.classList.remove(
-"hidden"
-);
-
-subject.disabled=false;
-
-document.getElementById(
-"subjectInfo"
-).innerHTML=
-`Select the subject for ${type}.`;
-
-return;
-}
-
-}
-
-
-/* ================================================= */
-/* STUDENT MODEL TYPE */
-/* ================================================= */
-
-function updateStudentModelType(){
-
-const level=
-document.getElementById(
-"studentLevel"
-).value;
-
-const modelType=
-document.getElementById(
-"studentModelType"
-).value;
-
-const multiBox=
-document.getElementById(
-"studentMultiSubjectBox"
-);
-
-multiBox.classList.add(
-"hidden"
-);
-
-
-/* GROUP 1 */
-
-if(modelType==="GROUP_1"){
-
-document.getElementById(
-"subjectInfo"
-).innerHTML=
-`
-
-<b>Group 1 selected.</b>
-
-<br>
-
-Subjects:
-
-${getGroupSubjects(level,1)
-.map(s=>escapeHTML(s.name))
-.join(", ")}
-
-<br><br>
-
-No individual subject selection is required.
-
-`;
-
-return;
-}
-
-
-/* GROUP 2 */
-
-if(modelType==="GROUP_2"){
-
-document.getElementById(
-"subjectInfo"
-).innerHTML=
-`
-
-<b>Group 2 selected.</b>
-
-<br>
-
-Subjects:
-
-${getGroupSubjects(level,2)
-.map(s=>escapeHTML(s.name))
-.join(", ")}
-
-<br><br>
-
-No individual subject selection is required.
-
-`;
-
-return;
-}
-
-
-/* OTHER */
-
-if(modelType==="OTHER"){
-
-multiBox.classList.remove(
-"hidden"
-);
-
-renderStudentModelSubjects();
-
-document.getElementById(
-"subjectInfo"
-).innerHTML=
-"Select all subjects included in this Model Test.";
-
-return;
-}
-
-
-/* FOUNDATION */
-
-if(modelType==="MODEL_TEST"){
-
-document.getElementById(
-"subjectInfo"
-).innerHTML=
-"Foundation Model Test is a combined paper of all four subjects.";
-
-}
-
-}
-
-
-/* ================================================= */
-/* STUDENT MODEL SUBJECTS */
-/* ================================================= */
-
-function renderStudentModelSubjects(){
-
-const level=
-document.getElementById(
-"studentLevel"
-).value;
-
-const box=
-document.getElementById(
-"studentSubjectCheckboxes"
-);
-
-box.innerHTML="";
-
-if(!level)
-return;
-
-SUBJECTS[level].forEach(
-subject=>{
-
-box.innerHTML+=`
-
-<div class="subject-check">
-
-<label>
-
-<input
-type="checkbox"
-value="${escapeHTML(subject.key)}"
-data-subject-name="${escapeHTML(subject.name)}">
-
-${escapeHTML(subject.name)}
-
-</label>
-
-</div>
-
-`;
-
-});
-
-}
-
-
-/* ================================================= */
-/* STUDENT FILE */
-/* ================================================= */
-
-document.getElementById(
-"answerFile"
-).addEventListener(
+/* ==================================================
+ADMIN SUBJECT DISPLAY
+================================================== */
+
+document
+.getElementById("adminSubject")
+.addEventListener(
 "change",
 function(){
 
-selectedFile=
-this.files.length
-?this.files[0]
-:null;
+const key = this.value;
 
-const info=
-document.getElementById(
-"fileInfo"
+const info =
+document.getElementById("adminSubjectInfo");
+
+if(!key){
+
+info.innerHTML =
+"Select a subject to see the descriptive checking maximum.";
+
+return;
+
+}
+
+const s = SUBJECTS[key];
+
+if(key === "taxation"){
+
+info.innerHTML = `
+<b>Taxation</b><br>
+Total Paper: <b>100</b><br>
+MCQ: <b>30</b> — Not checked<br>
+Descriptive Maximum: <b>70</b><br>
+Income Tax: <b>35</b> + GST: <b>35</b>
+`;
+
+return;
+
+}
+
+if(key === "fm_sm"){
+
+info.innerHTML = `
+<b>FM + SM</b><br>
+Total Paper: <b>100</b><br>
+MCQ: <b>30</b> — Not checked<br>
+Descriptive Maximum: <b>70</b><br>
+FM: <b>35</b> + SM: <b>35</b>
+`;
+
+return;
+
+}
+
+info.innerHTML = `
+<b>${s.name}</b><br>
+Total Paper: <b>${s.paper}</b><br>
+MCQ: <b>${s.mcq}</b> — Not checked<br>
+Descriptive Maximum:
+<b>${s.descriptive}</b>
+`;
+
+}
 );
+
+
+/* ==================================================
+CHECKING MODE
+================================================== */
+
+function setMode(mode){
+
+checkingMode = mode;
+
+document
+.getElementById("strictMode")
+.classList.toggle(
+"active",
+mode === "strict"
+);
+
+document
+.getElementById("moderateMode")
+.classList.toggle(
+"active",
+mode === "moderate"
+);
+
+}
+
+
+/* ==================================================
+STUDENT FILE
+================================================== */
+
+document
+.getElementById("answerFile")
+.addEventListener(
+"change",
+function(){
+
+selectedFile =
+this.files.length
+? this.files[0]
+: null;
+
+const info =
+document.getElementById("fileInfo");
 
 if(!selectedFile){
 
-info.style.display=
-"none";
-
+info.style.display = "none";
 return;
+
 }
 
-const size=
+const size =
 (
-selectedFile.size/
-1024/
+selectedFile.size /
+1024 /
 1024
 ).toFixed(2);
 
-info.style.display=
-"block";
+info.style.display = "block";
 
-info.innerHTML=`
-
+info.innerHTML = `
 📎 <b>
 ${escapeHTML(selectedFile.name)}
 </b>
-
 <br>
-
 ${size} MB
-
 `;
 
-});
+}
+);
 
 
-/* ================================================= */
-/* SUBMIT STUDENT */
-/* ================================================= */
+/* ==================================================
+STUDENT SUBMIT
+================================================== */
 
 async function submitAnswerSheet(){
 
-const name=
-document.getElementById(
-"studentName"
-).value.trim();
+const name =
+document
+.getElementById("studentName")
+.value
+.trim();
 
-const registration=
-document.getElementById(
-"registrationNumber"
-).value.trim();
+const registration =
+document
+.getElementById("registrationNumber")
+.value
+.trim();
 
-const level=
-document.getElementById(
-"studentLevel"
-).value;
+const subjectKey =
+document
+.getElementById("subject")
+.value;
 
-const subjectKey=
-document.getElementById(
-"subject"
-).value;
-
-const testType=
-document.getElementById(
-"studentTestType"
-).value;
-
-const modelType=
-document.getElementById(
-"studentModelType"
-).value;
-
-const attempt=
-document.getElementById(
-"studentAttempt"
-).value;
+const testType =
+document
+.getElementById("studentTestType")
+.value;
 
 
-/* VALIDATION */
+if(!name){
 
-if(!name)
-return showStudentError(
+showStudentError(
 "Please enter your name."
 );
 
-if(!registration)
-return showStudentError(
+return;
+
+}
+
+if(!registration){
+
+showStudentError(
 "Please enter your ICAI registration number."
 );
 
-if(!level)
-return showStudentError(
-"Please select your CA level."
-);
-
-if(!testType)
-return showStudentError(
-"Please select Test / Paper Type."
-);
-
-
-/* PYQ ATTEMPT */
-
-if(
-testType==="PYQ" &&
-!attempt
-){
-
-return showStudentError(
-"Please select the PYQ Attempt / Session."
-);
+return;
 
 }
 
+if(!subjectKey){
 
-/* MODEL TYPE */
-
-if(
-testType==="MODEL_TEST" &&
-!modelType
-){
-
-return showStudentError(
-"Please select Model Test Type."
-);
-
-}
-
-
-/* MODEL OTHER */
-
-let modelSubjects=[];
-
-if(
-testType==="MODEL_TEST" &&
-modelType==="OTHER"
-){
-
-modelSubjects=[
-...document.querySelectorAll(
-"#studentSubjectCheckboxes input:checked"
-)
-].map(
-el=>el.value
-);
-
-if(!modelSubjects.length){
-
-return showStudentError(
-"Please select at least one subject for Model Test Other."
-);
-
-}
-
-}
-
-
-/* SUBJECT REQUIRED FOR NORMAL TYPES */
-
-if(
-(
-testType==="MTP"||
-testType==="RTP"||
-testType==="PYQ"||
-testType==="OTHER"
-) &&
-!subjectKey
-){
-
-return showStudentError(
+showStudentError(
 "Please select a subject."
 );
 
+return;
+
 }
 
+if(!testType){
 
-if(!selectedFile)
-return showStudentError(
+showStudentError(
+"Please select the Test / Paper Type."
+);
+
+return;
+
+}
+
+if(!selectedFile){
+
+showStudentError(
 "Please select your answer sheet PDF."
 );
 
-if(!isPDF(selectedFile))
-return showStudentError(
-"Please upload a PDF."
-);
+return;
+
+}
 
 if(
-selectedFile.size>
-4*1024*1024
-)
-return showStudentError(
+!selectedFile.name
+.toLowerCase()
+.endsWith(".pdf")
+){
+
+showStudentError(
+"Please upload a PDF answer sheet."
+);
+
+return;
+
+}
+
+if(
+selectedFile.size >
+4 * 1024 * 1024
+){
+
+showStudentError(
 "PDF must be smaller than 4 MB."
 );
 
-
-/* ============================================= */
-/* SUBJECT CONFIG */
-/* ============================================= */
-
-const subjectList=
-SUBJECTS[level]||[];
-
-let subject=null;
-
-if(subjectKey){
-
-subject=
-subjectList.find(
-s=>s.key===subjectKey
-);
+return;
 
 }
 
+const subject =
+SUBJECTS[subjectKey];
 
-/* ============================================= */
-/* EVALUATION CONFIG */
-/* ============================================= */
+const button =
+document.getElementById("submitButton");
 
-let paperMaximum=0;
-let descriptiveMaximum=0;
-let mcqOnly=false;
-let negativeMarking=false;
-let negativeMarksPerWrong=0;
+button.disabled = true;
 
-
-/* FOUNDATION MODEL */
-
-if(
-testType==="MODEL_TEST" &&
-level==="foundation"
-){
-
-paperMaximum=400;
-
-descriptiveMaximum=200;
-
-mcqOnly=false;
-
-negativeMarking=true;
-
-negativeMarksPerWrong=0.25;
-
-}
-
-
-/* INTER / FINAL GROUP */
-
-else if(
-testType==="MODEL_TEST" &&
-(
-modelType==="GROUP_1"||
-modelType==="GROUP_2"
-)
-){
-
-paperMaximum=
-getGroupSubjects(level,
-modelType==="GROUP_1"?1:2)
-.reduce(
-(sum,s)=>sum+s.paper,
-0
-);
-
-descriptiveMaximum=
-getGroupSubjects(level,
-modelType==="GROUP_1"?1:2)
-.reduce(
-(sum,s)=>sum+s.descriptive,
-0
-);
-
-}
-
-
-/* MODEL OTHER */
-
-else if(
-testType==="MODEL_TEST" &&
-modelType==="OTHER"
-){
-
-const selectedSubjects=
-modelSubjects.map(
-key=>
-subjectList.find(
-s=>s.key===key
-)
-).filter(Boolean);
-
-paperMaximum=
-selectedSubjects.reduce(
-(sum,s)=>sum+s.paper,
-0
-);
-
-descriptiveMaximum=
-selectedSubjects.reduce(
-(sum,s)=>sum+s.descriptive,
-0
-);
-
-}
-
-
-/* NORMAL SUBJECT */
-
-else if(subject){
-
-paperMaximum=
-subject.paper;
-
-descriptiveMaximum=
-subject.descriptive;
-
-mcqOnly=
-subject.mcqOnly;
-
-negativeMarking=
-subject.negativeMarking;
-
-negativeMarksPerWrong=
-subject.negativeMarksPerWrong;
-
-}
-
-
-/* ============================================= */
-/* BUTTON */
-/* ============================================= */
-
-const button=
-document.getElementById(
-"submitButton"
-);
-
-button.disabled=true;
+button.textContent =
+"⏳ Uploading...";
 
 
 try{
 
-button.textContent=
-"📄 Reading Answer Sheet...";
-
-
-const base64=
+const base64 =
 await fileToBase64(
 selectedFile
 );
 
-
-button.textContent=
-"☁️ Uploading Answer Sheet...";
-
-
-/* ============================================= */
-/* UPLOAD ANSWER SHEET */
-/* ============================================= */
-
-const uploadResponse=
+const response =
 await fetch(
 "/api/upload",
 {
-
 method:"POST",
 
 headers:{
@@ -2438,1403 +1265,264 @@ name,
 registrationNumber:
 registration,
 
-level,
-
 subject:
-subject?.name||
-"Combined Model Test",
+subject.name,
 
 subjectKey:
-subjectKey||
-"combined",
+subjectKey,
 
-subjects:
-modelSubjects,
-
+testType:
 testType,
 
-modelType,
-
-attempt,
-
+checkingMode:
 checkingMode,
 
-paperMaximum,
-
-descriptiveMaximum,
-
-mcqOnly,
-
-negativeMarking,
-
-negativeMarksPerWrong
+descriptiveMaximum:
+subject.descriptive
 
 })
+}
+);
 
-});
+const result =
+await response.json();
 
-
-const uploadResult=
-await uploadResponse.json();
-
-
-if(!uploadResponse.ok){
+if(!response.ok){
 
 throw new Error(
-uploadResult.error||
-"Answer sheet upload failed."
+result.error ||
+"Upload failed"
 );
 
 }
-
-
-button.textContent=
-"📚 Finding Test Material...";
-
-
-/* ============================================= */
-/* AI CHECK */
-/* ============================================= */
-
-const checkResponse=
-await fetch(
-"/api/check",
-{
-
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:JSON.stringify({
-
-answerSheetBase64:
-base64,
-
-answerSheetName:
-selectedFile.name,
-
-level,
-
-subject:
-subject?.name||
-"Combined Model Test",
-
-subjectKey:
-subjectKey||
-"combined",
-
-subjects:
-modelSubjects,
-
-testType,
-
-modelType,
-
-attempt,
-
-checkingMode,
-
-paperMaximum,
-
-descriptiveMaximum,
-
-mcqOnly,
-
-negativeMarking,
-
-negativeMarksPerWrong
-
-})
-
-});
-
-
-const checkResult=
-await checkResponse.json();
-
-
-if(!checkResponse.ok){
-
-throw new Error(
-checkResult.error||
-"AI evaluation failed."
-);
-
-}
-
-
-if(!checkResult.evaluation){
-
-throw new Error(
-"AI returned an empty evaluation."
-);
-
-}
-
-
-/* SUCCESS */
 
 showStudentSuccess(
-"Answer sheet checked successfully by AI."
+"Answer sheet uploaded successfully."
 );
 
+document
+.getElementById("checkin")
+.style.display = "block";
 
-document.getElementById(
-"checkin"
-).style.display=
-"block";
-
-
-document.getElementById(
-"checkinText"
-).innerHTML=`
-
+document
+.getElementById("checkinText")
+.innerHTML = `
 <b>Student:</b>
 ${escapeHTML(name)}
-
 <br>
 
 <b>Registration Number:</b>
 ${escapeHTML(registration)}
-
-<br>
-
-<b>Level:</b>
-${escapeHTML(level.toUpperCase())}
-
 <br>
 
 <b>Subject:</b>
-${escapeHTML(
-subject?.name||
-"Combined Model Test"
-)}
-
+${escapeHTML(subject.name)}
 <br>
 
 <b>Test Type:</b>
-${escapeHTML(
-formatTestType(testType)
-)}
-
+${escapeHTML(formatTestType(testType))}
 <br>
 
-${
-testType==="PYQ"
-?
-`
-
-<b>PYQ Attempt:</b>
-${escapeHTML(attempt)}
-
+<b>Descriptive Maximum:</b>
+${subject.descriptive}
 <br>
-
-`
-:""
-}
-
-${
-testType==="MODEL_TEST"
-?
-`
-
-<b>Model Type:</b>
-${escapeHTML(
-modelType==="MODEL_TEST"
-?
-"Foundation Model Test"
-:
-formatModelType(modelType)
-)}
-
-<br>
-
-`
-:""
-}
 
 <b>Checking Mode:</b>
 ${
-checkingMode==="strict"
-?
-"ICAI Strict"
-:
-"Moderate"
+checkingMode === "strict"
+? "ICAI Strict"
+: "Moderate"
 }
 
-<br>
+<br><br>
 
-${
-negativeMarking
-?
-`
+Your answer sheet has been received.
 
-<b>Negative Marking:</b>
--0.25 per wrong MCQ
-
-<br>
-
-`
-:""
-}
-
-<br>
-
-🤖 AI evaluation completed.
-
+MCQs will not be evaluated.
 `;
-
-
-displayEvaluation(
-checkResult.evaluation
-);
-
-
-button.textContent=
-"✅ Evaluation Complete";
-
 
 }catch(error){
 
 console.error(error);
 
 showStudentError(
-error.message||
-"Unable to evaluate answer sheet."
+error.message ||
+"Unable to upload answer sheet."
 );
 
-button.textContent=
+}
+
+button.disabled = false;
+
+button.textContent =
 "🚀 Submit Answer Sheet";
 
-
-}finally{
-
-button.disabled=false;
-
-}
-
 }
 
 
-/* ================================================= */
-/* ADMIN LOGIN */
-/* ================================================= */
-
-async function adminLogin(){
-
-const password=
-document.getElementById(
-"adminPassword"
-).value;
-
-if(!password)
-return showLoginError(
-"Please enter admin password."
-);
-
-
-const button=
-document.getElementById(
-"adminLoginButton"
-);
-
-button.disabled=true;
-
-button.textContent=
-"🔐 Authenticating...";
-
-
-try{
-
-const response=
-await fetch(
-"/api/admin-login",
-{
-
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-credentials:"include",
-
-body:JSON.stringify({
-password
-})
-
-});
-
-
-const result=
-await response.json();
-
-
-if(!response.ok)
-throw new Error(
-result.error||
-"Invalid admin password."
-);
-
-
-document.getElementById(
-"adminLoginCard"
-).style.display=
-"none";
-
-
-document.getElementById(
-"adminContent"
-).style.display=
-"block";
-
-
-}catch(error){
-
-showLoginError(
-error.message
-);
-
-}finally{
-
-button.disabled=false;
-
-button.textContent=
-"🔓 Login as Admin";
-
-}
-
-}
-
-
-/* ================================================= */
-/* ADMIN LOGOUT */
-/* ================================================= */
-
-async function adminLogout(){
-
-try{
-
-await fetch(
-"/api/admin-logout",
-{
-
-method:"POST",
-
-credentials:"include"
-
-});
-
-}catch(e){}
-
-
-document.getElementById(
-"adminContent"
-).style.display=
-"none";
-
-document.getElementById(
-"adminLoginCard"
-).style.display=
-"block";
-
-document.getElementById(
-"adminPassword"
-).value="";
-
-}
-
-
-/* ================================================= */
-/* ADMIN LEVEL */
-/* ================================================= */
-
-function updateAdminLevel(){
-
-const level=
-document.getElementById(
-"adminLevel"
-).value;
-
-document.getElementById(
-"adminAttemptBox"
-).classList.add(
-"hidden"
-);
-
-document.getElementById(
-"adminAttempt"
-).value="";
-
-document.getElementById(
-"adminModelTypeBox"
-).classList.add(
-"hidden"
-);
-
-document.getElementById(
-"adminSubjectBox"
-).classList.add(
-"hidden"
-);
-
-document.getElementById(
-"adminMultiSubjectBox"
-).classList.add(
-"hidden"
-);
-
-document.getElementById(
-"adminSubject"
-).innerHTML=
-`<option value="">
-Select Subject
-</option>`;
-
-if(level){
-
-updateAdminTestType();
-
-}
-
-}
-
-
-/* ================================================= */
-/* ADMIN TEST TYPE */
-/* ================================================= */
-
-function updateAdminTestType(){
-
-const level=
-document.getElementById(
-"adminLevel"
-).value;
-
-const type=
-document.getElementById(
-"adminTestType"
-).value;
-
-const modelBox=
-document.getElementById(
-"adminModelTypeBox"
-);
-
-const modelType=
-document.getElementById(
-"adminModelType"
-);
-
-const subjectBox=
-document.getElementById(
-"adminSubjectBox"
-);
-
-const multiBox=
-document.getElementById(
-"adminMultiSubjectBox"
-);
-
-const attemptBox=
-document.getElementById(
-"adminAttemptBox"
-);
-
-const separate=
-document.getElementById(
-"separateMaterials"
-);
-
-const modelMaterial=
-document.getElementById(
-"modelMaterial"
-);
-
-
-/* RESET */
-
-modelBox.classList.add(
-"hidden"
-);
-
-subjectBox.classList.add(
-"hidden"
-);
-
-multiBox.classList.add(
-"hidden"
-);
-
-attemptBox.classList.add(
-"hidden"
-);
-
-modelMaterial.classList.add(
-"hidden"
-);
-
-separate.classList.remove(
-"hidden"
-);
-
-modelType.innerHTML=
-`<option value="">
-Select Model Test Type
-</option>`;
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-"Select level and test type.";
-
-
-if(!level || !type)
-return;
-
-
-/* ============================================= */
-/* PYQ */
-/* ============================================= */
-
-if(type==="PYQ"){
-
-attemptBox.classList.remove(
-"hidden"
-);
-
-subjectBox.classList.remove(
-"hidden"
-);
-
-renderAdminSingleSubjects();
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-"Enter the exact PYQ attempt and select its subject.";
-
-return;
-}
-
-
-/* ============================================= */
-/* MTP / RTP */
-/* ============================================= */
-
-if(
-type==="MTP"||
-type==="RTP"
-){
-
-subjectBox.classList.remove(
-"hidden"
-);
-
-renderAdminSingleSubjects();
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-`Select the subject for ${type}.`;
-
-return;
-}
-
-
-/* ============================================= */
-/* OTHER */
-/* ============================================= */
-
-if(type==="OTHER"){
-
-subjectBox.classList.remove(
-"hidden"
-);
-
-renderAdminSingleSubjects();
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-"Select the subject covered by this paper.";
-
-return;
-}
-
-
-/* ============================================= */
-/* MODEL TEST */
-/* ============================================= */
-
-if(type==="MODEL_TEST"){
-
-modelBox.classList.remove(
-"hidden"
-);
-
-modelMaterial.classList.remove(
-"hidden"
-);
-
-separate.classList.add(
-"hidden"
-);
-
-
-/* FOUNDATION */
-
-if(level==="foundation"){
-
-modelType.innerHTML=`
-
-<option value="MODEL_TEST">
-Foundation Model Test
-</option>
-
-`;
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-"Foundation Model Test is a combined 4-subject paper. Subject selection is not required.";
-
-return;
-}
-
-
-/* INTER / FINAL */
-
-if(
-level==="inter"||
-level==="final"
-){
-
-modelType.innerHTML=`
-
-<option value="">
-Select Model Test Type
-</option>
-
-<option value="GROUP_1">
-Group 1
-</option>
-
-<option value="GROUP_2">
-Group 2
-</option>
-
-<option value="OTHER">
-Other
-</option>
-
-`;
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-"Select Group 1, Group 2 or Other. Individual subject selection is not required for Group 1/2.";
-
-}
-
-}
-
-}
-
-
-/* ================================================= */
-/* ADMIN MODEL TYPE */
-/* ================================================= */
-
-function updateAdminModelType(){
-
-const level=
-document.getElementById(
-"adminLevel"
-).value;
-
-const modelType=
-document.getElementById(
-"adminModelType"
-).value;
-
-const subjectBox=
-document.getElementById(
-"adminSubjectBox"
-);
-
-const multiBox=
-document.getElementById(
-"adminMultiSubjectBox"
-);
-
-
-subjectBox.classList.add(
-"hidden"
-);
-
-multiBox.classList.add(
-"hidden"
-);
-
-
-/* GROUP 1 */
-
-if(modelType==="GROUP_1"){
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-`
-
-<b>Group 1 selected.</b>
-
-<br>
-
-Subjects:
-
-${getGroupSubjects(level,1)
-.map(s=>escapeHTML(s.name))
-.join(", ")}
-
-<br><br>
-
-No individual subject selection required.
-
-`;
-
-return;
-}
-
-
-/* GROUP 2 */
-
-if(modelType==="GROUP_2"){
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-`
-
-<b>Group 2 selected.</b>
-
-<br>
-
-Subjects:
-
-${getGroupSubjects(level,2)
-.map(s=>escapeHTML(s.name))
-.join(", ")}
-
-<br><br>
-
-No individual subject selection required.
-
-`;
-
-return;
-}
-
-
-/* MODEL OTHER */
-
-if(modelType==="OTHER"){
-
-multiBox.classList.remove(
-"hidden"
-);
-
-renderAdminSubjects();
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-"Select all subjects included in this Model Test.";
-
-return;
-}
-
-
-/* FOUNDATION */
-
-if(modelType==="MODEL_TEST"){
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-"Foundation Model Test is a combined paper of all four subjects.";
-
-}
-
-}
-
-
-/* ================================================= */
-/* ADMIN SINGLE SUBJECT */
-/* ================================================= */
-
-function renderAdminSingleSubjects(){
-
-const level=
-document.getElementById(
-"adminLevel"
-).value;
-
-const select=
-document.getElementById(
-"adminSubject"
-);
-
-select.innerHTML=
-`<option value="">
-Select Subject
-</option>`;
-
-if(!level)
-return;
-
-SUBJECTS[level].forEach(
-subject=>{
-
-select.innerHTML+=`
-
-<option value="${escapeHTML(subject.key)}">
-
-${escapeHTML(subject.name)}
-
-</option>
-
-`;
-
-});
-
-}
-
-
-/* ================================================= */
-/* ADMIN MULTIPLE SUBJECTS */
-/* ================================================= */
-
-function renderAdminSubjects(){
-
-const level=
-document.getElementById(
-"adminLevel"
-).value;
-
-const box=
-document.getElementById(
-"adminSubjectCheckboxes"
-);
-
-box.innerHTML="";
-
-if(!level)
-return;
-
-SUBJECTS[level].forEach(
-subject=>{
-
-box.innerHTML+=`
-
-<div class="subject-check">
-
-<label>
-
-<input
-type="checkbox"
-value="${escapeHTML(subject.key)}"
-data-subject-name="${escapeHTML(subject.name)}">
-
-${escapeHTML(subject.name)}
-
-</label>
-
-</div>
-
-`;
-
-});
-
-}
-
-
-/* ================================================= */
-/* ADMIN SUBJECT */
-/* ================================================= */
-
-function updateAdminSubject(){
-
-const level=
-document.getElementById(
-"adminLevel"
-).value;
-
-const key=
-document.getElementById(
-"adminSubject"
-).value;
-
-if(!level || !key)
-return;
-
-const subject=
-SUBJECTS[level].find(
-s=>s.key===key
-);
-
-if(!subject)
-return;
-
-
-let html=`
-
-Selected Subject:
-<b>
-${escapeHTML(subject.name)}
-</b>
-
-<br>
-
-Paper Maximum:
-<b>
-${subject.paper}
-</b>
-
-<br>
-
-`;
-
-
-if(subject.mcqOnly){
-
-html+=`
-
-<span style="color:#fca5a5">
-
-<b>MCQ Only</b>
-
-<br>
-
-Negative Marking:
-<b>-0.25 per wrong answer</b>
-
-</span>
-
-`;
-
-}else{
-
-html+=`
-
-Descriptive Maximum:
-<b>
-${subject.descriptive}
-</b>
-
-`;
-
-}
-
-
-document.getElementById(
-"adminSubjectInfo"
-).innerHTML=
-html;
-
-}
-
-
-/* ================================================= */
-/* GROUP SUBJECTS */
-/* ================================================= */
-
-function getGroupSubjects(
-level,
-group
-){
-
-return (
-SUBJECTS[level]||[]
-).filter(
-subject=>
-subject.group===group
-);
-
-}
-
-
-/* ================================================= */
-/* ADMIN UPLOAD */
-/* ================================================= */
+/* ==================================================
+ADMIN MATERIAL UPLOAD
+================================================== */
 
 async function uploadMaterials(){
 
-const level=
-document.getElementById(
-"adminLevel"
-).value;
+const subjectKey =
+document
+.getElementById("adminSubject")
+.value;
 
-const testType=
-document.getElementById(
-"adminTestType"
-).value;
+const testType =
+document
+.getElementById("adminTestType")
+.value;
 
-const modelType=
-document.getElementById(
-"adminModelType"
-).value;
+const questionPaper =
+document
+.getElementById("questionPaper")
+.files[0];
 
-const subjectKey=
-document.getElementById(
-"adminSubject"
-).value;
+const suggestedAnswer =
+document
+.getElementById("suggestedAnswer")
+.files[0];
 
-const attempt=
-document.getElementById(
-"adminAttempt"
-).value.trim();
-
-
-/* LEVEL */
-
-if(!level)
-return showAdminError(
-"Please select level."
-);
-
-
-/* TEST TYPE */
-
-if(!testType)
-return showAdminError(
-"Please select Test / Paper Type."
-);
-
-
-/* PYQ ATTEMPT */
-
-if(
-testType==="PYQ" &&
-!attempt
-){
-
-return showAdminError(
-"Please enter PYQ Attempt / Session."
-);
-
-}
-
-
-/* MODEL TYPE */
-
-if(
-testType==="MODEL_TEST" &&
-!modelType
-){
-
-return showAdminError(
-"Please select Model Test Type."
-);
-
-}
-
-
-/* ============================================= */
-/* SUBJECTS */
-/* ============================================= */
-
-let subjects=[];
-
-
-/* MTP / RTP / PYQ / OTHER */
-
-if(
-testType==="MTP"||
-testType==="RTP"||
-testType==="PYQ"||
-testType==="OTHER"
-){
 
 if(!subjectKey){
 
-return showAdminError(
+showAdminError(
 "Please select a subject."
 );
-
-}
-
-subjects=[
-subjectKey
-];
-
-}
-
-
-/* MODEL GROUP 1 */
-
-if(
-testType==="MODEL_TEST" &&
-modelType==="GROUP_1"
-){
-
-subjects=
-getGroupSubjects(
-level,
-1
-).map(
-s=>s.key
-);
-
-}
-
-
-/* MODEL GROUP 2 */
-
-if(
-testType==="MODEL_TEST" &&
-modelType==="GROUP_2"
-){
-
-subjects=
-getGroupSubjects(
-level,
-2
-).map(
-s=>s.key
-);
-
-}
-
-
-/* MODEL OTHER */
-
-if(
-testType==="MODEL_TEST" &&
-modelType==="OTHER"
-){
-
-subjects=[
-...document.querySelectorAll(
-"#adminSubjectCheckboxes input:checked"
-)
-].map(
-el=>el.value
-);
-
-if(!subjects.length){
-
-return showAdminError(
-"For Model Test Other, select at least one subject."
-);
-
-}
-
-}
-
-
-/* FOUNDATION MODEL */
-
-if(
-testType==="MODEL_TEST" &&
-level==="foundation" &&
-modelType==="MODEL_TEST"
-){
-
-subjects=
-SUBJECTS.foundation.map(
-s=>s.key
-);
-
-}
-
-
-/* ============================================= */
-/* FILES */
-/* ============================================= */
-
-const modelFile=
-document.getElementById(
-"modelTestFile"
-).files[0];
-
-const questionPaper=
-document.getElementById(
-"questionPaper"
-).files[0];
-
-const suggestedAnswer=
-document.getElementById(
-"suggestedAnswer"
-).files[0];
-
-
-const isModel=
-testType==="MODEL_TEST";
-
-
-/* ============================================= */
-/* MODEL TEST */
-/* ============================================= */
-
-if(isModel){
-
-if(!modelFile){
-
-return showAdminError(
-"Please select Model Test PDF."
-);
-
-}
-
-if(!isPDF(modelFile)){
-
-return showAdminError(
-"Model Test file must be a PDF."
-);
-
-}
-
-
-try{
-
-await uploadMaterialFile(
-modelFile,
-{
-level,
-testType,
-modelType,
-subjects,
-attempt:""
-},
-"model-test"
-);
-
-
-showAdminSuccess(
-"Model Test PDF uploaded successfully."
-);
-
-
-}catch(error){
-
-showAdminError(
-error.message
-);
-
-}
 
 return;
 
 }
 
+if(!testType){
 
-/* ============================================= */
-/* NORMAL MATERIAL */
-/* ============================================= */
+showAdminError(
+"Please select the Test / Paper Type."
+);
+
+return;
+
+}
 
 if(!questionPaper){
 
-return showAdminError(
-"Please select Question Paper."
+showAdminError(
+"Please select the Question Paper."
 );
+
+return;
 
 }
 
 if(!suggestedAnswer){
 
-return showAdminError(
-"Please select Suggested Answer."
+showAdminError(
+"Please select the Suggested Answer."
 );
+
+return;
 
 }
 
-if(
-!isPDF(questionPaper)||
-!isPDF(suggestedAnswer)
-){
+const subject =
+SUBJECTS[subjectKey];
 
-return showAdminError(
-"Both files must be PDFs."
-);
+const button =
+document
+.getElementById("materialButton");
 
-}
+button.disabled = true;
+
+button.textContent =
+"⏳ Uploading Materials...";
 
 
 try{
 
-/* QUESTION PAPER */
-
 await uploadMaterialFile(
 questionPaper,
-{
-level,
+subjectKey,
 testType,
-modelType:"",
-subjects,
-attempt
-},
 "question-paper"
 );
 
-
-/* SUGGESTED ANSWER */
-
 await uploadMaterialFile(
 suggestedAnswer,
-{
-level,
+subjectKey,
 testType,
-modelType:"",
-subjects,
-attempt
-},
 "suggested-answer"
 );
 
+showAdminSuccess(`
+Test material uploaded successfully. ✓
+<br><br>
 
-showAdminSuccess(
-`${formatTestType(testType)} material uploaded successfully${testType==="PYQ" ? ` for ${attempt}` : ""}.`
-);
+<b>Subject:</b>
+${escapeHTML(subject.name)}
+<br>
 
+<b>Test Type:</b>
+${escapeHTML(formatTestType(testType))}
+<br>
+
+<b>Descriptive Maximum:</b>
+${subject.descriptive}
+<br>
+
+<b>Question Paper:</b>
+${escapeHTML(questionPaper.name)}
+<br>
+
+<b>Suggested Answer:</b>
+${escapeHTML(suggestedAnswer.name)}
+
+<br><br>
+
+Material classification has been saved
+for future AI checking.
+`);
 
 }catch(error){
 
+console.error(error);
+
 showAdminError(
-error.message
+error.message ||
+"Material upload failed."
 );
 
 }
 
+button.disabled = false;
+
+button.textContent =
+"📚 Upload Test Material";
+
 }
 
 
-/* ================================================= */
-/* UPLOAD MATERIAL FILE */
-/* ================================================= */
+/* ==================================================
+SINGLE MATERIAL UPLOAD
+================================================== */
 
 async function uploadMaterialFile(
 file,
-metadata,
+subjectKey,
+testType,
 type
 ){
 
-const base64=
+const base64 =
 await fileToBase64(file);
 
-
-const response=
+const response =
 await fetch(
 "/api/material",
 {
-
 method:"POST",
-
-credentials:"include",
 
 headers:{
 "Content-Type":
@@ -3850,47 +1538,30 @@ data:
 base64,
 
 contentType:
+file.type ||
 "application/pdf",
 
-level:
-metadata.level,
+subject:
+subjectKey,
 
 testType:
-metadata.testType,
+testType,
 
-modelType:
-metadata.modelType,
-
-subjects:
-metadata.subjects,
-
-attempt:
-metadata.attempt||"",
-
+type:
 type
 
 })
+}
+);
 
-});
-
-
-const result=
+const result =
 await response.json();
-
 
 if(!response.ok){
 
-if(response.status===403){
-
 throw new Error(
-"Admin session expired. Please login again."
-);
-
-}
-
-throw new Error(
-result.error||
-"Material upload failed."
+result.error ||
+`${type} upload failed`
 );
 
 }
@@ -3900,424 +1571,105 @@ return result;
 }
 
 
-/* ================================================= */
-/* DISPLAY EVALUATION */
-/* ================================================= */
-
-function displayEvaluation(
-evaluation
-){
-
-const panel=
-document.getElementById(
-"resultPanel"
-);
-
-const total=
-Number(
-evaluation.total_marks||0
-);
-
-const maximum=
-Number(
-evaluation.maximum_marks||0
-);
-
-const percentage=
-Number(
-evaluation.percentage||0
-);
-
-
-document.getElementById(
-"scoreText"
-).textContent=
-`${total} / ${maximum}`;
-
-
-document.getElementById(
-"percentageText"
-).textContent=
-`${percentage.toFixed(2)}%`;
-
-
-document.getElementById(
-"overallSummary"
-).textContent=
-evaluation.overall_summary||
-"No overall summary available.";
-
-
-const results=
-document.getElementById(
-"questionResults"
-);
-
-results.innerHTML="";
-
-
-if(!Array.isArray(
-evaluation.questions
-)){
-
-results.innerHTML=
-`<div class="info">
-No question-wise evaluation was returned.
-</div>`;
-
-panel.style.display=
-"block";
-
-return;
-
-}
-
-
-evaluation.questions.forEach(
-question=>{
-
-const card=
-document.createElement(
-"div"
-);
-
-card.className=
-"question-result";
-
-
-const status=
-question.status;
-
-
-if(status==="correct")
-card.classList.add(
-"correct"
-);
-
-if(status==="partially_correct")
-card.classList.add(
-"partial"
-);
-
-if(status==="incorrect")
-card.classList.add(
-"incorrect"
-);
-
-if(status==="not_attempted")
-card.classList.add(
-"unattempted"
-);
-
-if(status==="unclear")
-card.classList.add(
-"unclear"
-);
-
-
-card.innerHTML=`
-
-<h3>
-Question
-${escapeHTML(
-question.question_number
-)}
-</h3>
-
-<div class="question-meta">
-
-Marks:
-
-<b>
-${Number(
-question.marks_awarded||0
-)}
-/
-${Number(
-question.marks_available||0
-)}
-</b>
-
-&nbsp; • &nbsp;
-
-Status:
-
-<b>
-${escapeHTML(
-formatStatus(status)
-)}
-</b>
-
-</div>
-
-<div class="question-remarks">
-
-${escapeHTML(
-question.remarks||
-"No remarks available."
-)}
-
-</div>
-
-`;
-
-
-results.appendChild(
-card
-);
-
-});
-
-
-panel.style.display=
-"block";
-
-
-panel.scrollIntoView({
-behavior:"smooth",
-block:"start"
-});
-
-}
-
-
-/* ================================================= */
-/* CHECKING MODE */
-/* ================================================= */
-
-function setMode(mode){
-
-checkingMode=
-mode;
-
-document.getElementById(
-"strictMode"
-).classList.toggle(
-"active",
-mode==="strict"
-);
-
-document.getElementById(
-"moderateMode"
-).classList.toggle(
-"active",
-mode==="moderate"
-);
-
-}
-
-
-/* ================================================= */
-/* HELPERS */
-/* ================================================= */
+/* ==================================================
+HELPERS
+================================================== */
 
 function fileToBase64(file){
 
 return new Promise(
 (resolve,reject)=>{
 
-const reader=
+const reader =
 new FileReader();
 
-reader.onload=()=>{
+reader.onload =
+function(){
+
+const result =
+reader.result;
+
 resolve(
-reader.result.split(",")[1]
+result.split(",")[1]
 );
+
 };
 
-reader.onerror=()=>{
-reject(
-new Error(
-"Unable to read file."
-)
-);
-};
+reader.onerror =
+reject;
 
 reader.readAsDataURL(file);
 
-});
-
 }
-
-
-function isPDF(file){
-
-return file.type==="application/pdf"||
-file.name
-.toLowerCase()
-.endsWith(".pdf");
-
-}
-
-
-function formatTestType(type){
-
-const map={
-
-MTP:"MTP",
-
-RTP:"RTP",
-
-PYQ:"PYQ",
-
-MODEL_TEST:"Model Test",
-
-OTHER:"Other"
-
-};
-
-return map[type]||type;
-
-}
-
-
-function formatModelType(type){
-
-const map={
-
-GROUP_1:"Group 1",
-
-GROUP_2:"Group 2",
-
-OTHER:"Other",
-
-MODEL_TEST:"Foundation Model Test"
-
-};
-
-return map[type]||type;
-
-}
-
-
-function formatStatus(status){
-
-const map={
-
-correct:"Correct",
-
-partially_correct:
-"Partially Correct",
-
-incorrect:"Incorrect",
-
-not_attempted:
-"Not Attempted",
-
-unclear:"Unclear"
-
-};
-
-return map[status]||"Unknown";
-
-}
-
-
-function showStudentError(
-message
-){
-
-const box=
-document.getElementById(
-"studentStatus"
 );
 
-box.className=
+
+}
+
+
+function showStudentError(message){
+
+const box =
+document.getElementById("studentStatus");
+
+box.className =
 "status error";
 
-box.innerHTML=
-"❌ <b>Error</b><br>"+
+box.innerHTML =
+"❌ <b>Error</b><br>" +
 escapeHTML(message);
 
 }
 
 
-function showStudentSuccess(
-message
-){
+function showStudentSuccess(message){
 
-const box=
-document.getElementById(
-"studentStatus"
-);
+const box =
+document.getElementById("studentStatus");
 
-box.className=
+box.className =
 "status success";
 
-box.innerHTML=
-"✅ <b>Success</b><br>"+
+box.innerHTML =
+"✅ <b>Success</b><br>" +
 escapeHTML(message);
 
 }
 
 
-function showAdminError(
-message
-){
+function showAdminError(message){
 
-const box=
-document.getElementById(
-"adminStatus"
-);
+const box =
+document.getElementById("adminStatus");
 
-box.className=
+box.className =
 "status error";
 
-box.innerHTML=
-"❌ <b>Error</b><br>"+
+box.innerHTML =
+"❌ <b>Error</b><br>" +
 escapeHTML(message);
 
 }
 
 
-function showAdminSuccess(
-message
-){
+function showAdminSuccess(message){
 
-const box=
-document.getElementById(
-"adminStatus"
-);
+const box =
+document.getElementById("adminStatus");
 
-box.className=
+box.className =
 "status success";
 
-box.innerHTML=
-"✅ <b>Success</b><br>"+
+box.innerHTML =
+"✅ <b>Success</b><br>" +
 message;
 
 }
 
 
-function showLoginError(
-message
-){
+function escapeHTML(value){
 
-const box=
-document.getElementById(
-"loginStatus"
-);
-
-box.className=
-"status error";
-
-box.style.display=
-"block";
-
-box.innerHTML=
-"❌ <b>Login Failed</b><br>"+
-escapeHTML(message);
-
-}
-
-
-function escapeHTML(
-value
-){
-
-return String(
-value??""
-)
+return String(value)
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -4327,8 +1679,67 @@ value??""
 }
 
 
+/* ==================================================
+START PORTAL
+================================================== */
+
 initializePortal();
 
+</script>
+
+<script>
+/* FINAL REQUIREMENT PATCH */
+Object.assign(SUBJECTS,{
+ foundation:[
+  {key:'accounting',name:'Accounting',paper:100,mcq:100,descriptive:0,negative:0.25},
+  {key:'business_laws',name:'Business Laws',paper:100,mcq:100,descriptive:0,negative:0.25},
+  {key:'quantitative_aptitude',name:'Quantitative Aptitude',paper:100,mcq:100,descriptive:0,negative:0.25},
+  {key:'business_economics',name:'Business Economics',paper:100,mcq:100,descriptive:0,negative:0.25}
+ ],
+ inter:[
+  {key:'advanced_accounts',name:'Advanced Accounting',group:1,descriptive:70,paper:100},
+  {key:'law',name:'Corporate & Other Laws',group:1,descriptive:70,paper:100},
+  {key:'taxation',name:'Taxation',group:1,descriptive:70,paper:100},
+  {key:'costing',name:'Cost & Management Accounting',group:2,descriptive:70,paper:100},
+  {key:'audit',name:'Auditing & Ethics',group:2,descriptive:70,paper:100},
+  {key:'fm',name:'Financial Management',group:2,descriptive:35,paper:50},
+  {key:'sm',name:'Strategic Management',group:2,descriptive:35,paper:50}
+ ],
+ final:[
+  {key:'financial_reporting',name:'Financial Reporting',group:1,descriptive:70,paper:100},
+  {key:'advanced_financial_management',name:'Advanced Financial Management',group:1,descriptive:70,paper:100},
+  {key:'advanced_auditing',name:'Advanced Auditing, Assurance & Professional Ethics',group:1,descriptive:70,paper:100},
+  {key:'direct_tax',name:'Direct Tax Laws',group:2,descriptive:70,paper:100},
+  {key:'indirect_tax',name:'Indirect Tax Laws',group:2,descriptive:70,paper:100}
+ ]
+});
+const FINAL_PYQ_ATTEMPTS=['JANUARY 2026','MAY 2026','SEPTEMBER 2025','JANUARY 2025','SEPTEMBER 2024','MAY 2024','JANUARY 2024'];
+function addFinalFields(){
+ const grid=document.querySelector('#studentLevel')?.closest('.grid');
+ if(grid&&!document.getElementById('studentPYQAttemptBox')) grid.insertAdjacentHTML('beforeend','<div id="studentPYQAttemptBox" class="hidden"><label>PYQ Attempt</label><select id="studentPYQAttempt"></select></div>');
+ const ag=document.querySelector('#adminLevel')?.parentElement;
+ if(ag&&!document.getElementById('adminPYQAttemptBox')){
+  const ref=document.getElementById('adminSubjectBox')||document.getElementById('adminSubject');
+  if(ref) ref.insertAdjacentHTML('afterend','<div id="adminPYQAttemptBox" class="hidden"><label>PYQ Attempt</label><select id="adminPYQAttempt"></select></div>');
+ }
+}
+function fillFinalAttempts(id){const e=document.getElementById(id);if(!e)return;e.innerHTML='<option value="">Select PYQ Attempt</option>'+FINAL_PYQ_ATTEMPTS.map(x=>'<option value="'+escapeHTML(x)+'">'+escapeHTML(x)+'</option>').join('')}
+function finalRenderSubjects(id,level){const e=document.getElementById(id);if(!e)return;e.innerHTML='<option value="">Select Subject</option>'+(SUBJECTS[level]||[]).map(s=>'<option value="'+escapeHTML(s.key)+'">'+escapeHTML(s.name)+'</option>').join('')}
+function updateStudentLevel(){addFinalFields();const l=document.getElementById('studentLevel').value;finalRenderSubjects('subject',l);document.getElementById('subject').disabled=false;updateStudentTestType()}
+function updateStudentTestType(){addFinalFields();const l=studentLevel.value,t=studentTestType.value;let s=document.getElementById('subject');let mb=document.getElementById('studentModelOptionBox');let mt=document.getElementById('studentModelType');let pb=document.getElementById('studentPYQAttemptBox');mb.classList.add('hidden');pb.classList.add('hidden');mt.innerHTML='<option value="">Select Model Test Type</option>';s.disabled=false;if(t==='PYQ'){pb.classList.remove('hidden');fillFinalAttempts('studentPYQAttempt')}if(t==='MODEL_TEST'){mb.classList.remove('hidden');if(l==='foundation'){mt.innerHTML='<option value="FOUNDATION">Foundation Model Test</option>';s.value='';s.disabled=true;subjectInfo.textContent='Foundation Model Test is a combined paper.'}else{mt.innerHTML='<option value="">Select Model Test Type</option><option value="GROUP_1">Group 1</option><option value="GROUP_2">Group 2</option><option value="OTHER">Other</option>';s.value='';subjectInfo.textContent='Select Group 1, Group 2 or Other.'}return}subjectInfo.textContent=t?`Select the subject for ${t}.`:'Select level and test type.'}
+function submitAnswerSheet(){return finalSubmitAnswerSheet()}
+async function finalSubmitAnswerSheet(){
+ const name=studentName.value.trim(),reg=registrationNumber.value.trim(),level=studentLevel.value,type=studentTestType.value,key=subject.value,modelType=document.getElementById('studentModelType')?.value||'',pyqAttempt=document.getElementById('studentPYQAttempt')?.value||'';
+ if(!name)return showStudentError('Please enter your name.');if(!reg)return showStudentError('Please enter your ICAI registration number.');if(!level)return showStudentError('Please select your CA level.');if(!type)return showStudentError('Please select Test / Paper Type.');if(type==='PYQ'&&!pyqAttempt)return showStudentError('Please select PYQ Attempt.');if(type==='MODEL_TEST'&&!modelType)return showStudentError('Please select Model Test Type.');
+ if(type!=='MODEL_TEST'&&!key)return showStudentError('Please select a subject.');
+ if(!selectedFile)return showStudentError('Please select your answer sheet PDF.');if(!isPDF(selectedFile))return showStudentError('Please upload a PDF.');if(selectedFile.size>4*1024*1024)return showStudentError('PDF must be smaller than 4 MB.');
+ const sd=(SUBJECTS[level]||[]).find(x=>x.key===key);let maximum=sd?.descriptive||0;if(type==='MODEL_TEST'){if(level==='foundation')maximum=0;else maximum=(modelType==='GROUP_1'?1:modelType==='GROUP_2'?2:0)&&0;/* combined maximum is enforced by AI/reference */}
+ const b=document.getElementById('submitButton');b.disabled=true;try{b.textContent='📄 Reading Answer Sheet...';const base64=await fileToBase64(selectedFile);b.textContent='☁️ Uploading Answer Sheet...';let u=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename:selectedFile.name,data:base64,contentType:'application/pdf',studentName:name,registrationNumber:reg,level,subject:sd?.name||'Combined Model Test',subjectKey:key||'combined',testType:type,modelType,pyqAttempt,checkingMode,descriptiveMaximum:maximum})});let ur=await u.json();if(!u.ok)throw new Error(ur.error||'Answer sheet upload failed.');b.textContent='🤖 AI Checking Answer Sheet...';let c=await fetch('/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answerSheetBase64:base64,answerSheetName:selectedFile.name,level,subject:sd?.name||'Combined Model Test',subjectKey:key||'combined',testType:type,modelType,pyqAttempt,checkingMode,descriptiveMaximum:maximum})});let cr=await c.json();if(!c.ok)throw new Error((cr.error||'AI evaluation failed.')+(cr.details?' — '+cr.details:''));if(!cr.evaluation)throw new Error('AI returned an empty evaluation.');showStudentSuccess('Answer sheet checked successfully by AI.');checkin.style.display='block';checkinText.innerHTML=`<b>Student:</b> ${escapeHTML(name)}<br><b>Registration:</b> ${escapeHTML(reg)}<br><b>Level:</b> ${level.toUpperCase()}<br><b>Paper:</b> ${escapeHTML(sd?.name||'Combined Model Test')}<br><b>Type:</b> ${escapeHTML(type)}${type==='PYQ'?'<br><b>Attempt:</b> '+escapeHTML(pyqAttempt):''}${type==='MODEL_TEST'?'<br><b>Model:</b> '+escapeHTML(modelType):''}<br><br>🤖 AI evaluation completed.`;displayEvaluation(cr.evaluation);b.textContent='✅ Evaluation Complete'}catch(e){console.error(e);showStudentError(e.message||'Unable to evaluate answer sheet.');b.textContent='🚀 Submit Answer Sheet'}finally{b.disabled=false}}
+function updateAdminLevel(){addFinalFields();const l=adminLevel.value;finalRenderSubjects('adminSubject',l);updateAdminTestType()}
+function updateAdminTestType(){addFinalFields();const l=adminLevel.value,t=adminTestType.value;adminModelTypeBox?.classList.add('hidden');adminSubjectBox?.classList.add('hidden');adminMultiSubjectBox?.classList.add('hidden');document.getElementById('adminPYQAttemptBox')?.classList.add('hidden');modelMaterial?.classList.add('hidden');separateMaterials?.classList.remove('hidden');adminModelType.innerHTML='<option value="">Select Model Test Type</option>';if(!l||!t)return;if(t==='MODEL_TEST'){adminModelTypeBox.classList.remove('hidden');modelMaterial.classList.remove('hidden');separateMaterials.classList.add('hidden');adminModelType.innerHTML=l==='foundation'?'<option value="FOUNDATION">Foundation Model Test</option>':'<option value="">Select Model Test Type</option><option value="GROUP_1">Group 1</option><option value="GROUP_2">Group 2</option><option value="OTHER">Other</option>';return}adminSubjectBox.classList.remove('hidden');if(t==='PYQ'){document.getElementById('adminPYQAttemptBox').classList.remove('hidden');fillFinalAttempts('adminPYQAttempt')}}
+async function uploadMaterials(){const l=adminLevel.value,t=adminTestType.value,k=adminSubject.value,mt=adminModelType.value,pa=document.getElementById('adminPYQAttempt')?.value||'';if(!l)return showAdminError('Please select level.');if(!t)return showAdminError('Please select Test / Paper Type.');if(t==='MODEL_TEST'&&!mt)return showAdminError('Please select Model Test Type.');if(t!=='MODEL_TEST'&&!k)return showAdminError('Please select a subject.');if(t==='PYQ'&&!pa)return showAdminError('Please select PYQ Attempt.');const model=modelTestFile?.files?.[0],qp=questionPaper?.files?.[0],sa=suggestedAnswer?.files?.[0];const btn=materialButton;btn.disabled=true;try{if(t==='MODEL_TEST'){if(!model||!isPDF(model))throw new Error('Please select Model Test PDF.');await finalUploadMaterial(model,{level:l,testType:t,modelType:mt,pyqAttempt:'',subjects:[]},'model-test')}else{if(!qp||!sa)throw new Error('Please select Question Paper and Suggested Answer.');await finalUploadMaterial(qp,{level:l,testType:t,modelType:'',pyqAttempt:pa,subjects:[k]},'question-paper');await finalUploadMaterial(sa,{level:l,testType:t,modelType:'',pyqAttempt:pa,subjects:[k]},'suggested-answer')}showAdminSuccess('Test material uploaded successfully. ✓')}catch(e){showAdminError(e.message)}finally{btn.disabled=false}}
+async function finalUploadMaterial(file,m,type){const data=await fileToBase64(file);const r=await fetch('/api/material',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename:file.name,data,contentType:'application/pdf',level:m.level,testType:m.testType,modelType:m.modelType,pyqAttempt:m.pyqAttempt,subjects:m.subjects,type})});const d=await r.json();if(!r.ok)throw new Error(d.error||d.details||'Material upload failed.');return d}
+addFinalFields();
 </script>
 
 </body>
