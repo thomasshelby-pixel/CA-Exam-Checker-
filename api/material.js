@@ -1,424 +1,247 @@
 import { put } from "@vercel/blob";
 
-import {
-  isAdminAuthenticated
-} from "./_adminAuth.js";
+function safe(value) {
+  return String(value ?? "")
+    .trim()
+    .replace(/[^a-zA-Z0-9._-]/g, "_");
+}
 
+export default async function handler(req, res) {
 
-export default async function handler(req,res){
-
-  if(req.method !== "POST"){
-
+  if (req.method !== "POST") {
     return res.status(405).json({
-      error:"Method not allowed"
+      error: "Method not allowed"
     });
-
   }
 
-
-  if(!isAdminAuthenticated(req)){
-
-    return res.status(403).json({
-      error:"Admin authentication required."
-    });
-
-  }
-
-
-  try{
-
-    if(!process.env.BLOB_READ_WRITE_TOKEN){
-
-      return res.status(500).json({
-        error:
-          "BLOB_READ_WRITE_TOKEN is not configured."
-      });
-
-    }
-
+  try {
 
     const {
       filename,
       data,
-      contentType,
+      contentType = "application/pdf",
+
       level,
       testType,
-      modelType,
-      subjects,
+      modelType = "",
+      pyqAttempt = "",
+
+      subjects = [],
       type
     } = req.body || {};
 
+    /* ================================
+       ENV
+    ================================= */
 
-    if(!filename || !data){
+    const token =
+      process.env.BLOB_READ_WRITE_TOKEN;
 
-      return res.status(400).json({
-        error:"File is missing."
+    if (!token) {
+      return res.status(500).json({
+        error:
+          "BLOB_READ_WRITE_TOKEN is not configured."
       });
-
     }
 
+    /* ================================
+       VALIDATION
+    ================================= */
 
-    if(!level){
-
+    if (!filename || !data) {
       return res.status(400).json({
-        error:"Level is required."
+        error: "File data is missing."
       });
-
     }
 
-
-    if(!testType){
-
+    if (!level) {
       return res.status(400).json({
-        error:"Test type is required."
+        error: "Level is required."
       });
-
     }
 
-
-    const validLevels=[
-      "foundation",
-      "inter",
-      "final"
-    ];
-
-
-    if(!validLevels.includes(level)){
-
+    if (!testType) {
       return res.status(400).json({
-        error:"Invalid CA level."
+        error: "Test type is required."
       });
-
     }
 
-
-    const validTestTypes=[
-      "MTP",
-      "RTP",
-      "PYQ",
-      "MODEL_TEST",
-      "OTHER"
-    ];
-
-
-    if(!validTestTypes.includes(testType)){
-
+    if (!type) {
       return res.status(400).json({
-        error:"Invalid test type."
+        error: "Material type is required."
       });
-
     }
 
+    /* ================================
+       PYQ
+    ================================= */
 
-    const subjectList=
+    if (
+      testType === "PYQ" &&
+      !pyqAttempt
+    ) {
+      return res.status(400).json({
+        error:
+          "PYQ attempt is required."
+      });
+    }
+
+    /* ================================
+       MODEL TEST
+    ================================= */
+
+    if (
+      testType === "MODEL_TEST" &&
+      !modelType
+    ) {
+      return res.status(400).json({
+        error:
+          "Model Test type is required."
+      });
+    }
+
+    /* ================================
+       SUBJECTS
+    ================================= */
+
+    const cleanSubjects =
       Array.isArray(subjects)
-      ?subjects
-      :[];
-
-
-    /*
-     * MTP / RTP / PYQ
-     * Exactly one subject.
-     */
-
-    if(
-      testType==="MTP" ||
-      testType==="RTP" ||
-      testType==="PYQ"
-    ){
-
-      if(subjectList.length!==1){
-
-        return res.status(400).json({
-          error:
-            `${testType} requires exactly one subject.`
-        });
-
-      }
-
-    }
-
+        ? subjects
+            .map(s => safe(s))
+            .filter(Boolean)
+        : [];
 
     /*
-     * MODEL TEST
-     */
+      Normal MTP/RTP/PYQ/OTHER:
+      exactly one subject
+    */
 
-    if(testType==="MODEL_TEST"){
-
-      if(!modelType){
-
-        return res.status(400).json({
-          error:
-            "Model Test Type is required."
-        });
-
-      }
-
-
-      if(
-        level==="foundation" &&
-        modelType!=="MODEL_TEST"
-      ){
-
-        return res.status(400).json({
-          error:
-            "Foundation only supports Foundation Model Test."
-        });
-
-      }
-
-
-      if(
-        (
-          level==="inter" ||
-          level==="final"
-        ) &&
-        ![
-          "GROUP_1",
-          "GROUP_2",
-          "OTHER"
-        ].includes(modelType)
-      ){
-
-        return res.status(400).json({
-          error:
-            "Invalid Model Test Type."
-        });
-
-      }
-
-
-      if(
-        modelType==="OTHER" &&
-        subjectList.length===0
-      ){
-
-        return res.status(400).json({
-          error:
-            "Model Test Other requires subjects."
-        });
-
-      }
-
-    }
-
-
-    /*
-     * OTHER
-     */
-
-    if(
-      testType==="OTHER" &&
-      subjectList.length===0
-    ){
-
+    if (
+      testType !== "MODEL_TEST" &&
+      cleanSubjects.length !== 1
+    ) {
       return res.status(400).json({
         error:
-          "Other material requires at least one subject."
+          "Exactly one subject is required."
       });
+    }
+
+    /*
+      Model Test:
+      subject is determined by
+      Group 1 / Group 2 / Other
+    */
+
+    let materialKey;
+
+    if (testType === "MODEL_TEST") {
+
+      materialKey =
+        `model-${safe(modelType)}`;
+
+    } else {
+
+      materialKey =
+        safe(cleanSubjects[0]);
 
     }
 
+    /* ================================
+       ATTEMPT
+    ================================= */
 
-    const safeLevel=
-      String(level)
-        .replace(
-          /[^a-zA-Z0-9_-]/g,
-          "_"
-        );
+    const attempt =
+      testType === "PYQ"
+        ? safe(pyqAttempt)
+        : "NA";
 
+    /* ================================
+       TYPE
+    ================================= */
 
-    const safeTestType=
-      String(testType)
-        .replace(
-          /[^a-zA-Z0-9_-]/g,
-          "_"
-        );
-
-
-    const safeModelType=
-      String(modelType || "NONE")
-        .replace(
-          /[^a-zA-Z0-9_-]/g,
-          "_"
-        );
-
+    const cleanType =
+      safe(type);
 
     /*
-     * SUBJECT FOLDER
-     *
-     * For single subject:
-     * subject key
-     *
-     * For multiple:
-     * combined sorted subject keys
-     */
+      Expected paths:
 
-    const subjectFolder=
-      subjectList.length
-      ?subjectList
-        .map(
-          s=>String(s)
-            .replace(
-              /[^a-zA-Z0-9_-]/g,
-              "_"
-            )
-        )
-        .sort()
-        .join("__")
-      :"ALL";
+      MODEL:
+      materials/inter/MODEL_TEST/
+      model-GROUP_1/NA/model-test-...
 
+      PYQ:
+      materials/inter/PYQ/
+      taxation/MAY_2026/question-paper-...
 
-    const safeType=
-      String(type || "material")
-        .replace(
-          /[^a-zA-Z0-9_-]/g,
-          "_"
-        );
+      MTP:
+      materials/inter/MTP/
+      taxation/NA/question-paper-...
+    */
 
+    const pathname =
+      `materials/` +
+      `${safe(level)}/` +
+      `${safe(testType)}/` +
+      `${materialKey}/` +
+      `${attempt}/` +
+      `${cleanType}-` +
+      `${Date.now()}-` +
+      `${safe(filename)}`;
 
-    const timestamp=
-      Date.now();
+    /* ================================
+       UPLOAD
+    ================================= */
 
-
-    const safeFilename=
-      String(filename)
-        .replace(
-          /[^a-zA-Z0-9._-]/g,
-          "_"
-        );
-
-
-    /*
-     * FINAL BLOB STRUCTURE
-     *
-     * materials/
-     *   inter/
-     *     PYQ/
-     *       NONE/
-     *         costing/
-     *
-     *   inter/
-     *     MODEL_TEST/
-     *       GROUP_2/
-     *         ALL/
-     *
-     *   inter/
-     *     MODEL_TEST/
-     *       OTHER/
-     *         audit__costing/
-     */
-
-    const prefix=
-      `materials/${safeLevel}/${safeTestType}/${safeModelType}/${subjectFolder}`;
-
-
-    const pathname=
-      `${prefix}/${safeType}-${timestamp}-${safeFilename}`;
-
-
-    const buffer=
-      Buffer.from(
-        data,
-        "base64"
-      );
-
-
-    if(
-      buffer.length >
-      10 * 1024 * 1024
-    ){
-
-      return res.status(400).json({
-        error:
-          "File must be smaller than 10 MB."
-      });
-
-    }
-
-
-    const blob=
+    const blob =
       await put(
         pathname,
-        buffer,
+        Buffer.from(
+          data,
+          "base64"
+        ),
         {
-          access:"private",
+          access: "public",
 
-          contentType:
-            contentType ||
-            "application/pdf",
+          token,
 
-          token:
-            process.env.BLOB_READ_WRITE_TOKEN,
-
-          addRandomSuffix:false,
-
-          metadata:{
-
-            level,
-
-            testType,
-
-            modelType:
-              modelType || "",
-
-            subjects:
-              subjectList.join(","),
-
-            materialType:
-              type || ""
-
-          }
-
+          contentType
         }
       );
 
+    /* ================================
+       RESPONSE
+    ================================= */
 
     return res.status(200).json({
 
-      success:true,
+      success: true,
 
       pathname:
         blob.pathname,
 
       url:
-        blob.url,
-
-      metadata:{
-
-        level,
-
-        testType,
-
-        modelType,
-
-        subjects:
-          subjectList,
-
-        type
-
-      }
+        blob.url
 
     });
 
-
-  }catch(error){
+  } catch (error) {
 
     console.error(
       "MATERIAL UPLOAD ERROR:",
       error
     );
 
-
     return res.status(500).json({
 
       error:
+        "Material upload failed.",
+
+      details:
         error?.message ||
-        "Material upload failed."
+        "Unknown error"
 
     });
 
   }
 
 }
-attempt
