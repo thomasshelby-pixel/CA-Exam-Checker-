@@ -353,3 +353,294 @@ export default async function handler(req, res) {
     });
   }
 }
+
+import { list } from "@vercel/blob";
+
+function safe(value) {
+  return String(value || "")
+    .replace(
+      /[^a-zA-Z0-9_-]/g,
+      "_"
+    );
+}
+
+function uniqueSorted(values) {
+  return [
+    ...new Set(
+      values
+        .filter(Boolean)
+    )
+  ].sort();
+}
+
+export default async function handler(req, res) {
+
+  if (
+    req.method !== "GET" &&
+    req.method !== "POST"
+  ) {
+    return res.status(405).json({
+      error: "Method not allowed"
+    });
+  }
+
+  try {
+
+    if (
+      !process.env
+        .BLOB_READ_WRITE_TOKEN
+    ) {
+      return res.status(500).json({
+        error:
+          "BLOB_READ_WRITE_TOKEN is not configured."
+      });
+    }
+
+    const body =
+      req.body || {};
+
+    const query =
+      req.query || {};
+
+    const mode =
+      body.mode ||
+      query.mode ||
+      "";
+
+    const level =
+      body.level ||
+      query.level ||
+      "";
+
+    const subject =
+      body.subject ||
+      query.subject ||
+      "";
+
+    const testType =
+      body.testType ||
+      query.testType ||
+      "";
+
+    if (!level) {
+      return res.status(400).json({
+        error:
+          "Level is required."
+      });
+    }
+
+    /*
+      PYQ ATTEMPTS
+    */
+
+    if (
+      mode ===
+      "pyq-attempts"
+    ) {
+
+      if (!subject) {
+        return res.status(400).json({
+          error:
+            "Subject is required."
+        });
+      }
+
+      const prefix =
+        `materials/${safe(level)}/PYQ/NONE/${safe(subject)}/`;
+
+      const result =
+        await list({
+          prefix,
+          token:
+            process.env
+              .BLOB_READ_WRITE_TOKEN
+        });
+
+      const attempts = [];
+
+      for (
+        const blob
+        of result.blobs || []
+      ) {
+
+        const match =
+          blob.pathname.match(
+            /\/attempt-([^/]+)\//i
+          );
+
+        if (match) {
+          attempts.push(
+            match[1]
+              .replace(/_/g, " ")
+          );
+        }
+      }
+
+      return res.status(200).json({
+        attempts:
+          uniqueSorted(
+            attempts
+          )
+      });
+    }
+
+    /*
+      MODEL TEST OTHER SUBJECTS
+    */
+
+    if (
+      mode ===
+      "model-other-subjects"
+    ) {
+
+      const prefix =
+        `materials/${safe(level)}/MODEL_TEST/OTHER/`;
+
+      const result =
+        await list({
+          prefix,
+          token:
+            process.env
+              .BLOB_READ_WRITE_TOKEN
+        });
+
+      const subjects = [];
+
+      for (
+        const blob
+        of result.blobs || []
+      ) {
+
+        const parts =
+          blob.pathname
+            .split("/");
+
+        /*
+          materials
+          0 = materials
+          1 = level
+          2 = MODEL_TEST
+          3 = OTHER
+          4 = subject folder
+        */
+
+        const folder =
+          parts[4] || "";
+
+        folder
+          .split("__")
+          .forEach(
+            subjectName => {
+              if (subjectName) {
+                subjects.push(
+                  subjectName
+                );
+              }
+            }
+          );
+      }
+
+      return res.status(200).json({
+        subjects:
+          uniqueSorted(
+            subjects
+          )
+      });
+    }
+
+    /*
+      OTHER MATERIAL SUBJECTS
+    */
+
+    if (
+      mode ===
+      "other-subjects"
+    ) {
+
+      const prefix =
+        `materials/${safe(level)}/OTHER/NONE/`;
+
+      const result =
+        await list({
+          prefix,
+          token:
+            process.env
+              .BLOB_READ_WRITE_TOKEN
+        });
+
+      const subjects = [];
+
+      for (
+        const blob
+        of result.blobs || []
+      ) {
+
+        const parts =
+          blob.pathname
+            .split("/");
+
+        if (parts[4]) {
+          subjects.push(
+            parts[4]
+          );
+        }
+      }
+
+      return res.status(200).json({
+        subjects:
+          uniqueSorted(
+            subjects
+          )
+      });
+    }
+
+    /*
+      NORMAL MATERIAL LIST
+    */
+
+    if (
+      !testType ||
+      !subject
+    ) {
+      return res.status(400).json({
+        error:
+          "testType and subject are required."
+      });
+    }
+
+    const prefix =
+      `materials/${safe(level)}/${safe(testType)}/NONE/${safe(subject)}/`;
+
+    const result =
+      await list({
+        prefix,
+        token:
+          process.env
+            .BLOB_READ_WRITE_TOKEN
+      });
+
+    return res.status(200).json({
+      files:
+        (result.blobs || [])
+          .map(blob => ({
+            pathname:
+              blob.pathname,
+            uploadedAt:
+              blob.uploadedAt
+          }))
+    });
+
+  } catch (error) {
+
+    console.error(
+      "MATERIALS LIST ERROR:",
+      error
+    );
+
+    return res.status(500).json({
+      error:
+        error?.message ||
+        "Unable to load material information."
+    });
+  }
+}
