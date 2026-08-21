@@ -1,4 +1,7 @@
 {
+  "name": "ca-exam-checker",
+  "version": "4.1.0",
+  "private": true,
   "type": "module",
   "dependencies": {
     "@vercel/blob": "latest"
