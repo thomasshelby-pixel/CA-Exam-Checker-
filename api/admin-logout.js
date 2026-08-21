@@ -1,24 +1,17 @@
-export default async function handler(
-  req,
-  res
-) {
+import {
+  clearAdminCookie
+} from "../lib/adminAuth.js";
 
+export default async function handler(req, res) {
   if (req.method !== "POST") {
-
     return res.status(405).json({
-      error:
-        "Method not allowed"
+      error: "Method not allowed"
     });
-
   }
 
-  res.setHeader(
-    "Set-Cookie",
-    "ca_admin=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"
-  );
+  clearAdminCookie(res);
 
   return res.status(200).json({
     success: true
   });
-
 }
