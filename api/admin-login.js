@@ -1,7 +1,6 @@
 import {
-  createAdminToken,
-  getAdminCookie
-} from "./_adminAuth.js";
+  adminCookieHeader
+} from "./auth.js";
 
 export default async function handler(
   req,
@@ -22,33 +21,24 @@ export default async function handler(
       password
     } = req.body || {};
 
-    if (!password) {
-
-      return res.status(400).json({
-        error: "Password required"
-      });
-
-    }
-
-    const adminPassword =
+    const expected =
       process.env.ADMIN_PASSWORD;
 
-    if (!adminPassword) {
+    const secret =
+      process.env.ADMIN_SESSION_SECRET;
 
-      console.error(
-        "ADMIN_PASSWORD is missing."
-      );
+    if (!expected || !secret) {
 
       return res.status(500).json({
         error:
-          "Admin authentication is not configured."
+          "ADMIN_PASSWORD and ADMIN_SESSION_SECRET must be configured in Vercel."
       });
 
     }
 
     if (
-      password !==
-      adminPassword
+      !password ||
+      password !== expected
     ) {
 
       return res.status(401).json({
@@ -58,17 +48,9 @@ export default async function handler(
 
     }
 
-    const token =
-      createAdminToken();
-
     res.setHeader(
       "Set-Cookie",
-      getAdminCookie(token)
-    );
-
-    res.setHeader(
-      "Cache-Control",
-      "no-store"
+      adminCookieHeader(secret)
     );
 
     return res.status(200).json({
@@ -77,16 +59,13 @@ export default async function handler(
 
   } catch (error) {
 
-    console.error(
-      "Admin login error:",
-      error
-    );
-
     return res.status(500).json({
       error:
-        "Admin login failed."
+        "Admin login failed.",
+      details:
+        error?.message ||
+        "Unknown error"
     });
 
   }
-
 }
