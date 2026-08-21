@@ -1,71 +1,54 @@
-import {
-  adminCookieHeader
-} from "./auth.js";
+import { setAdminCookie } from "../lib/adminAuth.js";
 
-export default async function handler(
-  req,
-  res
-) {
-
+export default async function handler(req, res) {
   if (req.method !== "POST") {
-
     return res.status(405).json({
       error: "Method not allowed"
     });
-
   }
 
   try {
+    const { password } = req.body || {};
 
-    const {
-      password
-    } = req.body || {};
-
-    const expected =
-      process.env.ADMIN_PASSWORD;
-
-    const secret =
-      process.env.ADMIN_SESSION_SECRET;
-
-    if (!expected || !secret) {
-
+    if (!process.env.ADMIN_PASSWORD) {
       return res.status(500).json({
         error:
-          "ADMIN_PASSWORD and ADMIN_SESSION_SECRET must be configured in Vercel."
+          "ADMIN_PASSWORD is not configured in Vercel."
       });
+    }
 
+    if (!password) {
+      return res.status(400).json({
+        error: "Admin password is required."
+      });
     }
 
     if (
-      !password ||
-      password !== expected
+      String(password) !==
+      String(process.env.ADMIN_PASSWORD)
     ) {
-
       return res.status(401).json({
-        error:
-          "Invalid admin password."
+        error: "Invalid admin password."
       });
-
     }
 
-    res.setHeader(
-      "Set-Cookie",
-      adminCookieHeader(secret)
-    );
+    setAdminCookie(res);
 
     return res.status(200).json({
-      success: true
+      success: true,
+      message: "Admin login successful."
     });
 
   } catch (error) {
+    console.error(
+      "ADMIN LOGIN ERROR:",
+      error
+    );
 
     return res.status(500).json({
       error:
-        "Admin login failed.",
-      details:
         error?.message ||
-        "Unknown error"
+        "Admin login failed."
     });
-
   }
 }
