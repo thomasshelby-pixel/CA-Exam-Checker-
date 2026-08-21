@@ -1,118 +1,166 @@
-import { put } from "@vercel/blob";
+import {
+  put
+} from "@vercel/blob";
+
+import {
+  isAdmin
+} from "./auth.js";
+
 
 function safe(value) {
+
   return String(value ?? "")
     .trim()
-    .replace(/[^a-zA-Z0-9._-]/g, "_");
+    .replace(
+      /[^a-zA-Z0-9._-]/g,
+      "_"
+    );
+
 }
 
-export default async function handler(req, res) {
+
+export default async function handler(
+  req,
+  res
+) {
 
   if (req.method !== "POST") {
+
     return res.status(405).json({
-      error: "Method not allowed"
+      error:
+        "Method not allowed"
     });
+
   }
+
+
+  /* =========================
+     ADMIN LOCK
+  ========================= */
+
+  if (!isAdmin(req)) {
+
+    return res.status(403).json({
+
+      error:
+        "Admin login required."
+
+    });
+
+  }
+
 
   try {
 
-    const {
-      filename,
-      data,
-      contentType = "application/pdf",
-
-      level,
-      testType,
-      modelType = "",
-      pyqAttempt = "",
-
-      subjects = [],
-      type
-    } = req.body || {};
-
-    /* ================================
-       ENV
-    ================================= */
-
     const token =
-      process.env.BLOB_READ_WRITE_TOKEN;
+      process.env
+        .BLOB_READ_WRITE_TOKEN;
+
 
     if (!token) {
+
       return res.status(500).json({
         error:
           "BLOB_READ_WRITE_TOKEN is not configured."
       });
+
     }
 
-    /* ================================
-       VALIDATION
-    ================================= */
+
+    const {
+
+      filename,
+
+      data,
+
+      contentType =
+        "application/pdf",
+
+      level,
+
+      testType,
+
+      modelType = "",
+
+      pyqAttempt = "",
+
+      subjects = [],
+
+      type
+
+    } = req.body || {};
+
 
     if (!filename || !data) {
+
       return res.status(400).json({
-        error: "File data is missing."
+        error:
+          "File is missing."
       });
+
     }
 
-    if (!level) {
+
+    if (
+      !level ||
+      !testType ||
+      !type
+    ) {
+
       return res.status(400).json({
-        error: "Level is required."
+        error:
+          "Level, test type and material type are required."
       });
+
     }
 
-    if (!testType) {
-      return res.status(400).json({
-        error: "Test type is required."
-      });
-    }
 
-    if (!type) {
-      return res.status(400).json({
-        error: "Material type is required."
-      });
-    }
-
-    /* ================================
-       PYQ
-    ================================= */
+    /* =========================
+       PYQ ATTEMPT
+    ========================= */
 
     if (
       testType === "PYQ" &&
       !pyqAttempt
     ) {
+
       return res.status(400).json({
         error:
           "PYQ attempt is required."
       });
+
     }
 
-    /* ================================
-       MODEL TEST
-    ================================= */
+
+    /* =========================
+       MODEL TYPE
+    ========================= */
 
     if (
       testType === "MODEL_TEST" &&
       !modelType
     ) {
+
       return res.status(400).json({
         error:
           "Model Test type is required."
       });
+
     }
 
-    /* ================================
-       SUBJECTS
-    ================================= */
 
     const cleanSubjects =
       Array.isArray(subjects)
+
         ? subjects
             .map(s => safe(s))
             .filter(Boolean)
+
         : [];
 
+
     /*
-      Normal MTP/RTP/PYQ/OTHER:
+      Normal papers:
       exactly one subject
     */
 
@@ -120,62 +168,41 @@ export default async function handler(req, res) {
       testType !== "MODEL_TEST" &&
       cleanSubjects.length !== 1
     ) {
+
       return res.status(400).json({
         error:
           "Exactly one subject is required."
       });
+
     }
+
 
     /*
       Model Test:
-      subject is determined by
-      Group 1 / Group 2 / Other
+      subject is represented by
+      model group.
     */
 
-    let materialKey;
+    const materialKey =
 
-    if (testType === "MODEL_TEST") {
+      testType === "MODEL_TEST"
 
-      materialKey =
-        `model-${safe(modelType)}`;
+        ? `model-${safe(modelType)}`
 
-    } else {
+        : safe(cleanSubjects[0]);
 
-      materialKey =
-        safe(cleanSubjects[0]);
-
-    }
-
-    /* ================================
-       ATTEMPT
-    ================================= */
 
     const attempt =
+
       testType === "PYQ"
+
         ? safe(pyqAttempt)
+
         : "NA";
 
-    /* ================================
-       TYPE
-    ================================= */
-
-    const cleanType =
-      safe(type);
 
     /*
-      Expected paths:
-
-      MODEL:
-      materials/inter/MODEL_TEST/
-      model-GROUP_1/NA/model-test-...
-
-      PYQ:
-      materials/inter/PYQ/
-      taxation/MAY_2026/question-paper-...
-
-      MTP:
-      materials/inter/MTP/
-      taxation/NA/question-paper-...
+      FINAL PATH
     */
 
     const pathname =
@@ -184,13 +211,10 @@ export default async function handler(req, res) {
       `${safe(testType)}/` +
       `${materialKey}/` +
       `${attempt}/` +
-      `${cleanType}-` +
+      `${safe(type)}-` +
       `${Date.now()}-` +
       `${safe(filename)}`;
 
-    /* ================================
-       UPLOAD
-    ================================= */
 
     const blob =
       await put(
@@ -200,21 +224,25 @@ export default async function handler(req, res) {
           "base64"
         ),
         {
-          access: "public",
+
+          access:
+            "public",
 
           token,
 
-          contentType
+          contentType,
+
+          addRandomSuffix:
+            true
+
         }
       );
 
-    /* ================================
-       RESPONSE
-    ================================= */
 
     return res.status(200).json({
 
-      success: true,
+      success:
+        true,
 
       pathname:
         blob.pathname,
@@ -224,12 +252,14 @@ export default async function handler(req, res) {
 
     });
 
+
   } catch (error) {
 
     console.error(
-      "MATERIAL UPLOAD ERROR:",
+      "MATERIAL ERROR:",
       error
     );
+
 
     return res.status(500).json({
 
