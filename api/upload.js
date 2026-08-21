@@ -1,158 +1,170 @@
-import { put } from "@vercel/blob";
+import {
+  put
+} from "@vercel/blob";
 
-export default async function handler(req,res){
+function safe(value) {
 
-  if(req.method!=="POST"){
+  return String(value ?? "")
+    .trim()
+    .replace(
+      /[^a-zA-Z0-9._-]/g,
+      "_"
+    );
+
+}
+
+export default async function handler(
+  req,
+  res
+) {
+
+  if (req.method !== "POST") {
+
     return res.status(405).json({
-      error:"Method not allowed"
+      error:
+        "Method not allowed"
     });
+
   }
 
-  try{
+  try {
 
-    if(!process.env.BLOB_READ_WRITE_TOKEN){
+    const token =
+      process.env
+        .BLOB_READ_WRITE_TOKEN;
+
+    if (!token) {
+
       return res.status(500).json({
         error:
           "BLOB_READ_WRITE_TOKEN is not configured."
       });
+
     }
 
     const {
-      filename,
-      data,
-      contentType,
 
-      studentName,
-      registrationNumber,
+      filename,
+
+      data,
+
+      contentType =
+        "application/pdf",
+
+      studentName = "",
+
+      registrationNumber = "",
 
       level,
-      subject,
-      subjectKey,
+
+      subjectKey = "",
 
       testType,
-      modelType,
 
-      checkingMode,
-      descriptiveMaximum
+      modelType = "",
+
+      pyqAttempt = ""
 
     } = req.body || {};
 
-    if(!data){
-      return res.status(400).json({
-        error:"Answer sheet is missing."
-      });
-    }
 
-    if(!level){
-      return res.status(400).json({
-        error:"Level is missing."
-      });
-    }
+    if (!filename || !data) {
 
-    if(!testType){
-      return res.status(400).json({
-        error:"Test type is missing."
-      });
-    }
-
-    const buffer =
-      Buffer.from(data,"base64");
-
-    if(buffer.length > 4 * 1024 * 1024){
       return res.status(400).json({
         error:
-          "Answer sheet must be smaller than 4 MB."
+          "Answer sheet is missing."
       });
+
     }
 
-    const safeLevel =
-      String(level)
-        .replace(/[^a-zA-Z0-9_-]/g,"_");
+    if (!level || !testType) {
 
-    const safeTestType =
-      String(testType)
-        .replace(/[^a-zA-Z0-9_-]/g,"_");
+      return res.status(400).json({
+        error:
+          "Level and test type are required."
+      });
 
-    const timestamp =
-      Date.now();
+    }
 
-    const safeFilename =
-      String(filename || "answer-sheet.pdf")
-        .replace(/[^a-zA-Z0-9._-]/g,"_");
 
     const pathname =
-      `answers/${safeLevel}/${safeTestType}/${timestamp}-${safeFilename}`;
+      `answer-sheets/` +
+      `${safe(level)}/` +
+      `${safe(testType)}/` +
+      `${Date.now()}-` +
+      `${safe(filename)}`;
+
 
     const blob =
       await put(
         pathname,
-        buffer,
+        Buffer.from(
+          data,
+          "base64"
+        ),
         {
-          access:"private",
+          access:
+            "public",
 
-          contentType:
-            contentType ||
-            "application/pdf",
+          token,
 
-          token:
-            process.env.BLOB_READ_WRITE_TOKEN,
+          contentType,
 
-          addRandomSuffix:false,
-
-          metadata:{
-            studentName:
-              studentName || "",
-
-            registrationNumber:
-              registrationNumber || "",
-
-            level,
-
-            subject:
-              subject || "",
-
-            subjectKey:
-              subjectKey || "",
-
-            testType,
-
-            modelType:
-              modelType || "",
-
-            checkingMode:
-              checkingMode || "",
-
-            descriptiveMaximum:
-              String(
-                descriptiveMaximum || ""
-              )
-          }
+          addRandomSuffix:
+            true
         }
       );
 
+
     return res.status(200).json({
 
-      success:true,
+      success:
+        true,
+
+      url:
+        blob.url,
 
       pathname:
         blob.pathname,
 
-      url:
-        blob.url
+      metadata: {
+
+        studentName,
+
+        registrationNumber,
+
+        level,
+
+        subjectKey,
+
+        testType,
+
+        modelType,
+
+        pyqAttempt
+
+      }
 
     });
 
-  }catch(error){
+  } catch (error) {
 
     console.error(
-      "ANSWER UPLOAD ERROR:",
+      "UPLOAD ERROR:",
       error
     );
 
     return res.status(500).json({
+
       error:
+        "Answer sheet upload failed.",
+
+      details:
         error?.message ||
-        "Answer sheet upload failed."
+        "Unknown error"
+
     });
+
   }
+
 }
