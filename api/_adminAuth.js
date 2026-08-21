@@ -1,189 +1,104 @@
-import {
-  createHmac,
-  timingSafeEqual
-} from "crypto";
+import crypto from "crypto";
 
-const COOKIE_NAME = "ca_admin_session";
+export function getCookie(req, name) {
+  const raw = req.headers?.cookie || "";
 
-const SESSION_DURATION =
-  8 * 60 * 60 * 1000; // 8 hours
+  const parts = raw
+    .split(";")
+    .map(x => x.trim());
 
+  const item = parts.find(
+    x => x.startsWith(`${name}=`)
+  );
 
-function getSecret() {
+  return item
+    ? decodeURIComponent(
+        item.slice(name.length + 1)
+      )
+    : "";
+}
+
+function sign(value, secret) {
+  return crypto
+    .createHmac("sha256", secret)
+    .update(value)
+    .digest("hex");
+}
+
+export function makeAdminCookie(secret) {
+
+  const value =
+    `${Date.now()}.${crypto.randomBytes(18).toString("hex")}`;
+
+  return `${value}.${sign(value, secret)}`;
+}
+
+export function isAdmin(req) {
 
   const secret =
-    process.env.ADMIN_PASSWORD;
+    process.env.ADMIN_SESSION_SECRET;
 
-  if (!secret) {
-    throw new Error(
-      "ADMIN_PASSWORD environment variable is not configured."
-    );
-  }
+  if (!secret) return false;
 
-  return secret;
+  const cookie =
+    getCookie(req, "ca_admin");
 
-}
+  if (!cookie) return false;
 
+  const parts =
+    cookie.split(".");
 
-function createSignature(
-  expires
-) {
-
-  return createHmac(
-    "sha256",
-    getSecret()
-  )
-    .update(String(expires))
-    .digest("base64url");
-
-}
-
-
-function safeCompare(
-  a,
-  b
-) {
-
-  const aBuffer =
-    Buffer.from(a);
-
-  const bBuffer =
-    Buffer.from(b);
-
-  if (
-    aBuffer.length !==
-    bBuffer.length
-  ) {
+  if (parts.length !== 3) {
     return false;
   }
 
-  return timingSafeEqual(
-    aBuffer,
-    bBuffer
-  );
+  const value =
+    `${parts[0]}.${parts[1]}`;
 
-}
-
-
-export function createAdminToken() {
-
-  const expires =
-    Date.now() +
-    SESSION_DURATION;
-
-  const signature =
-    createSignature(expires);
-
-  return `${expires}.${signature}`;
-
-}
-
-
-export function isAdminAuthenticated(
-  req
-) {
+  const expected =
+    sign(value, secret);
 
   try {
 
-    const cookieHeader =
-      req.headers.cookie || "";
-
-    const cookies =
-      cookieHeader
-        .split(";")
-        .map(v => v.trim());
-
-    const adminCookie =
-      cookies.find(
-        cookie =>
-          cookie.startsWith(
-            `${COOKIE_NAME}=`
-          )
-      );
-
-    if (!adminCookie) {
-      return false;
-    }
-
-    const token =
-      decodeURIComponent(
-        adminCookie.substring(
-          COOKIE_NAME.length + 1
-        )
-      );
-
-    const parts =
-      token.split(".");
-
-    if (parts.length !== 2) {
-      return false;
-    }
-
-    const expires =
-      Number(parts[0]);
-
-    const signature =
-      parts[1];
-
     if (
-      !Number.isFinite(expires)
+      !crypto.timingSafeEqual(
+        Buffer.from(parts[2]),
+        Buffer.from(expected)
+      )
     ) {
       return false;
     }
 
-    if (
-      Date.now() > expires
-    ) {
-      return false;
-    }
-
-    const expectedSignature =
-      createSignature(expires);
-
-    return safeCompare(
-      signature,
-      expectedSignature
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Admin authentication error:",
-      error
-    );
+  } catch {
 
     return false;
 
   }
 
+  const created =
+    Number(parts[0]);
+
+  return (
+    Number.isFinite(created) &&
+    Date.now() - created <
+      1000 * 60 * 60 * 12
+  );
 }
 
-
-export function getAdminCookie(
-  token
+export function adminCookieHeader(
+  secret,
+  maxAge = 60 * 60 * 12
 ) {
 
-  return [
-    `${COOKIE_NAME}=${encodeURIComponent(token)}`,
-    "HttpOnly",
-    "Secure",
-    "SameSite=Strict",
-    "Path=/",
-    `Max-Age=${SESSION_DURATION / 1000}`
-  ].join("; ");
+  const value =
+    makeAdminCookie(secret);
 
-}
-
-
-export function getClearAdminCookie() {
-
-  return [
-    `${COOKIE_NAME}=`,
-    "HttpOnly",
-    "Secure",
-    "SameSite=Strict",
-    "Path=/",
-    "Max-Age=0"
-  ].join("; ");
-
+  return (
+    `ca_admin=${encodeURIComponent(value)}; ` +
+    `Path=/; ` +
+    `HttpOnly; ` +
+    `Secure; ` +
+    `SameSite=Lax; ` +
+    `Max-Age=${maxAge}`
+  );
 }
