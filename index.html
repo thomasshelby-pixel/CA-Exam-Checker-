@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
 <title>CA Exam Checker</title>
 
 <style>
-
 *{
   box-sizing:border-box;
   margin:0;
@@ -219,6 +217,14 @@ input[type=file]{
   line-height:1.6;
 }
 
+.notice{
+  border-left:4px solid #6366f1;
+}
+
+.warning{
+  border-left:4px solid #f59e0b;
+}
+
 button{
   border:0;
   border-radius:10px;
@@ -401,12 +407,11 @@ button:disabled{
   font-size:12px;
 }
 
-.notice{
-  border-left:4px solid #6366f1;
-}
-
-.warning{
-  border-left:4px solid #f59e0b;
+footer{
+  text-align:center;
+  color:#64748b;
+  padding:20px;
+  font-size:12px;
 }
 
 @media(max-width:700px){
@@ -422,32 +427,23 @@ button:disabled{
   }
 
 }
-
 </style>
 </head>
 
 <body>
 
 <header>
-
-<h1>CA Exam Checker</h1>
-
-<p>
-CA Answer Sheet Evaluation & Examination Portal
-</p>
-
+  <h1>CA Exam Checker</h1>
+  <p>CA Answer Sheet Evaluation & Examination Portal</p>
 </header>
-
 
 <div class="container">
 
-
-<!-- ===================================================== -->
-<!-- STUDENT PORTAL -->
-<!-- ===================================================== -->
+<!-- =====================================================
+     STUDENT PORTAL
+===================================================== -->
 
 <div id="studentPanel">
-
 
 <div class="card">
 
@@ -455,47 +451,32 @@ CA Answer Sheet Evaluation & Examination Portal
 STUDENT CHECK-IN
 </span>
 
-<h2>
-👤 Student Details
-</h2>
-
+<h2>👤 Student Details</h2>
 
 <div class="grid">
 
-
 <div>
-
-<label>
-Student Name
-</label>
+<label>Student Name</label>
 
 <input
 id="studentName"
 type="text"
 placeholder="Enter full name">
-
 </div>
 
 
 <div>
-
-<label>
-Registration Number
-</label>
+<label>Registration Number</label>
 
 <input
 id="registrationNumber"
 type="text"
 placeholder="Enter ICAI registration number">
-
 </div>
 
 
 <div>
-
-<label>
-Level
-</label>
+<label>Level</label>
 
 <select
 id="studentLevel"
@@ -518,15 +499,11 @@ CA Final
 </option>
 
 </select>
-
 </div>
 
 
 <div>
-
-<label>
-Test / Paper Type
-</label>
+<label>Test / Paper Type</label>
 
 <select
 id="studentTestType"
@@ -557,14 +534,10 @@ Other
 </option>
 
 </select>
-
 </div>
 
 
-<!-- SUBJECT -->
-
-<div
-id="studentSubjectBox">
+<div id="studentSubjectBox">
 
 <label>
 Subject
@@ -583,7 +556,7 @@ Select Level First
 </div>
 
 
-<!-- MODEL TYPE -->
+<!-- MODEL TEST TYPE -->
 
 <div
 id="studentModelOptionBox"
@@ -627,7 +600,6 @@ Select PYQ Attempt
 
 </div>
 
-
 </div>
 
 
@@ -651,13 +623,12 @@ Select level and test type.
 
 </div>
 
-
 </div>
 
 
-<!-- ===================================================== -->
-<!-- CHECKING MODE -->
-<!-- ===================================================== -->
+<!-- =====================================================
+     CHECKING MODE
+===================================================== -->
 
 <div class="card">
 
@@ -665,13 +636,9 @@ Select level and test type.
 CHECKING MODE
 </span>
 
-<h2>
-⚙️ Evaluation Standard
-</h2>
-
+<h2>⚙️ Evaluation Standard</h2>
 
 <div class="mode-grid">
-
 
 <div
 id="strictMode"
@@ -707,7 +674,6 @@ with reasonable step marking.
 
 </div>
 
-
 </div>
 
 
@@ -716,6 +682,7 @@ with reasonable step marking.
 <b>AI Rule:</b>
 
 Descriptive questions will be evaluated.
+
 MCQ-only papers/questions are not evaluated
 by the descriptive checker.
 
@@ -724,9 +691,9 @@ by the descriptive checker.
 </div>
 
 
-<!-- ===================================================== -->
-<!-- ANSWER SHEET -->
-<!-- ===================================================== -->
+<!-- =====================================================
+     ANSWER SHEET
+===================================================== -->
 
 <div class="card">
 
@@ -734,10 +701,7 @@ by the descriptive checker.
 ANSWER SHEET
 </span>
 
-<h2>
-📄 Upload Answer Sheet
-</h2>
-
+<h2>📄 Upload Answer Sheet</h2>
 
 <div class="upload-box">
 
@@ -753,7 +717,6 @@ Select your answer sheet
 PDF recommended • Maximum 4 MB
 </p>
 
-
 <label
 class="file-label"
 for="answerFile">
@@ -762,18 +725,15 @@ Choose PDF
 
 </label>
 
-
 <input
 id="answerFile"
 type="file"
 accept=".pdf,application/pdf">
 
-
 <div
 id="fileInfo"
 class="file-info">
 </div>
-
 
 </div>
 
@@ -793,13 +753,10 @@ id="studentStatus"
 class="status">
 </div>
 
-
 </div>
 
 
-<!-- ===================================================== -->
-<!-- CHECK-IN -->
-<!-- ===================================================== -->
+<!-- CHECKIN -->
 
 <div
 id="checkin"
@@ -821,9 +778,7 @@ class="info">
 </div>
 
 
-<!-- ===================================================== -->
 <!-- RESULT -->
-<!-- ===================================================== -->
 
 <div
 id="resultPanel"
@@ -865,26 +820,22 @@ class="info">
 Question-wise Evaluation
 </h2>
 
-
 <div
 id="questionResults">
 </div>
 
+</div>
 
 </div>
 
 
-</div>
-
-
-<!-- ===================================================== -->
-<!-- ADMIN PORTAL -->
-<!-- ===================================================== -->
+<!-- =====================================================
+     ADMIN PORTAL
+===================================================== -->
 
 <div
 id="adminPanel"
 class="admin">
-
 
 <!-- ADMIN LOGIN -->
 
@@ -901,11 +852,8 @@ ADMIN ACCESS
 </h2>
 
 <div class="info">
-
 This area is restricted to authorized administrators.
-
 </div>
-
 
 <label>
 Admin Password
@@ -916,7 +864,6 @@ id="adminPassword"
 type="password"
 placeholder="Enter admin password">
 
-
 <button
 id="adminLoginButton"
 class="primary"
@@ -926,12 +873,10 @@ onclick="adminLogin()">
 
 </button>
 
-
 <div
 id="loginStatus"
 class="status">
 </div>
-
 
 </div>
 
@@ -941,7 +886,6 @@ class="status">
 <div
 id="adminContent"
 style="display:none;">
-
 
 <div class="card">
 
@@ -958,22 +902,30 @@ ADMIN / CHECKER
 
 <b>Model Test:</b>
 
-One PDF containing
-Question Paper + Suggested Answer.
+<br>
+
+Foundation:
+ONE combined PDF containing all four Foundation subjects.
 
 <br><br>
 
-<b>MTP / RTP / PYQ / Other:</b>
+Inter / Final:
+ONE PDF containing Question Paper + Suggested Answer.
 
-Question Paper and Suggested Answer
-are uploaded separately.
+<br><br>
+
+For Inter / Final Model Test:
+only Group 1, Group 2 or Other.
+
+<br><br>
+
+<b>MTP / RTP:</b>
+select the exact subject.
 
 <br><br>
 
 <b>PYQ:</b>
-
-Attempt must be specified so that
-students can select the exact same attempt.
+select subject and exact attempt.
 
 </div>
 
@@ -1054,15 +1006,22 @@ class="hidden">
 PYQ Attempt
 </label>
 
-<input
-id="adminPYQAttempt"
-type="text"
-placeholder="Example: May 2026 / Jan 2026">
+<select
+id="adminPYQAttempt">
+
+<option value="">
+Select PYQ Attempt
+</option>
+
+</select>
 
 <div class="info warning">
 
-This attempt will be stored with the material.
-Students will have to select the same attempt.
+The selected attempt will be stored
+with the PYQ material.
+
+Students will have to select
+the same attempt.
 
 </div>
 
@@ -1115,7 +1074,7 @@ Select Subject
 </div>
 
 
-<!-- MULTI SUBJECT -->
+<!-- MULTIPLE SUBJECT -->
 
 <div
 id="adminMultiSubjectBox"
@@ -1142,14 +1101,12 @@ Select level and test type.
 </div>
 
 
-<div class="admin-divider">
-</div>
+<div class="admin-divider"></div>
 
 
 <!-- SEPARATE MATERIAL -->
 
 <div id="separateMaterials">
-
 
 <div class="material-card">
 
@@ -1158,7 +1115,7 @@ Select level and test type.
 </h3>
 
 <p>
-Upload the official question paper.
+Upload the official Question Paper.
 </p>
 
 <input
@@ -1177,8 +1134,7 @@ accept=".pdf,application/pdf">
 </h3>
 
 <p>
-Upload the official / reference
-suggested answer.
+Upload the official / reference Suggested Answer.
 </p>
 
 <input
@@ -1188,7 +1144,6 @@ type="file"
 accept=".pdf,application/pdf">
 
 </div>
-
 
 </div>
 
@@ -1204,11 +1159,8 @@ class="material-card hidden">
 </h3>
 
 <p>
-
-Upload ONE PDF containing the
-Model Test Question Paper and
-Suggested Answer.
-
+Upload ONE PDF containing
+Question Paper + Suggested Answer.
 </p>
 
 <input
@@ -1244,6 +1196,7 @@ onclick="adminLogout()">
 
 </button>
 
+</div>
 
 </div>
 
@@ -1253,17 +1206,15 @@ onclick="adminLogout()">
 
 
 <footer>
-
 CA Exam Checker • Educational evaluation platform
-
 </footer>
 
 
 <script>
 
-/* ===================================================== */
-/* SUBJECT DATABASE */
-/* ===================================================== */
+/* =====================================================
+   SUBJECT DATABASE
+===================================================== */
 
 const SUBJECTS = {
 
@@ -1273,7 +1224,7 @@ foundation:[
 key:"accounting",
 name:"Accounting",
 paper:100,
-descriptive:70,
+descriptive:100,
 type:"DESCRIPTIVE"
 },
 
@@ -1281,7 +1232,7 @@ type:"DESCRIPTIVE"
 key:"business_laws",
 name:"Business Laws",
 paper:100,
-descriptive:70,
+descriptive:100,
 type:"DESCRIPTIVE"
 },
 
@@ -1313,7 +1264,7 @@ key:"advanced_accounts",
 name:"Advanced Accounting",
 paper:100,
 group:1,
-descriptive:70
+descriptive:100
 },
 
 {
@@ -1321,7 +1272,7 @@ key:"law",
 name:"Corporate & Other Laws",
 paper:100,
 group:1,
-descriptive:70
+descriptive:100
 },
 
 {
@@ -1329,7 +1280,7 @@ key:"taxation",
 name:"Taxation",
 paper:100,
 group:1,
-descriptive:70
+descriptive:100
 },
 
 {
@@ -1337,7 +1288,7 @@ key:"costing",
 name:"Cost & Management Accounting",
 paper:100,
 group:2,
-descriptive:70
+descriptive:100
 },
 
 {
@@ -1345,7 +1296,7 @@ key:"audit",
 name:"Auditing & Ethics",
 paper:100,
 group:2,
-descriptive:70
+descriptive:100
 },
 
 {
@@ -1353,7 +1304,7 @@ key:"fm",
 name:"Financial Management",
 paper:100,
 group:2,
-descriptive:35
+descriptive:100
 },
 
 {
@@ -1361,7 +1312,7 @@ key:"sm",
 name:"Strategic Management",
 paper:100,
 group:2,
-descriptive:35
+descriptive:100
 }
 
 ],
@@ -1374,7 +1325,7 @@ key:"financial_reporting",
 name:"Financial Reporting",
 paper:100,
 group:1,
-descriptive:70
+descriptive:100
 },
 
 {
@@ -1382,7 +1333,7 @@ key:"advanced_financial_management",
 name:"Advanced Financial Management",
 paper:100,
 group:1,
-descriptive:70
+descriptive:100
 },
 
 {
@@ -1390,7 +1341,7 @@ key:"advanced_auditing",
 name:"Advanced Auditing",
 paper:100,
 group:1,
-descriptive:70
+descriptive:100
 },
 
 {
@@ -1398,7 +1349,7 @@ key:"direct_tax",
 name:"Direct Tax Laws",
 paper:100,
 group:2,
-descriptive:70
+descriptive:100
 },
 
 {
@@ -1406,24 +1357,52 @@ key:"indirect_tax",
 name:"Indirect Tax Laws",
 paper:100,
 group:2,
-descriptive:70
+descriptive:100
 }
 
-]};
+]
+
+};
 
 
-/* ===================================================== */
-/* STATE */
-/* ===================================================== */
+/* =====================================================
+   PYQ ATTEMPTS
+   SAME LIST USED BY ADMIN + STUDENT
+===================================================== */
+
+const PYQ_ATTEMPTS=[
+
+"May 2026",
+"January 2026",
+"September 2025",
+"May 2025",
+"January 2025",
+"September 2024",
+"May 2024",
+"January 2024",
+"November 2023",
+"May 2023",
+"November 2022",
+"May 2022",
+"November 2021",
+"July 2021",
+"January 2021"
+
+];
+
+
+/* =====================================================
+   STATE
+===================================================== */
 
 let checkingMode="strict";
 
 let selectedFile=null;
 
 
-/* ===================================================== */
-/* INITIALIZE */
-/* ===================================================== */
+/* =====================================================
+   INITIALIZE
+===================================================== */
 
 function initializePortal(){
 
@@ -1447,20 +1426,27 @@ document.getElementById(
 ).style.display=
 isAdmin?"block":"none";
 
-}
 
+populatePYQSelect(
+"studentPYQAttempt"
+);
+
+populatePYQSelect(
+"adminPYQAttempt"
+);
+
+}
 
 initializePortal();
 
 
-/* ===================================================== */
-/* MODE */
-/* ===================================================== */
+/* =====================================================
+   MODE
+===================================================== */
 
 function setMode(mode){
 
 checkingMode=mode;
-
 
 document.getElementById(
 "strictMode"
@@ -1468,7 +1454,6 @@ document.getElementById(
 "active",
 mode==="strict"
 );
-
 
 document.getElementById(
 "moderateMode"
@@ -1480,9 +1465,41 @@ mode==="moderate"
 }
 
 
-/* ===================================================== */
-/* STUDENT LEVEL */
-/* ===================================================== */
+/* =====================================================
+   PYQ SELECT
+===================================================== */
+
+function populatePYQSelect(id){
+
+const select=
+document.getElementById(id);
+
+if(!select)return;
+
+select.innerHTML=
+`<option value="">
+Select PYQ Attempt
+</option>`;
+
+PYQ_ATTEMPTS.forEach(
+attempt=>{
+
+const option=
+document.createElement("option");
+
+option.value=attempt;
+option.textContent=attempt;
+
+select.appendChild(option);
+
+});
+
+}
+
+
+/* =====================================================
+   STUDENT LEVEL
+===================================================== */
 
 function updateStudentLevel(){
 
@@ -1491,38 +1508,27 @@ document.getElementById(
 "studentLevel"
 ).value;
 
-
 const subject=
 document.getElementById(
 "subject"
 );
-
 
 subject.innerHTML=
 `<option value="">
 Select Subject
 </option>`;
 
-
 document.getElementById(
 "studentModelOptionBox"
-).classList.add(
-"hidden"
-);
-
+).classList.add("hidden");
 
 document.getElementById(
 "studentPYQAttemptBox"
-).classList.add(
-"hidden"
-);
-
+).classList.add("hidden");
 
 document.getElementById(
 "studentModelInfo"
-).classList.add(
-"hidden"
-);
+).classList.add("hidden");
 
 
 if(!level){
@@ -1537,18 +1543,16 @@ return;
 }
 
 
-SUBJECTS[level].forEach(
+(SUBJECTS[level]||[]).forEach(
 s=>{
 
-subject.innerHTML+=`
+const option=
+document.createElement("option");
 
-<option value="${escapeHTML(s.key)}">
+option.value=s.key;
+option.textContent=s.name;
 
-${escapeHTML(s.name)}
-
-</option>
-
-`;
+subject.appendChild(option);
 
 });
 
@@ -1558,9 +1562,9 @@ updateStudentTestType();
 }
 
 
-/* ===================================================== */
-/* STUDENT TEST TYPE */
-/* ===================================================== */
+/* =====================================================
+   STUDENT TEST TYPE
+===================================================== */
 
 function updateStudentTestType(){
 
@@ -1574,94 +1578,59 @@ document.getElementById(
 "studentTestType"
 ).value;
 
-
 const subjectBox=
 document.getElementById(
 "studentSubjectBox"
 );
-
 
 const subject=
 document.getElementById(
 "subject"
 );
 
-
 const modelBox=
 document.getElementById(
 "studentModelOptionBox"
 );
-
 
 const modelType=
 document.getElementById(
 "studentModelType"
 );
 
-
 const pyqBox=
 document.getElementById(
 "studentPYQAttemptBox"
 );
 
-
-const pyqAttempt=
-document.getElementById(
-"studentPYQAttempt"
-);
-
-
-modelBox.classList.add(
-"hidden"
-);
-
-pyqBox.classList.add(
-"hidden"
-);
-
+modelBox.classList.add("hidden");
+pyqBox.classList.add("hidden");
 
 modelType.innerHTML=
 `<option value="">
 Select Model Test Type
 </option>`;
 
-
-pyqAttempt.innerHTML=
-`<option value="">
-Select PYQ Attempt
-</option>`;
-
-
-subjectBox.classList.remove(
-"hidden"
-);
+subjectBox.classList.remove("hidden");
 
 subject.disabled=false;
 
 
 document.getElementById(
 "studentModelInfo"
-).classList.add(
-"hidden"
-);
+).classList.add("hidden");
 
 
-/* ================================================ */
 /* MODEL TEST */
-/* ================================================ */
 
 if(type==="MODEL_TEST"){
 
-modelBox.classList.remove(
-"hidden"
-);
+modelBox.classList.remove("hidden");
 
+subjectBox.classList.add("hidden");
 
-if(!level){
-
-return;
-
-}
+subject.value="";
+subject.disabled=true;
 
 
 /* FOUNDATION */
@@ -1676,47 +1645,17 @@ Foundation Model Test
 
 `;
 
-subjectBox.classList.add(
-"hidden"
-);
-
-subject.value="";
-subject.disabled=true;
-
-
-const info=
-document.getElementById(
-"studentModelInfo"
-);
-
-info.classList.remove(
-"hidden"
-);
-
-info.innerHTML=`
-
+showStudentModelInfo(`
 <b>Foundation Model Test</b>
-
+<br><br>
+Combined paper for all four Foundation subjects.
 <br>
-
-Combined paper for all Foundation subjects.
-
+Accounting and Business Laws are descriptive.
 <br>
-
-Accounting & Business Laws contain
-descriptive questions.
-
+Quantitative Aptitude and Business Economics are MCQ based.
 <br>
-
-Quantitative Aptitude & Business Economics
-are MCQ-based with negative marking.
-
-`;
-
-document.getElementById(
-"subjectInfo"
-).innerHTML=
-"Foundation Model Test is a combined paper.";
+Negative marking: 0.25 for each wrong MCQ.
+`);
 
 return;
 
@@ -1750,24 +1689,9 @@ Other
 
 `;
 
-subjectBox.classList.add(
-"hidden"
+showStudentModelInfo(
+"Select Group 1, Group 2 or Other."
 );
-
-subject.value="";
-subject.disabled=true;
-
-
-document.getElementById(
-"studentModelInfo"
-).classList.remove(
-"hidden"
-);
-
-document.getElementById(
-"studentModelInfo"
-).innerHTML=
-"Select Group 1, Group 2 or Other. Subject selection is not required for Group 1 or Group 2.";
 
 return;
 
@@ -1776,25 +1700,15 @@ return;
 }
 
 
-/* ================================================ */
 /* PYQ */
-/* ================================================ */
 
 if(type==="PYQ"){
 
-pyqBox.classList.remove(
-"hidden"
-);
+pyqBox.classList.remove("hidden");
 
-subjectBox.classList.remove(
-"hidden"
-);
+subjectBox.classList.remove("hidden");
 
 subject.disabled=false;
-
-
-populateStudentPYQAttempts();
-
 
 document.getElementById(
 "subjectInfo"
@@ -1806,21 +1720,16 @@ return;
 }
 
 
-/* ================================================ */
 /* MTP / RTP */
-/* ================================================ */
 
 if(
 type==="MTP"||
 type==="RTP"
 ){
 
-subjectBox.classList.remove(
-"hidden"
-);
+subjectBox.classList.remove("hidden");
 
 subject.disabled=false;
-
 
 document.getElementById(
 "subjectInfo"
@@ -1832,18 +1741,13 @@ return;
 }
 
 
-/* ================================================ */
 /* OTHER */
-/* ================================================ */
 
 if(type==="OTHER"){
 
-subjectBox.classList.remove(
-"hidden"
-);
+subjectBox.classList.remove("hidden");
 
 subject.disabled=false;
-
 
 document.getElementById(
 "subjectInfo"
@@ -1855,8 +1759,6 @@ return;
 }
 
 
-/* EMPTY */
-
 document.getElementById(
 "subjectInfo"
 ).innerHTML=
@@ -1865,9 +1767,9 @@ document.getElementById(
 }
 
 
-/* ===================================================== */
-/* STUDENT MODEL TYPE */
-/* ===================================================== */
+/* =====================================================
+   STUDENT MODEL TYPE
+===================================================== */
 
 function updateStudentModelType(){
 
@@ -1887,122 +1789,61 @@ modelType==="GROUP_1"||
 modelType==="GROUP_2"
 ){
 
+const group=
+modelType==="GROUP_1"?1:2;
+
 const subjects=
 getGroupSubjects(
 level,
-modelType==="GROUP_1"?1:2
+group
 );
 
-
-document.getElementById(
-"studentModelInfo"
-).classList.remove(
-"hidden"
-);
-
-document.getElementById(
-"studentModelInfo"
-).innerHTML=`
-
+showStudentModelInfo(`
 <b>${formatModelType(modelType)}</b>
-
-<br>
-
+<br><br>
 Subjects:
-
 ${subjects.map(
 s=>escapeHTML(s.name)
 ).join(", ")}
+`);
 
-`;
+return;
 
 }
 
-else if(modelType==="OTHER"){
 
-document.getElementById(
-"studentModelInfo"
-).classList.remove(
-"hidden"
+if(modelType==="OTHER"){
+
+showStudentModelInfo(
+"Other Model Test: The administrator specifies the subjects included in that paper."
 );
 
+}
+
+}
+
+
+/* =====================================================
+   STUDENT MODEL INFO
+===================================================== */
+
+function showStudentModelInfo(html){
+
+const box=
 document.getElementById(
 "studentModelInfo"
-).innerHTML=
-"Model Test Other: Subjects are specified by the administrator for that particular paper.";
-
-}
-
-}
-
-
-/* ===================================================== */
-/* STUDENT PYQ ATTEMPTS */
-/* ===================================================== */
-
-function populateStudentPYQAttempts(){
-
-const select=
-document.getElementById(
-"studentPYQAttempt"
 );
 
+box.classList.remove("hidden");
 
-/*
-Common attempts.
-Actual available attempts will ultimately
-be validated against uploaded material
-by backend.
-*/
-
-const attempts=[
-
-"May 2026",
-"January 2026",
-"September 2025",
-"May 2025",
-"January 2025",
-"September 2024",
-"May 2024",
-"January 2024",
-"November 2023",
-"May 2023",
-"November 2022",
-"May 2022",
-"November 2021",
-"July 2021",
-"January 2021"
-
-];
-
-
-select.innerHTML=
-`<option value="">
-Select PYQ Attempt
-</option>`;
-
-
-attempts.forEach(
-attempt=>{
-
-select.innerHTML+=`
-
-<option value="${escapeHTML(attempt)}">
-
-${escapeHTML(attempt)}
-
-</option>
-
-`;
-
-});
+box.innerHTML=html;
 
 }
 
 
-/* ===================================================== */
-/* STUDENT SUBJECT */
-/* ===================================================== */
+/* =====================================================
+   STUDENT SUBJECT
+===================================================== */
 
 function updateStudentSubject(){
 
@@ -2016,12 +1857,10 @@ document.getElementById(
 "subject"
 ).value;
 
-
 const info=
 document.getElementById(
 "subjectInfo"
 );
-
 
 if(!level){
 
@@ -2031,7 +1870,6 @@ info.innerHTML=
 return;
 
 }
-
 
 if(!key){
 
@@ -2044,13 +1882,11 @@ return;
 
 
 const subject=
-SUBJECTS[level].find(
+(SUBJECTS[level]||[]).find(
 s=>s.key===key
 );
 
-
-if(!subject)
-return;
+if(!subject)return;
 
 
 if(subject.type==="MCQ"){
@@ -2077,8 +1913,7 @@ mark for every wrong answer.
 
 <br><br>
 
-This descriptive AI checker will not
-evaluate MCQ answers.
+This descriptive AI checker will not evaluate MCQ answers.
 
 `;
 
@@ -2098,6 +1933,11 @@ ${escapeHTML(level.toUpperCase())}
 
 <br>
 
+Paper Maximum:
+<b>${subject.paper}</b>
+
+<br>
+
 Descriptive Maximum:
 <b>${subject.descriptive}</b>
 
@@ -2106,9 +1946,9 @@ Descriptive Maximum:
 }
 
 
-/* ===================================================== */
-/* STUDENT FILE */
-/* ===================================================== */
+/* =====================================================
+   STUDENT FILE
+===================================================== */
 
 document.getElementById(
 "answerFile"
@@ -2121,12 +1961,10 @@ this.files.length
 ?this.files[0]
 :null;
 
-
 const info=
 document.getElementById(
 "fileInfo"
 );
-
 
 if(!selectedFile){
 
@@ -2147,7 +1985,6 @@ selectedFile.size/
 
 info.style.display="block";
 
-
 info.innerHTML=`
 
 📎 <b>
@@ -2163,9 +2000,9 @@ ${size} MB
 });
 
 
-/* ===================================================== */
-/* SUBMIT STUDENT */
-/* ===================================================== */
+/* =====================================================
+   SUBMIT STUDENT
+===================================================== */
 
 async function submitAnswerSheet(){
 
@@ -2205,25 +2042,22 @@ document.getElementById(
 ).value;
 
 
-/* BASIC VALIDATION */
+/* VALIDATION */
 
 if(!name)
 return showStudentError(
 "Please enter your name."
 );
 
-
 if(!registration)
 return showStudentError(
 "Please enter your ICAI registration number."
 );
 
-
 if(!level)
 return showStudentError(
 "Please select your CA level."
 );
-
 
 if(!testType)
 return showStudentError(
@@ -2231,40 +2065,29 @@ return showStudentError(
 );
 
 
-/* MODEL */
-
 if(
 testType==="MODEL_TEST" &&
 !modelType
-){
-
+)
 return showStudentError(
 "Please select Model Test Type."
 );
 
-}
-
-
-/* PYQ ATTEMPT */
 
 if(
 testType==="PYQ" &&
 !pyqAttempt
-){
-
+)
 return showStudentError(
 "Please select PYQ Attempt."
 );
 
-}
 
-
-/* SUBJECT REQUIRED */
+/* SUBJECT RULE */
 
 const foundationModel=
 testType==="MODEL_TEST" &&
 level==="foundation";
-
 
 const groupedModel=
 testType==="MODEL_TEST" &&
@@ -2274,15 +2097,15 @@ modelType==="GROUP_2"
 );
 
 
-const modelOther=
-testType==="MODEL_TEST" &&
-modelType==="OTHER";
-
+/*
+  For Model Test Foundation,
+  Group 1 and Group 2:
+  no subject required.
+*/
 
 if(
 !foundationModel &&
 !groupedModel &&
-!modelOther &&
 !subjectKey
 ){
 
@@ -2295,34 +2118,23 @@ return showStudentError(
 
 /* FILE */
 
-if(!selectedFile){
-
+if(!selectedFile)
 return showStudentError(
 "Please select your answer sheet PDF."
 );
 
-}
-
-
-if(!isPDF(selectedFile)){
-
+if(!isPDF(selectedFile))
 return showStudentError(
 "Please upload a PDF."
 );
 
-}
-
-
 if(
 selectedFile.size >
 4*1024*1024
-){
-
+)
 return showStudentError(
 "PDF must be smaller than 4 MB."
 );
-
-}
 
 
 /* SUBJECT */
@@ -2330,9 +2142,7 @@ return showStudentError(
 const subjectList=
 SUBJECTS[level]||[];
 
-
 let subject=null;
-
 
 if(subjectKey){
 
@@ -2357,15 +2167,15 @@ level==="foundation"
 ){
 
 /*
-Accounting = 70
-Business Laws = 70
+Accounting = 100
+Business Laws = 100
 QA = MCQ
 Business Economics = MCQ
 
-Total descriptive = 140
+Total descriptive = 200
 */
 
-descriptiveMaximum=140;
+descriptiveMaximum=200;
 
 }
 
@@ -2383,14 +2193,14 @@ modelType==="GROUP_2"
 const group=
 modelType==="GROUP_1"?1:2;
 
-
 descriptiveMaximum=
 getGroupSubjects(
 level,
 group
 )
 .reduce(
-(total,s)=>total+
+(total,s)=>
+total+
 Number(s.descriptive||0),
 0
 );
@@ -2415,12 +2225,18 @@ document.getElementById(
 "submitButton"
 );
 
-
 button.disabled=true;
+
+document.getElementById(
+"resultPanel"
+).style.display="none";
+
+document.getElementById(
+"checkin"
+).style.display="none";
 
 
 try{
-
 
 button.textContent=
 "📄 Reading Answer Sheet...";
@@ -2432,19 +2248,18 @@ selectedFile
 );
 
 
+/* =================================================
+   UPLOAD ANSWER
+================================================= */
+
 button.textContent=
 "☁️ Uploading Answer Sheet...";
 
-
-/* ============================================= */
-/* UPLOAD ANSWER */
-/* ============================================= */
 
 const uploadResponse=
 await fetch(
 "/api/upload",
 {
-
 method:"POST",
 
 headers:{
@@ -2478,7 +2293,9 @@ modelType==="GROUP_1"
 ?"Group 1 Model Test":
 modelType==="GROUP_2"
 ?"Group 2 Model Test":
-"Combined Model Test"
+modelType==="OTHER"
+?"Other Model Test":
+"Foundation Model Test"
 ),
 
 subjectKey:
@@ -2497,36 +2314,39 @@ descriptiveMaximum
 
 })
 
-});
+}
+);
 
 
 const uploadResult=
-await uploadResponse.json();
+await safeJSON(
+uploadResponse
+);
 
 
 if(!uploadResponse.ok){
 
 throw new Error(
 uploadResult.error||
+uploadResult.details||
 "Answer sheet upload failed."
 );
 
 }
 
 
+/* =================================================
+   AI CHECK
+================================================= */
+
 button.textContent=
-"📚 Finding Test Material...";
+"🤖 AI Checking Answer Sheet...";
 
-
-/* ============================================= */
-/* AI CHECK */
-/* ============================================= */
 
 const checkResponse=
 await fetch(
 "/api/check",
 {
-
 method:"POST",
 
 headers:{
@@ -2551,7 +2371,9 @@ modelType==="GROUP_1"
 ?"Group 1 Model Test":
 modelType==="GROUP_2"
 ?"Group 2 Model Test":
-"Combined Model Test"
+modelType==="OTHER"
+?"Other Model Test":
+"Foundation Model Test"
 ),
 
 subjectKey:
@@ -2570,18 +2392,31 @@ descriptiveMaximum
 
 })
 
-});
+}
+);
 
 
 const checkResult=
-await checkResponse.json();
+await safeJSON(
+checkResponse
+);
 
 
 if(!checkResponse.ok){
 
 throw new Error(
-checkResult.error||
-"AI evaluation failed."
+
+(checkResult.error||
+"AI evaluation failed.")+
+
+(
+checkResult.details
+?
+" — "+
+checkResult.details
+:""
+)
+
 );
 
 }
@@ -2605,8 +2440,7 @@ showStudentSuccess(
 
 document.getElementById(
 "checkin"
-).style.display=
-"block";
+).style.display="block";
 
 
 document.getElementById(
@@ -2628,16 +2462,10 @@ ${escapeHTML(level.toUpperCase())}
 
 <br>
 
-<b>Subject:</b>
+<b>Paper:</b>
 ${escapeHTML(
 subject?.name||
-(
-modelType==="GROUP_1"
-?"Group 1 Model Test":
-modelType==="GROUP_2"
-?"Group 2 Model Test":
-"Combined Model Test"
-)
+formatModelType(modelType)
 )}
 
 <br>
@@ -2653,14 +2481,12 @@ ${
 testType==="MODEL_TEST"
 ?
 `
-
 <b>Model Type:</b>
 ${escapeHTML(
 formatModelType(modelType)
 )}
 
 <br>
-
 `
 :""
 }
@@ -2669,12 +2495,10 @@ ${
 testType==="PYQ"
 ?
 `
-
 <b>PYQ Attempt:</b>
 ${escapeHTML(pyqAttempt)}
 
 <br>
-
 `
 :""
 }
@@ -2682,19 +2506,13 @@ ${escapeHTML(pyqAttempt)}
 <b>Checking Mode:</b>
 ${
 checkingMode==="strict"
-?
-"ICAI Strict"
-:
-"Moderate"
+?"ICAI Strict"
+:"Moderate"
 }
 
 <br><br>
 
 🤖 AI evaluation completed.
-
-<br>
-
-MCQs were ignored.
 
 `;
 
@@ -2716,16 +2534,13 @@ console.error(
 error
 );
 
-
 showStudentError(
 error.message||
 "Unable to evaluate answer sheet."
 );
 
-
 button.textContent=
 "🚀 Submit Answer Sheet";
-
 
 }
 finally{
@@ -2737,9 +2552,9 @@ button.disabled=false;
 }
 
 
-/* ===================================================== */
-/* ADMIN LOGIN */
-/* ===================================================== */
+/* =====================================================
+   ADMIN LOGIN
+===================================================== */
 
 async function adminLogin(){
 
@@ -2747,7 +2562,6 @@ const password=
 document.getElementById(
 "adminPassword"
 ).value;
-
 
 if(!password){
 
@@ -2763,7 +2577,6 @@ document.getElementById(
 "adminLoginButton"
 );
 
-
 button.disabled=true;
 
 button.textContent=
@@ -2772,12 +2585,10 @@ button.textContent=
 
 try{
 
-
 const response=
 await fetch(
 "/api/admin-login",
 {
-
 method:"POST",
 
 headers:{
@@ -2791,17 +2602,21 @@ body:JSON.stringify({
 password
 })
 
-});
+}
+);
 
 
 const result=
-await response.json();
+await safeJSON(
+response
+);
 
 
 if(!response.ok){
 
 throw new Error(
 result.error||
+result.details||
 "Invalid admin password."
 );
 
@@ -2810,15 +2625,12 @@ result.error||
 
 document.getElementById(
 "adminLoginCard"
-).style.display=
-"none";
+).style.display="none";
 
 
 document.getElementById(
 "adminContent"
-).style.display=
-"block";
-
+).style.display="block";
 
 }
 catch(error){
@@ -2840,9 +2652,9 @@ button.textContent=
 }
 
 
-/* ===================================================== */
-/* ADMIN LOGOUT */
-/* ===================================================== */
+/* =====================================================
+   ADMIN LOGOUT
+===================================================== */
 
 async function adminLogout(){
 
@@ -2851,12 +2663,10 @@ try{
 await fetch(
 "/api/admin-logout",
 {
-
 method:"POST",
-
 credentials:"include"
-
-});
+}
+);
 
 }
 catch(e){}
@@ -2864,62 +2674,42 @@ catch(e){}
 
 document.getElementById(
 "adminContent"
-).style.display=
-"none";
+).style.display="none";
 
 
 document.getElementById(
 "adminLoginCard"
-).style.display=
-"block";
+).style.display="block";
 
 
 document.getElementById(
 "adminPassword"
 ).value="";
 
-
 }
 
 
-/* ===================================================== */
-/* ADMIN LEVEL */
-/* ===================================================== */
+/* =====================================================
+   ADMIN LEVEL
+===================================================== */
 
 function updateAdminLevel(){
 
-const level=
-document.getElementById(
-"adminLevel"
-).value;
-
-
 document.getElementById(
 "adminSubjectBox"
-).classList.add(
-"hidden"
-);
-
+).classList.add("hidden");
 
 document.getElementById(
 "adminMultiSubjectBox"
-).classList.add(
-"hidden"
-);
-
+).classList.add("hidden");
 
 document.getElementById(
 "adminModelTypeBox"
-).classList.add(
-"hidden"
-);
-
+).classList.add("hidden");
 
 document.getElementById(
 "adminPYQAttemptBox"
-).classList.add(
-"hidden"
-);
+).classList.add("hidden");
 
 
 document.getElementById(
@@ -2929,6 +2719,11 @@ document.getElementById(
 Select Subject
 </option>`;
 
+
+const level=
+document.getElementById(
+"adminLevel"
+).value;
 
 const type=
 document.getElementById(
@@ -2953,9 +2748,9 @@ document.getElementById(
 }
 
 
-/* ===================================================== */
-/* ADMIN TEST TYPE */
-/* ===================================================== */
+/* =====================================================
+   ADMIN TEST TYPE
+===================================================== */
 
 function updateAdminTestType(){
 
@@ -2975,36 +2770,30 @@ document.getElementById(
 "adminModelTypeBox"
 );
 
-
 const modelType=
 document.getElementById(
 "adminModelType"
 );
-
 
 const subjectBox=
 document.getElementById(
 "adminSubjectBox"
 );
 
-
 const multiBox=
 document.getElementById(
 "adminMultiSubjectBox"
 );
-
 
 const pyqBox=
 document.getElementById(
 "adminPYQAttemptBox"
 );
 
-
 const separate=
 document.getElementById(
 "separateMaterials"
 );
-
 
 const modelMaterial=
 document.getElementById(
@@ -3012,34 +2801,19 @@ document.getElementById(
 );
 
 
-modelBox.classList.add(
-"hidden"
-);
+/* RESET */
 
+modelBox.classList.add("hidden");
 
-subjectBox.classList.add(
-"hidden"
-);
+subjectBox.classList.add("hidden");
 
+multiBox.classList.add("hidden");
 
-multiBox.classList.add(
-"hidden"
-);
+pyqBox.classList.add("hidden");
 
+modelMaterial.classList.add("hidden");
 
-pyqBox.classList.add(
-"hidden"
-);
-
-
-modelMaterial.classList.add(
-"hidden"
-);
-
-
-separate.classList.remove(
-"hidden"
-);
+separate.classList.remove("hidden");
 
 
 modelType.innerHTML=
@@ -3060,108 +2834,74 @@ return;
 }
 
 
-/* ============================================= */
 /* PYQ */
-/* ============================================= */
 
 if(type==="PYQ"){
 
-subjectBox.classList.remove(
-"hidden"
-);
+subjectBox.classList.remove("hidden");
 
-
-pyqBox.classList.remove(
-"hidden"
-);
-
+pyqBox.classList.remove("hidden");
 
 renderAdminSingleSubjects();
-
 
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
-"Select subject and specify the exact PYQ attempt.";
-
+"Select subject and exact PYQ attempt.";
 
 return;
 
 }
 
 
-/* ============================================= */
 /* MTP / RTP */
-/* ============================================= */
 
 if(
 type==="MTP"||
 type==="RTP"
 ){
 
-subjectBox.classList.remove(
-"hidden"
-);
-
+subjectBox.classList.remove("hidden");
 
 renderAdminSingleSubjects();
-
 
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
 `Select the subject for ${type}.`;
 
-
 return;
 
 }
 
 
-/* ============================================= */
 /* OTHER */
-/* ============================================= */
 
 if(type==="OTHER"){
 
-subjectBox.classList.remove(
-"hidden"
-);
-
+subjectBox.classList.remove("hidden");
 
 renderAdminSingleSubjects();
-
 
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
 "Select the subject covered by this paper.";
 
-
 return;
 
 }
 
 
-/* ============================================= */
 /* MODEL TEST */
-/* ============================================= */
 
 if(type==="MODEL_TEST"){
 
-modelBox.classList.remove(
-"hidden"
-);
+modelBox.classList.remove("hidden");
 
+modelMaterial.classList.remove("hidden");
 
-modelMaterial.classList.remove(
-"hidden"
-);
-
-
-separate.classList.add(
-"hidden"
-);
+separate.classList.add("hidden");
 
 
 /* FOUNDATION */
@@ -3176,13 +2916,10 @@ Foundation Model Test
 
 `;
 
-
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
-
-"Foundation Model Test is a combined paper. No subject selection is required.";
-
+"Foundation Model Test is a combined paper containing all four subjects. No subject selection required.";
 
 return;
 
@@ -3216,23 +2953,21 @@ Other
 
 `;
 
-
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
-
-"Select Group 1, Group 2 or Other. Group 1 and Group 2 automatically include their subjects.";
-
-}
+"Select Group 1, Group 2 or Other.";
 
 }
 
 }
 
+}
 
-/* ===================================================== */
-/* ADMIN MODEL TYPE */
-/* ===================================================== */
+
+/* =====================================================
+   ADMIN MODEL TYPE
+===================================================== */
 
 function updateAdminModelType(){
 
@@ -3241,12 +2976,15 @@ document.getElementById(
 "adminLevel"
 ).value;
 
-
 const modelType=
 document.getElementById(
 "adminModelType"
 ).value;
 
+const multiBox=
+document.getElementById(
+"adminMultiSubjectBox"
+);
 
 const subjectBox=
 document.getElementById(
@@ -3254,20 +2992,9 @@ document.getElementById(
 );
 
 
-const multiBox=
-document.getElementById(
-"adminMultiSubjectBox"
-);
+subjectBox.classList.add("hidden");
 
-
-subjectBox.classList.add(
-"hidden"
-);
-
-
-multiBox.classList.add(
-"hidden"
-);
+multiBox.classList.add("hidden");
 
 
 /* GROUP 1 */
@@ -3280,7 +3007,6 @@ level,
 1
 );
 
-
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=`
@@ -3291,12 +3017,13 @@ document.getElementById(
 
 Subjects automatically included:
 
+<br>
+
 ${subjects.map(
 s=>escapeHTML(s.name)
 ).join(", ")}
 
 `;
-
 
 return;
 
@@ -3313,7 +3040,6 @@ level,
 2
 );
 
-
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=`
@@ -3324,12 +3050,13 @@ document.getElementById(
 
 Subjects automatically included:
 
+<br>
+
 ${subjects.map(
 s=>escapeHTML(s.name)
 ).join(", ")}
 
 `;
-
 
 return;
 
@@ -3340,19 +3067,14 @@ return;
 
 if(modelType==="OTHER"){
 
-multiBox.classList.remove(
-"hidden"
-);
-
+multiBox.classList.remove("hidden");
 
 renderAdminSubjects();
-
 
 document.getElementById(
 "adminSubjectInfo"
 ).innerHTML=
 "Select all subjects included in this Model Test.";
-
 
 return;
 
@@ -3373,9 +3095,9 @@ document.getElementById(
 }
 
 
-/* ===================================================== */
-/* ADMIN SINGLE SUBJECT */
-/* ===================================================== */
+/* =====================================================
+   ADMIN SINGLE SUBJECTS
+===================================================== */
 
 function renderAdminSingleSubjects(){
 
@@ -3384,12 +3106,10 @@ document.getElementById(
 "adminLevel"
 ).value;
 
-
 const select=
 document.getElementById(
 "adminSubject"
 );
-
 
 select.innerHTML=
 `<option value="">
@@ -3397,31 +3117,31 @@ Select Subject
 </option>`;
 
 
-if(!level)
-return;
+if(!level)return;
 
 
-SUBJECTS[level].forEach(
+(SUBJECTS[level]||[]).forEach(
 subject=>{
 
-select.innerHTML+=`
+const option=
+document.createElement("option");
 
-<option value="${escapeHTML(subject.key)}">
+option.value=
+subject.key;
 
-${escapeHTML(subject.name)}
+option.textContent=
+subject.name;
 
-</option>
-
-`;
+select.appendChild(option);
 
 });
 
 }
 
 
-/* ===================================================== */
-/* ADMIN MULTIPLE SUBJECTS */
-/* ===================================================== */
+/* =====================================================
+   ADMIN MULTIPLE SUBJECTS
+===================================================== */
 
 function renderAdminSubjects(){
 
@@ -3430,50 +3150,64 @@ document.getElementById(
 "adminLevel"
 ).value;
 
-
 const box=
 document.getElementById(
 "adminSubjectCheckboxes"
 );
 
-
 box.innerHTML="";
 
 
-if(!level)
-return;
+if(!level)return;
 
 
-SUBJECTS[level].forEach(
+(SUBJECTS[level]||[]).forEach(
 subject=>{
 
-box.innerHTML+=`
+const wrapper=
+document.createElement("div");
 
-<div class="subject-check">
+wrapper.className=
+"subject-check";
 
-<label>
 
-<input
-type="checkbox"
-value="${escapeHTML(subject.key)}"
-data-subject-name="${escapeHTML(subject.name)}">
+const label=
+document.createElement("label");
 
-${escapeHTML(subject.name)}
 
-</label>
+const input=
+document.createElement("input");
 
-</div>
+input.type="checkbox";
 
-`;
+input.value=
+subject.key;
+
+input.dataset.subjectName=
+subject.name;
+
+
+label.appendChild(input);
+
+label.appendChild(
+document.createTextNode(
+subject.name
+)
+);
+
+
+wrapper.appendChild(label);
+
+box.appendChild(wrapper);
 
 });
 
 }
 
 
-/* ===================================================== */
-/* ADMIN SUBJECT */
-/* ===================================================== */
+/* =====================================================
+   ADMIN SUBJECT
+===================================================== */
 
 function updateAdminSubject(){
 
@@ -3482,25 +3216,21 @@ document.getElementById(
 "adminLevel"
 ).value;
 
-
 const key=
 document.getElementById(
 "adminSubject"
 ).value;
 
 
-if(!level || !key)
-return;
+if(!level || !key)return;
 
 
 const subject=
-SUBJECTS[level].find(
+(SUBJECTS[level]||[]).find(
 s=>s.key===key
 );
 
-
-if(!subject)
-return;
+if(!subject)return;
 
 
 if(subject.type==="MCQ"){
@@ -3538,6 +3268,11 @@ Selected Subject:
 
 <br>
 
+Paper Maximum:
+<b>${subject.paper}</b>
+
+<br>
+
 Descriptive Maximum:
 <b>${subject.descriptive}</b>
 
@@ -3546,9 +3281,9 @@ Descriptive Maximum:
 }
 
 
-/* ===================================================== */
-/* GROUP SUBJECTS */
-/* ===================================================== */
+/* =====================================================
+   GROUP SUBJECTS
+===================================================== */
 
 function getGroupSubjects(
 level,
@@ -3565,9 +3300,9 @@ subject.group===group
 }
 
 
-/* ===================================================== */
-/* ADMIN UPLOAD */
-/* ===================================================== */
+/* =====================================================
+   ADMIN UPLOAD
+===================================================== */
 
 async function uploadMaterials(){
 
@@ -3576,54 +3311,44 @@ document.getElementById(
 "adminLevel"
 ).value;
 
-
 const testType=
 document.getElementById(
 "adminTestType"
 ).value;
-
 
 const modelType=
 document.getElementById(
 "adminModelType"
 ).value;
 
-
 const subjectKey=
 document.getElementById(
 "adminSubject"
 ).value;
 
-
 const pyqAttempt=
 document.getElementById(
 "adminPYQAttempt"
-).value.trim();
+).value;
 
 
 /* LEVEL */
 
-if(!level){
-
+if(!level)
 return showAdminError(
 "Please select level."
 );
 
-}
 
+/* TYPE */
 
-/* TEST TYPE */
-
-if(!testType){
-
+if(!testType)
 return showAdminError(
 "Please select Test / Paper Type."
 );
 
-}
 
-
-/* PYQ ATTEMPT */
+/* PYQ */
 
 if(
 testType==="PYQ" &&
@@ -3631,13 +3356,13 @@ testType==="PYQ" &&
 ){
 
 return showAdminError(
-"Please enter PYQ Attempt."
+"Please select PYQ Attempt."
 );
 
 }
 
 
-/* MODEL TYPE */
+/* MODEL */
 
 if(
 testType==="MODEL_TEST" &&
@@ -3672,7 +3397,6 @@ return showAdminError(
 );
 
 }
-
 
 subjects=[
 subjectKey
@@ -3766,12 +3490,10 @@ document.getElementById(
 "modelTestFile"
 ).files[0];
 
-
 const questionPaper=
 document.getElementById(
 "questionPaper"
 ).files[0];
-
 
 const suggestedAnswer=
 document.getElementById(
@@ -3812,17 +3534,12 @@ modelFile,
 {
 
 level,
-
 testType,
-
 modelType,
-
-pyqAttempt:"",
-
+pyqAttempt,
 subjects
 
 },
-
 "model-test"
 );
 
@@ -3831,11 +3548,7 @@ showAdminSuccess(
 "Model Test PDF uploaded successfully."
 );
 
-
-/* RESET */
-
 resetAdminFiles();
-
 
 }
 catch(error){
@@ -3845,7 +3558,6 @@ error.message
 );
 
 }
-
 
 return;
 
@@ -3886,23 +3598,17 @@ return showAdminError(
 
 try{
 
-
 await uploadMaterialFile(
 questionPaper,
 {
 
 level,
-
 testType,
-
 modelType:"",
-
 pyqAttempt,
-
 subjects
 
 },
-
 "question-paper"
 );
 
@@ -3912,30 +3618,22 @@ suggestedAnswer,
 {
 
 level,
-
 testType,
-
 modelType:"",
-
 pyqAttempt,
-
 subjects
 
 },
-
 "suggested-answer"
 );
 
 
 showAdminSuccess(
-
 `${formatTestType(testType)} material uploaded successfully.`
-
 );
 
 
 resetAdminFiles();
-
 
 }
 catch(error){
@@ -3949,9 +3647,9 @@ error.message
 }
 
 
-/* ===================================================== */
-/* MATERIAL FILE UPLOAD */
-/* ===================================================== */
+/* =====================================================
+   MATERIAL FILE UPLOAD
+===================================================== */
 
 async function uploadMaterialFile(
 file,
@@ -3960,9 +3658,7 @@ type
 ){
 
 const base64=
-await fileToBase64(
-file
-);
+await fileToBase64(file);
 
 
 const response=
@@ -4009,11 +3705,12 @@ type
 
 })
 
-});
+}
+);
 
 
 const result=
-await response.json();
+await safeJSON(response);
 
 
 if(!response.ok){
@@ -4026,9 +3723,9 @@ throw new Error(
 
 }
 
-
 throw new Error(
 result.error||
+result.details||
 "Material upload failed."
 );
 
@@ -4040,9 +3737,9 @@ return result;
 }
 
 
-/* ===================================================== */
-/* RESET ADMIN FILES */
-/* ===================================================== */
+/* =====================================================
+   RESET
+===================================================== */
 
 function resetAdminFiles(){
 
@@ -4057,7 +3754,9 @@ const el=
 document.getElementById(id);
 
 if(el){
+
 el.value="";
+
 }
 
 });
@@ -4065,9 +3764,9 @@ el.value="";
 }
 
 
-/* ===================================================== */
-/* DISPLAY EVALUATION */
-/* ===================================================== */
+/* =====================================================
+   DISPLAY EVALUATION
+===================================================== */
 
 function displayEvaluation(
 evaluation
@@ -4078,18 +3777,15 @@ document.getElementById(
 "resultPanel"
 );
 
-
 const total=
 Number(
 evaluation.total_marks||0
 );
 
-
 const maximum=
 Number(
 evaluation.maximum_marks||0
 );
-
 
 const percentage=
 Number(
@@ -4121,22 +3817,23 @@ document.getElementById(
 "questionResults"
 );
 
-
 results.innerHTML="";
 
 
-if(!Array.isArray(
+if(
+!Array.isArray(
 evaluation.questions
-)){
+)
+){
 
 results.innerHTML=
-
-`<div class="info">
+`
+<div class="info">
 No question-wise evaluation was returned.
-</div>`;
+</div>
+`;
 
-panel.style.display=
-"block";
+panel.style.display="block";
 
 return;
 
@@ -4146,12 +3843,10 @@ return;
 evaluation.questions.forEach(
 question=>{
 
-
 const card=
 document.createElement(
 "div"
 );
-
 
 card.className=
 "question-result";
@@ -4162,33 +3857,19 @@ question.status;
 
 
 if(status==="correct")
-card.classList.add(
-"correct"
-);
-
+card.classList.add("correct");
 
 if(status==="partially_correct")
-card.classList.add(
-"partial"
-);
-
+card.classList.add("partial");
 
 if(status==="incorrect")
-card.classList.add(
-"incorrect"
-);
-
+card.classList.add("incorrect");
 
 if(status==="not_attempted")
-card.classList.add(
-"unattempted"
-);
-
+card.classList.add("unattempted");
 
 if(status==="unclear")
-card.classList.add(
-"unclear"
-);
+card.classList.add("unclear");
 
 
 card.innerHTML=`
@@ -4200,11 +3881,9 @@ question.question_number
 )}
 </h3>
 
-
 <div class="question-meta">
 
 Marks:
-
 <b>
 ${Number(
 question.marks_awarded||0
@@ -4218,7 +3897,6 @@ question.marks_available||0
 &nbsp; • &nbsp;
 
 Status:
-
 <b>
 ${escapeHTML(
 formatStatus(status)
@@ -4226,7 +3904,6 @@ formatStatus(status)
 </b>
 
 </div>
-
 
 <div class="question-remarks">
 
@@ -4240,16 +3917,12 @@ question.remarks||
 `;
 
 
-results.appendChild(
-card
-);
+results.appendChild(card);
 
 });
 
 
-panel.style.display=
-"block";
-
+panel.style.display="block";
 
 panel.scrollIntoView({
 behavior:"smooth",
@@ -4259,9 +3932,9 @@ block:"start"
 }
 
 
-/* ===================================================== */
-/* HELPERS */
-/* ===================================================== */
+/* =====================================================
+   HELPERS
+===================================================== */
 
 function fileToBase64(file){
 
@@ -4292,9 +3965,7 @@ new Error(
 };
 
 
-reader.readAsDataURL(
-file
-);
+reader.readAsDataURL(file);
 
 });
 
@@ -4303,10 +3974,53 @@ file
 
 function isPDF(file){
 
-return file.type==="application/pdf"||
+return (
+file.type==="application/pdf"||
 file.name
 .toLowerCase()
-.endsWith(".pdf");
+.endsWith(".pdf")
+);
+
+}
+
+
+/* SAFE JSON
+   Prevents:
+   Unexpected token '<'
+   Unexpected token 'A'
+   etc.
+*/
+
+async function safeJSON(response){
+
+const text=
+await response.text();
+
+try{
+
+return text
+?JSON.parse(text)
+:{};
+
+}
+catch(error){
+
+console.error(
+"NON JSON SERVER RESPONSE:",
+text
+);
+
+return {
+
+error:
+`Server returned invalid JSON (HTTP ${response.status}).`,
+
+details:
+text.slice(0,1000)
+
+};
+
+}
 
 }
 
@@ -4316,17 +4030,12 @@ function formatTestType(type){
 const map={
 
 MTP:"MTP",
-
 RTP:"RTP",
-
 PYQ:"PYQ",
-
 MODEL_TEST:"Model Test",
-
 OTHER:"Other"
 
 };
-
 
 return map[type]||type;
 
@@ -4338,15 +4047,11 @@ function formatModelType(type){
 const map={
 
 GROUP_1:"Group 1",
-
 GROUP_2:"Group 2",
-
 OTHER:"Other",
-
 MODEL_TEST:"Foundation Model Test"
 
 };
-
 
 return map[type]||type;
 
@@ -4362,15 +4067,16 @@ correct:"Correct",
 partially_correct:
 "Partially Correct",
 
-incorrect:"Incorrect",
+incorrect:
+"Incorrect",
 
 not_attempted:
 "Not Attempted",
 
-unclear:"Unclear"
+unclear:
+"Unclear"
 
 };
-
 
 return map[status]||"Unknown";
 
@@ -4386,10 +4092,8 @@ document.getElementById(
 "studentStatus"
 );
 
-
 box.className=
 "status error";
-
 
 box.innerHTML=
 "❌ <b>Error</b><br>"+
@@ -4407,10 +4111,8 @@ document.getElementById(
 "studentStatus"
 );
 
-
 box.className=
 "status success";
-
 
 box.innerHTML=
 "✅ <b>Success</b><br>"+
@@ -4428,10 +4130,8 @@ document.getElementById(
 "adminStatus"
 );
 
-
 box.className=
 "status error";
-
 
 box.innerHTML=
 "❌ <b>Error</b><br>"+
@@ -4449,14 +4149,12 @@ document.getElementById(
 "adminStatus"
 );
 
-
 box.className=
 "status success";
 
-
 box.innerHTML=
 "✅ <b>Success</b><br>"+
-message;
+escapeHTML(message);
 
 }
 
@@ -4470,14 +4168,11 @@ document.getElementById(
 "loginStatus"
 );
 
-
 box.className=
 "status error";
 
-
 box.style.display=
 "block";
-
 
 box.innerHTML=
 "❌ <b>Login Failed</b><br>"+
