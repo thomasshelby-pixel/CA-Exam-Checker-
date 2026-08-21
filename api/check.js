@@ -1,8 +1,7 @@
-import { list } from "@vercel/blob";
+import {
+  list
+} from "@vercel/blob";
 
-/* =====================================================
-   HELPERS
-===================================================== */
 
 function safe(value) {
 
@@ -40,50 +39,12 @@ function latest(
 }
 
 
-async function downloadBlob(
-  blob
-) {
-
-  /*
-    Blob is public, therefore normal
-    fetch is sufficient.
-  */
-
-  const response =
-    await fetch(
-      blob.url
-    );
-
-  if (!response.ok) {
-
-    throw new Error(
-      `Unable to download ${blob.pathname}. HTTP ${response.status}`
-    );
-
-  }
-
-  const arrayBuffer =
-    await response.arrayBuffer();
-
-  return Buffer
-    .from(arrayBuffer)
-    .toString("base64");
-
-}
-
-
-/* =====================================================
-   HANDLER
-===================================================== */
-
 export default async function handler(
   req,
   res
 ) {
 
-  if (
-    req.method !== "POST"
-  ) {
+  if (req.method !== "POST") {
 
     return res.status(405).json({
       error:
@@ -95,9 +56,38 @@ export default async function handler(
 
   try {
 
+    const aiKey =
+      process.env
+        .AI_GATEWAY_API_KEY;
+
+    const blobToken =
+      process.env
+        .BLOB_READ_WRITE_TOKEN;
+
+
+    if (!aiKey) {
+
+      return res.status(500).json({
+        error:
+          "AI_GATEWAY_API_KEY is not configured."
+      });
+
+    }
+
+
+    if (!blobToken) {
+
+      return res.status(500).json({
+        error:
+          "BLOB_READ_WRITE_TOKEN is not configured."
+      });
+
+    }
+
+
     const {
 
-      answerSheetBase64,
+      answerSheetUrl,
 
       answerSheetName =
         "answer-sheet.pdf",
@@ -107,8 +97,7 @@ export default async function handler(
       subject =
         "Combined Model Test",
 
-      subjectKey =
-        "combined",
+      subjectKey = "",
 
       testType,
 
@@ -124,83 +113,34 @@ export default async function handler(
     } = req.body || {};
 
 
-    /* =================================================
-       ENVIRONMENT
-    ================================================= */
-
-    const blobToken =
-      process.env
-        .BLOB_READ_WRITE_TOKEN;
-
-    const aiKey =
-      process.env
-        .AI_GATEWAY_API_KEY;
-
-
-    if (!blobToken) {
-
-      return res.status(500).json({
-        error:
-          "BLOB_READ_WRITE_TOKEN is not configured."
-      });
-
-    }
-
-
-    if (!aiKey) {
-
-      return res.status(500).json({
-        error:
-          "AI_GATEWAY_API_KEY is not configured."
-      });
-
-    }
-
-
-    /* =================================================
-       VALIDATION
-    ================================================= */
-
-    if (!answerSheetBase64) {
-
-      return res.status(400).json({
-        error:
-          "Answer sheet is missing."
-      });
-
-    }
-
-
-    if (!level) {
-
-      return res.status(400).json({
-        error:
-          "Level is missing."
-      });
-
-    }
-
-
-    if (!testType) {
-
-      return res.status(400).json({
-        error:
-          "Test type is missing."
-      });
-
-    }
-
-
     const maximum =
       Number(
         descriptiveMaximum
       );
 
 
+    if (!answerSheetUrl) {
+
+      return res.status(400).json({
+        error:
+          "Answer sheet URL is missing."
+      });
+
+    }
+
+
+    if (!level || !testType) {
+
+      return res.status(400).json({
+        error:
+          "Level and test type are required."
+      });
+
+    }
+
+
     if (
-      !Number.isFinite(
-        maximum
-      ) ||
+      !Number.isFinite(maximum) ||
       maximum < 0
     ) {
 
@@ -212,24 +152,12 @@ export default async function handler(
     }
 
 
-    /* =================================================
+    /* =========================
        MATERIAL PATH
-    ================================================= */
+    ========================= */
 
-    let materialPrefix;
+    let prefix;
 
-
-    /*
-      MODEL TEST
-
-      Example:
-
-      materials/
-      inter/
-      MODEL_TEST/
-      model-GROUP_1/
-      NA/
-    */
 
     if (
       testType ===
@@ -246,20 +174,14 @@ export default async function handler(
       }
 
 
-      materialPrefix =
+      prefix =
         `materials/` +
         `${safe(level)}/` +
         `MODEL_TEST/` +
         `model-${safe(modelType)}/` +
         `NA/`;
 
-    }
-
-    /*
-      NORMAL TEST
-    */
-
-    else {
+    } else {
 
       if (!subjectKey) {
 
@@ -271,80 +193,59 @@ export default async function handler(
       }
 
 
-      /*
-        PYQ requires attempt
-      */
-
       if (
-        testType ===
-        "PYQ"
+        testType === "PYQ" &&
+        !pyqAttempt
       ) {
 
-        if (!pyqAttempt) {
-
-          return res.status(400).json({
-            error:
-              "PYQ attempt is required."
-          });
-
-        }
+        return res.status(400).json({
+          error:
+            "PYQ attempt is required."
+        });
 
       }
 
 
-      const attempt =
-        testType ===
-        "PYQ"
-
-          ? safe(pyqAttempt)
-
-          : "NA";
-
-
-      materialPrefix =
+      prefix =
         `materials/` +
         `${safe(level)}/` +
         `${safe(testType)}/` +
         `${safe(subjectKey)}/` +
-        `${attempt}/`;
+        `${
+          testType === "PYQ"
+            ? safe(pyqAttempt)
+            : "NA"
+        }/`;
 
     }
 
 
     console.log(
       "MATERIAL PREFIX:",
-      materialPrefix
+      prefix
     );
 
 
-    /* =================================================
-       FIND MATERIALS
-    ================================================= */
+    /* =========================
+       FIND MATERIAL
+    ========================= */
 
-    const materialResult =
+    const result =
       await list({
 
-        prefix:
-          materialPrefix,
+        prefix,
 
         token:
-          blobToken
+          blobToken,
+
+        limit:
+          1000
 
       });
 
 
     const blobs =
-      materialResult?.blobs ||
-      [];
-
-
-    console.log(
-      "FOUND BLOBS:",
-      blobs.map(
-        blob =>
-          blob.pathname
-      )
-    );
+      result?.blobs || [];
 
 
     if (!blobs.length) {
@@ -355,7 +256,7 @@ export default async function handler(
           "Test material not found.",
 
         details:
-          `No material found inside ${materialPrefix}`,
+          `No material found inside ${prefix}`,
 
         availableFiles:
           []
@@ -365,22 +266,14 @@ export default async function handler(
     }
 
 
-    /* =================================================
-       FIND QUESTION PAPER
-    ================================================= */
-
     let questionPaper;
 
     let suggestedAnswer;
 
 
-    /*
-      MODEL TEST
-
-      ONE PDF contains both
-      question paper and
-      suggested answer.
-    */
+    /* =========================
+       MODEL TEST
+    ========================= */
 
     if (
       testType ===
@@ -393,38 +286,16 @@ export default async function handler(
           "/model-test-"
         );
 
+      /*
+        SAME PDF contains
+        question + suggested answer.
+      */
 
       suggestedAnswer =
         questionPaper;
 
 
-      if (!questionPaper) {
-
-        return res.status(404).json({
-
-          error:
-            "Model Test PDF is missing.",
-
-          details:
-            materialPrefix,
-
-          availableFiles:
-            blobs.map(
-              blob =>
-                blob.pathname
-            )
-
-        });
-
-      }
-
-    }
-
-    /*
-      MTP / RTP / PYQ / OTHER
-    */
-
-    else {
+    } else {
 
       questionPaper =
         latest(
@@ -432,172 +303,65 @@ export default async function handler(
           "/question-paper-"
         );
 
-
       suggestedAnswer =
         latest(
           blobs,
           "/suggested-answer-"
         );
 
-
-      if (!questionPaper) {
-
-        return res.status(404).json({
-
-          error:
-            "Question Paper is missing.",
-
-          details:
-            materialPrefix,
-
-          availableFiles:
-            blobs.map(
-              blob =>
-                blob.pathname
-            )
-
-        });
-
-      }
+    }
 
 
-      if (!suggestedAnswer) {
+    if (!questionPaper) {
 
-        return res.status(404).json({
+      return res.status(404).json({
 
-          error:
-            "Suggested Answer is missing.",
+        error:
+          "Question Paper is missing.",
 
-          details:
-            materialPrefix,
+        details:
+          prefix,
 
-          availableFiles:
-            blobs.map(
-              blob =>
-                blob.pathname
-            )
+        availableFiles:
+          blobs.map(
+            b => b.pathname
+          )
 
-        });
-
-      }
+      });
 
     }
 
 
-    /* =================================================
-       DOWNLOAD MATERIAL
-    ================================================= */
+    if (!suggestedAnswer) {
 
-    const questionPaperBase64 =
-      await downloadBlob(
-        questionPaper
-      );
+      return res.status(404).json({
 
+        error:
+          "Suggested Answer is missing.",
 
-    const suggestedAnswerBase64 =
-      await downloadBlob(
-        suggestedAnswer
-      );
+        details:
+          prefix,
 
+        availableFiles:
+          blobs.map(
+            b => b.pathname
+          )
 
-    /* =================================================
-       CHECKING MODE
-    ================================================= */
+      });
 
-    const checkingInstructions =
-
-      checkingMode ===
-      "strict"
-
-        ? `
-STRICT ICAI-STYLE CHECKING:
-
-- Be conservative with marks.
-- Award marks only for demonstrated knowledge.
-- Penalise wrong concepts.
-- Penalise wrong provisions.
-- Penalise incorrect calculations.
-- Give step marks only for genuinely correct steps.
-- Missing required workings should lose marks.
-- Theory must contain relevant provision,
-  concept, application and conclusion.
-`
-
-        : `
-MODERATE EXAMINER-STYLE CHECKING:
-
-- Give reasonable step marking.
-- Give credit for substantially correct approaches.
-- Minor calculation mistakes may receive partial marks.
-- Major conceptual errors must be penalised.
-- Missing essential workings should affect marks.
-`;
+    }
 
 
-    /* =================================================
-       MODEL TEST INSTRUCTION
-    ================================================= */
-
-    const modelInstruction =
-
-      testType ===
-      "MODEL_TEST"
-
-        ? `
-MODEL TEST STRUCTURE:
-
-The uploaded Model Test PDF is ONE PDF.
-
-The same PDF contains:
-
-1. Question Paper
-2. Suggested Answer
-
-Identify the Question Paper section
-and Suggested Answer section inside
-the same PDF.
-
-Do NOT expect a separate Suggested Answer PDF.
-`
-
-        : "";
-
-
-    /* =================================================
-       PYQ INSTRUCTION
-    ================================================= */
-
-    const pyqInstruction =
-
-      testType ===
-      "PYQ"
-
-        ? `
-PYQ ATTEMPT:
-
-This evaluation is specifically for:
-
-${pyqAttempt}
-
-Use ONLY the material belonging to this
-exact PYQ attempt.
-
-Do not substitute another attempt.
-`
-
-        : "";
-
-
-    /* =================================================
-       AI PROMPT
-    ================================================= */
+    /* =========================
+       PROMPT
+    ========================= */
 
     const prompt = `
 
 You are an expert CA examination checker.
 
 Evaluate the student's answer sheet against
-the supplied official/reference material.
+the supplied Question Paper and Suggested Answer.
 
 LEVEL:
 ${level}
@@ -620,149 +384,108 @@ ${maximum}
 CHECKING MODE:
 ${checkingMode}
 
-${checkingInstructions}
 
-${modelInstruction}
+IMPORTANT:
 
-${pyqInstruction}
+Evaluate ONLY descriptive questions.
 
+IGNORE MCQs completely.
 
-==================================================
-CORE RULES
-==================================================
+Do not invent questions.
 
-1. Evaluate ONLY descriptive questions.
+Do not invent marks.
 
-2. IGNORE MCQs completely.
+Question Paper is authoritative for:
 
-3. Do not invent questions.
+- question numbers
+- sub-parts
+- marks
+- question structure
 
-4. Do not invent marks.
+Suggested Answer is authoritative for:
 
-5. Question Paper determines:
-   - question number
-   - sub-part
-   - marks
-   - question structure
+- concepts
+- provisions
+- calculations
+- workings
+- conclusions
 
-6. Suggested Answer determines:
-   - expected answer
-   - calculations
-   - provisions
-   - concepts
-   - workings
-   - conclusions
+Give genuine partial marks.
 
-7. Compare student's answer directly
-   against the expected answer.
+Correct working with wrong final answer
+may receive appropriate step marks.
 
-8. Award genuine partial marks.
+Wrong approach must be penalised.
 
-9. Correct method with wrong final answer
-   may receive appropriate step marks.
+Theory must be checked for:
 
-10. Wrong approach must not receive marks
-    merely because some keywords or numbers
-    are similar.
+- provision
+- concept
+- application
+- conclusion
+- keywords
 
-11. Theory questions must be checked for:
-    - provision
-    - concept
-    - application
-    - conclusion
-    - relevant keywords
+Practical questions must be checked for:
 
-12. Practical questions must be checked for:
-    - formula
-    - working
-    - calculation
-    - adjustment
-    - final answer
+- formula
+- workings
+- calculations
+- adjustments
+- final answer
 
-13. Unattempted:
-    marks_awarded = 0
-    status = "not_attempted"
+Unattempted:
 
-14. Unclear handwriting:
-    status = "unclear"
+marks_awarded = 0
 
-15. Never award more than available marks.
+status = "not_attempted"
 
-16. Never award negative marks.
+Unclear handwriting:
 
-17. Include every descriptive question.
+status = "unclear"
 
-18. Exclude MCQs.
+Never award more than available marks.
 
-19. Handle internal choices correctly.
+Never award negative marks.
 
-20. Do not award marks twice for an internal choice.
+Include every descriptive question.
 
-21. Remarks must explain actual lost marks.
+Exclude MCQs.
 
-22. Do not give generic praise.
+Handle internal choices correctly.
 
-23. Do not reveal hidden reasoning.
+Do not award both alternatives of an
+internal choice.
 
-24. Total must be mathematically correct.
+Remarks must explain actual lost marks.
 
-25. Maximum marks must equal:
-    ${maximum}
-
-26. Percentage must be calculated mathematically.
-
-27. If a question is descriptive but the
-    student did not attempt it, include it
-    as not_attempted with zero marks.
-
-
-==================================================
-FOUNDATION MCQ RULE
-==================================================
-
-If the subject is:
-
-Quantitative Aptitude
-OR
-Business Economics
-
-the paper may be entirely MCQ.
-
-Ignore all MCQs for descriptive evaluation.
-
-Do NOT apply negative marking to the
-descriptive evaluation score.
-
-The frontend/backend descriptive maximum
-must represent only descriptive marks.
-
-
-==================================================
-FINAL VERIFICATION
-==================================================
-
-Before returning the result verify:
-
-- Every descriptive question included
-- MCQs excluded
-- Correct marks available
-- Correct awarded marks
-- No negative marks
-- No awarded marks above available marks
-- Correct total
-- Correct maximum
-- Correct percentage
-
+Do not reveal hidden reasoning.
 
 Return ONLY valid JSON.
+
+
+MODEL TEST:
+
+If this is a Model Test, the SAME PDF
+contains Question Paper and Suggested Answer.
+Identify both sections inside that PDF.
+
+
+PYQ:
+
+If this is PYQ, use ONLY the exact attempt:
+
+${pyqAttempt || "N/A"}
+
+Do not substitute another attempt.
+
 `;
 
 
-    /* =================================================
+    /* =========================
        AI REQUEST
-    ================================================= */
+    ========================= */
 
-    const aiPayload = {
+    const payload = {
 
       model:
         "openai/gpt-5.6-sol",
@@ -775,8 +498,6 @@ Return ONLY valid JSON.
       input: [
 
         {
-          type:
-            "message",
 
           role:
             "user",
@@ -784,6 +505,7 @@ Return ONLY valid JSON.
           content: [
 
             {
+
               type:
                 "input_text",
 
@@ -793,44 +515,45 @@ Return ONLY valid JSON.
             },
 
             {
+
               type:
                 "input_file",
 
-              filename:
-                questionPaper
-                  .pathname
-                  .split("/")
-                  .pop(),
+              file_url:
+                questionPaper.url,
 
-              file_data:
-                `data:application/pdf;base64,${questionPaperBase64}`
+              filename:
+                questionPaper.pathname
+                  .split("/")
+                  .pop()
 
             },
 
             {
+
               type:
                 "input_file",
 
-              filename:
-                suggestedAnswer
-                  .pathname
-                  .split("/")
-                  .pop(),
+              file_url:
+                suggestedAnswer.url,
 
-              file_data:
-                `data:application/pdf;base64,${suggestedAnswerBase64}`
+              filename:
+                suggestedAnswer.pathname
+                  .split("/")
+                  .pop()
 
             },
 
             {
+
               type:
                 "input_file",
 
-              filename:
-                answerSheetName,
+              file_url:
+                answerSheetUrl,
 
-              file_data:
-                `data:application/pdf;base64,${answerSheetBase64}`
+              filename:
+                answerSheetName
 
             }
 
@@ -898,11 +621,17 @@ Return ONLY valid JSON.
                         "string",
 
                       enum: [
+
                         "correct",
+
                         "partially_correct",
+
                         "incorrect",
+
                         "not_attempted",
+
                         "unclear"
+
                       ]
 
                     },
@@ -917,9 +646,13 @@ Return ONLY valid JSON.
                   required: [
 
                     "question_number",
+
                     "marks_available",
+
                     "marks_awarded",
+
                     "status",
+
                     "remarks"
 
                   ],
@@ -974,10 +707,9 @@ Return ONLY valid JSON.
     };
 
 
-    console.log(
-      "Sending evaluation request to AI..."
-    );
-
+    /* =========================
+       CALL AI
+    ========================= */
 
     const aiResponse =
       await fetch(
@@ -994,14 +726,14 @@ Return ONLY valid JSON.
             "Content-Type":
               "application/json",
 
-            "Authorization":
+            Authorization:
               `Bearer ${aiKey}`
 
           },
 
           body:
             JSON.stringify(
-              aiPayload
+              payload
             )
 
         }
@@ -1009,11 +741,7 @@ Return ONLY valid JSON.
       );
 
 
-    /* =================================================
-       AI RESPONSE
-    ================================================= */
-
-    const rawResult =
+    const raw =
       await aiResponse.json();
 
 
@@ -1023,14 +751,12 @@ Return ONLY valid JSON.
     );
 
 
-    if (
-      !aiResponse.ok
-    ) {
+    if (!aiResponse.ok) {
 
       console.error(
         "AI GATEWAY ERROR:",
         JSON.stringify(
-          rawResult,
+          raw,
           null,
           2
         )
@@ -1045,72 +771,55 @@ Return ONLY valid JSON.
           "AI evaluation failed.",
 
         details:
-          rawResult?.error?.message ||
-          rawResult?.error?.details ||
-          rawResult?.message ||
-          JSON.stringify(
-            rawResult
-          )
+          raw?.error?.message ||
+          raw?.message ||
+          JSON.stringify(raw)
 
       });
 
     }
 
 
-    /* =================================================
-       EXTRACT OUTPUT
-    ================================================= */
+    /* =========================
+       EXTRACT
+    ========================= */
 
     let outputText =
       "";
 
 
     if (
-      typeof
-      rawResult.output_text ===
+      typeof raw.output_text ===
       "string"
     ) {
 
       outputText =
-        rawResult.output_text;
+        raw.output_text;
 
     }
 
 
-    /*
-      Fallback:
-      Responses API output array
-    */
-
     if (
       !outputText &&
       Array.isArray(
-        rawResult.output
+        raw.output
       )
     ) {
 
       for (
         const item
-        of rawResult.output
+        of raw.output
       ) {
-
-        if (
-          !Array.isArray(
-            item.content
-          )
-        ) {
-          continue;
-        }
-
 
         for (
           const content
-          of item.content
+          of (
+            item.content || []
+          )
         ) {
 
           if (
-            typeof
-            content.text ===
+            typeof content.text ===
             "string"
           ) {
 
@@ -1126,23 +835,6 @@ Return ONLY valid JSON.
     }
 
 
-    /*
-      Additional fallback
-    */
-
-    if (
-      !outputText &&
-      rawResult.output &&
-      typeof rawResult.output ===
-        "string"
-    ) {
-
-      outputText =
-        rawResult.output;
-
-    }
-
-
     if (!outputText) {
 
       return res.status(500).json({
@@ -1151,21 +843,20 @@ Return ONLY valid JSON.
           "AI returned an empty evaluation.",
 
         details:
-          JSON.stringify(
-            rawResult
-          ).slice(
-            0,
-            5000
-          )
+          JSON.stringify(raw)
+            .slice(
+              0,
+              5000
+            )
 
       });
 
     }
 
 
-    /* =================================================
-       PARSE JSON
-    ================================================= */
+    /* =========================
+       PARSE
+    ========================= */
 
     let evaluation;
 
@@ -1177,13 +868,7 @@ Return ONLY valid JSON.
           outputText
         );
 
-    } catch (error) {
-
-      console.error(
-        "JSON PARSE ERROR:",
-        outputText
-      );
-
+    } catch {
 
       return res.status(500).json({
 
@@ -1200,10 +885,6 @@ Return ONLY valid JSON.
 
     }
 
-
-    /* =================================================
-       VALIDATE STRUCTURE
-    ================================================= */
 
     if (
       !evaluation ||
@@ -1222,9 +903,9 @@ Return ONLY valid JSON.
     }
 
 
-    /* =================================================
+    /* =========================
        SCORE
-    ================================================= */
+    ========================= */
 
     let total =
       0;
@@ -1275,10 +956,6 @@ Return ONLY valid JSON.
       }
 
 
-      /*
-        Never negative
-      */
-
       awarded =
         Math.max(
           0,
@@ -1286,20 +963,12 @@ Return ONLY valid JSON.
         );
 
 
-      /*
-        Never above question marks
-      */
-
       awarded =
         Math.min(
           available,
           awarded
         );
 
-
-      /*
-        Round to 2 decimals
-      */
 
       awarded =
         Math.round(
@@ -1319,22 +988,22 @@ Return ONLY valid JSON.
 
     total =
       Math.round(
-        total * 100
+        Math.min(
+          maximum,
+          total
+        ) * 100
       ) / 100;
 
 
-    /*
-      Never exceed maximum
-    */
-
-    total =
-      Math.min(
-        total,
-        maximum
-      );
+    evaluation.total_marks =
+      total;
 
 
-    const percentage =
+    evaluation.maximum_marks =
+      maximum;
+
+
+    evaluation.percentage =
       maximum > 0
 
         ? Math.round(
@@ -1348,21 +1017,9 @@ Return ONLY valid JSON.
         : 0;
 
 
-    evaluation.total_marks =
-      total;
-
-
-    evaluation.maximum_marks =
-      maximum;
-
-
-    evaluation.percentage =
-      percentage;
-
-
-    /* =================================================
-       FINAL RESPONSE
-    ================================================= */
+    /* =========================
+       RESPONSE
+    ========================= */
 
     return res.status(200).json({
 
@@ -1390,7 +1047,8 @@ Return ONLY valid JSON.
         descriptiveMaximum:
           maximum,
 
-        materialPrefix,
+        materialPrefix:
+          prefix,
 
         questionPaper:
           questionPaper.pathname,
