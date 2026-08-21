@@ -1,4 +1,4 @@
-import { list } from "@vercel/blob";
+import { list, get } from "@vercel/blob";
 
 const AI_URL =
   "https://ai-gateway.vercel.sh/v1/responses";
@@ -26,30 +26,36 @@ function safeAttempt(value) {
 
 function formatTestType(type) {
 
-  return ({
-    MTP: "MTP",
-    RTP: "RTP",
-    PYQ: "PYQ",
-    MODEL_TEST: "Model Test",
-    OTHER: "Other"
-  })[type] || type;
+  return (
+    {
+      MTP: "MTP",
+      RTP: "RTP",
+      PYQ: "PYQ",
+      MODEL_TEST: "Model Test",
+      OTHER: "Other"
+    }[type] || type
+  );
 }
 
 function formatModelType(type) {
 
-  return ({
-    FOUNDATION:
-      "Foundation Model Test",
+  return (
+    {
+      FOUNDATION:
+        "Foundation Model Test",
 
-    GROUP_1:
-      "Group 1",
+      GROUP_1:
+        "Group 1",
 
-    GROUP_2:
-      "Group 2",
+      GROUP_2:
+        "Group 2",
 
-    OTHER:
-      "Other"
-  })[type] || type || "—";
+      OTHER:
+        "Other"
+    }[type] ||
+    type ||
+    "—"
+  );
 }
 
 async function downloadBlob(blob) {
@@ -66,6 +72,7 @@ async function downloadBlob(blob) {
     );
 
   if (!response.ok) {
+
     throw new Error(
       `Unable to download ${blob.pathname}. HTTP ${response.status}`
     );
@@ -81,17 +88,51 @@ async function downloadBlob(blob) {
   );
 }
 
-async function latestMatching(
+async function downloadPrivateBlobBase64(
+  pathname
+) {
+
+  const result =
+    await get(
+      pathname,
+      {
+        access: "private",
+
+        token:
+          process.env.BLOB_READ_WRITE_TOKEN
+      }
+    );
+
+  if (
+    !result ||
+    result.statusCode !== 200 ||
+    !result.stream
+  ) {
+
+    throw new Error(
+      `Unable to read uploaded answer sheet: ${pathname}`
+    );
+  }
+
+  const arrayBuffer =
+    await new Response(
+      result.stream
+    ).arrayBuffer();
+
+  return Buffer
+    .from(arrayBuffer)
+    .toString("base64");
+}
+
+function latestMatching(
   blobs,
   marker
 ) {
 
-  return [
-    ...blobs
-  ]
+  return [...blobs]
     .filter(
-      blob =>
-        blob.pathname
+      b =>
+        b.pathname
           .toLowerCase()
           .includes(
             marker.toLowerCase()
@@ -99,12 +140,8 @@ async function latestMatching(
     )
     .sort(
       (a, b) =>
-        new Date(
-          b.uploadedAt
-        ) -
-        new Date(
-          a.uploadedAt
-        )
+        new Date(b.uploadedAt) -
+        new Date(a.uploadedAt)
     )[0] || null;
 }
 
@@ -113,7 +150,10 @@ export default async function handler(
   res
 ) {
 
-  if (req.method !== "POST") {
+  if (
+    req.method !== "POST"
+  ) {
+
     return res.status(405).json({
       error:
         "Method not allowed"
@@ -122,20 +162,37 @@ export default async function handler(
 
   try {
 
-    const {
+    let {
+
       answerSheetBase64,
+
+      answerSheetPath,
+
       answerSheetName,
+
       level,
+
       subject,
+
       subjectKey,
+
       testType,
+
       modelType,
+
       pyqAttempt,
+
       checkingMode,
+
       descriptiveMaximum
+
     } = req.body || {};
 
-    if (!answerSheetBase64) {
+    if (
+      !answerSheetBase64 &&
+      !answerSheetPath
+    ) {
+
       return res.status(400).json({
         error:
           "Answer sheet is missing."
@@ -143,6 +200,7 @@ export default async function handler(
     }
 
     if (!level) {
+
       return res.status(400).json({
         error:
           "Level is missing."
@@ -150,6 +208,7 @@ export default async function handler(
     }
 
     if (!testType) {
+
       return res.status(400).json({
         error:
           "Test type is missing."
@@ -160,6 +219,7 @@ export default async function handler(
       !process.env
         .BLOB_READ_WRITE_TOKEN
     ) {
+
       return res.status(500).json({
         error:
           "BLOB_READ_WRITE_TOKEN is not configured."
@@ -170,6 +230,7 @@ export default async function handler(
       !process.env
         .AI_GATEWAY_API_KEY
     ) {
+
       return res.status(500).json({
         error:
           "AI_GATEWAY_API_KEY is not configured."
@@ -187,6 +248,7 @@ export default async function handler(
       ) ||
       maximumMarks < 0
     ) {
+
       return res.status(400).json({
         error:
           "Invalid descriptive maximum marks."
@@ -194,16 +256,12 @@ export default async function handler(
     }
 
     /*
-      FOUNDATION MCQ PAPERS
-      ---------------------
-      QA + Business Economics
-      are objective papers.
+     * FOUNDATION MCQ-ONLY
+     */
 
-      Current AI checker evaluates
-      descriptive answers only.
-    */
-
-    if (maximumMarks === 0) {
+    if (
+      maximumMarks === 0
+    ) {
 
       return res.status(200).json({
 
@@ -221,11 +279,15 @@ export default async function handler(
           maximum_marks: 0,
 
           percentage: 0
+
         },
 
         metadata: {
+
           level,
+
           subject,
+
           subjectKey,
 
           testType:
@@ -242,23 +304,19 @@ export default async function handler(
             pyqAttempt || "",
 
           checkingMode
+
         }
+
       });
     }
 
     let questionPaperBlob;
+
     let suggestedAnswerBlob;
 
     /*
-      MODEL TEST
-      --------------------
-      ONE PDF ONLY.
-
-      That same PDF contains:
-      Question Paper
-      +
-      Suggested Answer
-    */
+     * MODEL TEST
+     */
 
     if (
       testType ===
@@ -266,6 +324,7 @@ export default async function handler(
     ) {
 
       if (!modelType) {
+
         return res.status(400).json({
           error:
             "Model Test Type is required."
@@ -278,6 +337,7 @@ export default async function handler(
         modelType !==
           "FOUNDATION"
       ) {
+
         return res.status(400).json({
           error:
             "Foundation only supports Foundation Model Test."
@@ -291,8 +351,11 @@ export default async function handler(
           "GROUP_1",
           "GROUP_2",
           "OTHER"
-        ].includes(modelType)
+        ].includes(
+          modelType
+        )
       ) {
+
         return res.status(400).json({
           error:
             "Invalid Model Test Type."
@@ -305,6 +368,7 @@ export default async function handler(
       let result =
         await list({
           prefix,
+
           token:
             process.env
               .BLOB_READ_WRITE_TOKEN
@@ -314,8 +378,8 @@ export default async function handler(
         result.blobs || [];
 
       /*
-        Old Foundation compatibility
-      */
+       * FOUNDATION BACKWARD COMPATIBILITY
+       */
 
       if (
         level ===
@@ -331,6 +395,7 @@ export default async function handler(
         result =
           await list({
             prefix,
+
             token:
               process.env
                 .BLOB_READ_WRITE_TOKEN
@@ -341,8 +406,8 @@ export default async function handler(
       }
 
       /*
-        MODEL TEST OTHER
-      */
+       * MODEL TEST OTHER
+       */
 
       if (
         modelType ===
@@ -354,6 +419,7 @@ export default async function handler(
           subjectKey ===
             "combined"
         ) {
+
           return res.status(400).json({
             error:
               "Subject is required for Model Test Other."
@@ -375,57 +441,60 @@ export default async function handler(
                 parts[4] || "";
 
               return (
+
                 blob.pathname
                   .toLowerCase()
                   .includes(
                     "/model-test-"
-                  ) &&
+                  )
+
+                &&
+
                 folder
                   .split("__")
                   .includes(
                     selected
                   )
+
               );
             }
           );
 
         questionPaperBlob =
-          await latestMatching(
+          latestMatching(
             matches,
             "/model-test-"
           );
 
       } else {
 
-        /*
-          Group 1 / Group 2 /
-          Foundation
-        */
-
         questionPaperBlob =
-          await latestMatching(
+          latestMatching(
             blobs,
             "/model-test-"
           );
       }
 
-      if (!questionPaperBlob) {
+      if (
+        !questionPaperBlob
+      ) {
 
         return res.status(404).json({
+
           error:
             "Model Test material is missing.",
 
           details:
             `No Model Test found for ${level} / ${formatModelType(modelType)}.`
+
         });
       }
 
       /*
-        SAME PDF is used as:
-        Question Paper
-        +
-        Suggested Answer
-      */
+       * MODEL TEST PDF CONTAINS
+       * BOTH QUESTION PAPER +
+       * SUGGESTED ANSWER
+       */
 
       suggestedAnswerBlob =
         questionPaperBlob;
@@ -433,20 +502,15 @@ export default async function handler(
     } else {
 
       /*
-        ALL OTHER TEST TYPES
-        --------------------
-
-        MTP
-        RTP
-        PYQ
-        OTHER
-      */
+       * MTP / RTP / PYQ / OTHER
+       */
 
       if (
         !subjectKey ||
         subjectKey ===
           "combined"
       ) {
+
         return res.status(400).json({
           error:
             "Subject is required for this test type."
@@ -465,6 +529,7 @@ export default async function handler(
             pyqAttempt
           )
         ) {
+
           return res.status(400).json({
             error:
               "PYQ Attempt is required."
@@ -483,6 +548,7 @@ export default async function handler(
       const result =
         await list({
           prefix,
+
           token:
             process.env
               .BLOB_READ_WRITE_TOKEN
@@ -492,13 +558,13 @@ export default async function handler(
         result.blobs || [];
 
       questionPaperBlob =
-        await latestMatching(
+        latestMatching(
           blobs,
           "/question-paper-"
         );
 
       suggestedAnswerBlob =
-        await latestMatching(
+        latestMatching(
           blobs,
           "/suggested-answer-"
         );
@@ -517,8 +583,10 @@ export default async function handler(
 
           availableFiles:
             blobs.map(
-              b => b.pathname
+              b =>
+                b.pathname
             )
+
         });
       }
 
@@ -536,11 +604,17 @@ export default async function handler(
 
           availableFiles:
             blobs.map(
-              b => b.pathname
+              b =>
+                b.pathname
             )
+
         });
       }
     }
+
+    /*
+     * DOWNLOAD MATERIAL
+     */
 
     const questionPaperBase64 =
       await downloadBlob(
@@ -551,6 +625,24 @@ export default async function handler(
       await downloadBlob(
         suggestedAnswerBlob
       );
+
+    /*
+     * NEW ANSWER SHEET FLOW
+     *
+     * Browser uploads PDF to Blob.
+     * Browser sends only pathname here.
+     */
+
+    if (
+      !answerSheetBase64 &&
+      answerSheetPath
+    ) {
+
+      answerSheetBase64 =
+        await downloadPrivateBlobBase64(
+          answerSheetPath
+        );
+    }
 
     return await evaluateWithAI({
 
@@ -585,6 +677,7 @@ export default async function handler(
 
       suggestedAnswerName:
         suggestedAnswerBlob.pathname
+
     });
 
   } catch (error) {
@@ -595,12 +688,14 @@ export default async function handler(
     );
 
     return res.status(500).json({
+
       error:
         "Unable to evaluate answer sheet.",
 
       details:
         error?.message ||
         "Unknown error"
+
     });
   }
 }
@@ -640,9 +735,12 @@ async function evaluateWithAI({
 }) {
 
   const checkingInstructions =
-    checkingMode === "strict"
+
+    checkingMode ===
+    "strict"
 
       ? `
+
 STRICT ICAI-STYLE CHECKING:
 
 - Be conservative with marks.
@@ -651,9 +749,11 @@ STRICT ICAI-STYLE CHECKING:
 - Give genuine step marks only for correct steps.
 - Missing essential workings should lose marks.
 - Theory requires provision/concept, application and conclusion where applicable.
+
 `
 
       : `
+
 MODERATE EXAMINER-STYLE CHECKING:
 
 - Give reasonable step marking.
@@ -661,6 +761,7 @@ MODERATE EXAMINER-STYLE CHECKING:
 - Minor calculation errors may receive partial marks.
 - Conceptual errors must be penalised.
 - Do not award marks for unsupported claims.
+
 `;
 
   const modelTestNote =
@@ -668,13 +769,19 @@ MODERATE EXAMINER-STYLE CHECKING:
     "MODEL_TEST"
 
       ? `
-The Model Test is ONE PDF containing the question paper and suggested/reference answer.
 
-Identify both sections inside the same PDF before checking.
+The Model Test is ONE PDF containing the Question Paper and Suggested Answer.
+
+First identify the Question Paper section and Suggested Answer section inside the same PDF.
+
+Do not assume that a separate Suggested Answer PDF exists.
+
 `
 
       : `
-For ${formatTestType(testType)}, the Question Paper and Suggested Answer are separate PDFs.
+
+For this test type the Question Paper and Suggested Answer are separate PDFs.
+
 `;
 
   const prompt = `
@@ -688,10 +795,14 @@ SUBJECT:
 ${subject || "Combined paper"}
 
 TEST TYPE:
-${formatTestType(testType)}
+${formatTestType(
+    testType
+  )}
 
 MODEL TYPE:
-${formatModelType(modelType)}
+${formatModelType(
+    modelType
+  )}
 
 PYQ ATTEMPT:
 ${pyqAttempt || "N/A"}
@@ -701,7 +812,8 @@ ${maximumMarks}
 
 CHECKING MODE:
 ${
-  checkingMode === "strict"
+  checkingMode ===
+  "strict"
     ? "ICAI STRICT"
     : "MODERATE"
 }
@@ -712,107 +824,106 @@ ${modelTestNote}
 
 CORE RULES:
 
-1. Use the official/reference Question Paper to determine question numbers, sub-parts and marks.
+1. Use the Question Paper to determine question numbers, sub-parts and marks.
 
-2. Use the official/reference Suggested Answer to determine expected concepts, provisions, calculations, workings and conclusions.
+2. Use the Suggested Answer to determine expected concepts, provisions, calculations, workings and conclusions.
 
-3. Locate every descriptive question in the Question Paper and compare it with the student's corresponding answer.
+3. Locate every descriptive question.
 
-4. Evaluate ONLY descriptive questions. Ignore MCQs completely.
+4. Compare every descriptive question with the student's corresponding answer.
 
-5. Never invent a question, mark allocation, answer or student response.
+5. Evaluate ONLY descriptive questions.
 
-6. Award genuine partial/step marks when the student's approach is materially correct.
+6. Ignore MCQs completely.
 
-7. A wrong final answer can still receive partial marks when the working is substantially correct.
+7. Never invent questions.
 
-8. A wrong approach must not receive marks merely because some keywords/numbers match.
+8. Never invent marks.
 
-9. For theory, check provision/concept, application, conclusion and important relevant keywords.
+9. Award genuine partial/step marks.
 
-10. For practical questions, check formula, workings, calculations, adjustments and final answer.
+10. Wrong final answer can receive partial marks if working is substantially correct.
 
-11. Unattempted question = 0 marks and status not_attempted.
+11. Wrong approach must not receive marks merely because keywords or numbers match.
 
-12. If handwriting/content cannot be reliably read = status unclear and award only marks that can be justified.
+12. Theory must be checked for provision, concept, application, conclusion and important keywords.
 
-13. Never award negative marks in descriptive evaluation.
+13. Practical questions must be checked for formula, workings, calculations, adjustments and final answer.
 
-14. Never exceed marks_available for any question.
+14. Unattempted question:
+marks_awarded = 0
+status = "not_attempted"
 
-15. Handle internal choices carefully.
+15. Unclear handwriting:
+status = "unclear"
 
-16. Do not penalise a student for not attempting a question that was an internal alternative to another attempted question.
+16. Never award negative descriptive marks.
 
-17. Remarks must state the actual reason for lost marks.
+17. Never exceed marks_available.
 
-18. Do not give generic praise.
+18. Handle internal choices carefully.
 
-19. Do not reveal hidden reasoning.
+19. Remarks must explain actual lost marks.
 
-20. The supplied descriptive maximum is a hard ceiling.
+20. Do not give generic praise.
 
-21. The total must equal the sum of awarded question marks.
+21. Do not reveal hidden reasoning.
 
-22. Total must not exceed ${maximumMarks}.
+22. Total marks must equal the sum of question marks.
 
-23. Percentage =
-total_marks / maximum_marks * 100.
+23. Total marks must not exceed ${maximumMarks}.
 
-24. Round percentage to two decimals.
+24. Percentage =
+total_marks / maximum_marks × 100.
 
-FOUNDATION NOTE:
+25. Round percentage to two decimals.
 
-Foundation Accounting and Business Laws are descriptive papers.
+FOUNDATION:
 
-Foundation Quantitative Aptitude and Business Economics are objective/MCQ papers with 0.25 negative marking per wrong answer.
+Foundation has four subjects.
 
-This checker does NOT score those MCQs.
+Each subject is 100 marks.
 
-FINAL CHECK:
+Quantitative Aptitude and Business Economics are fully objective/MCQ papers with 0.25 negative marking for each wrong answer.
 
-- Include every descriptive question.
-- Exclude MCQs.
-- Correct marks available.
-- Correct awarded marks.
-- Correct total.
-- Correct percentage.
-- Total <= ${maximumMarks}.
+Do not apply MCQ negative marking to descriptive evaluation.
 
-Return ONLY JSON matching the supplied schema.
+Return ONLY valid JSON.
+
 `;
 
   const aiResponse =
     await fetch(
       AI_URL,
       {
+
         method:
           "POST",
 
         headers: {
+
           "Content-Type":
             "application/json",
 
           Authorization:
             `Bearer ${process.env.AI_GATEWAY_API_KEY}`
+
         },
 
         body:
           JSON.stringify({
 
             model:
-              process.env.AI_MODEL ||
               DEFAULT_MODEL,
 
             reasoning: {
-              effort:
-                process.env.AI_REASONING ||
-                "high"
+              effort: "high"
             },
 
             input: [
 
               {
+
                 type:
                   "message",
 
@@ -822,14 +933,17 @@ Return ONLY JSON matching the supplied schema.
                 content: [
 
                   {
+
                     type:
                       "input_text",
 
                     text:
                       prompt
+
                   },
 
                   {
+
                     type:
                       "input_file",
 
@@ -840,9 +954,11 @@ Return ONLY JSON matching the supplied schema.
 
                     file_data:
                       `data:application/pdf;base64,${questionPaperBase64}`
+
                   },
 
                   {
+
                     type:
                       "input_file",
 
@@ -853,9 +969,11 @@ Return ONLY JSON matching the supplied schema.
 
                     file_data:
                       `data:application/pdf;base64,${suggestedAnswerBase64}`
+
                   },
 
                   {
+
                     type:
                       "input_file",
 
@@ -865,9 +983,11 @@ Return ONLY JSON matching the supplied schema.
 
                     file_data:
                       `data:application/pdf;base64,${answerSheetBase64}`
+
                   }
 
                 ]
+
               }
 
             ],
@@ -930,12 +1050,19 @@ Return ONLY JSON matching the supplied schema.
                               "string",
 
                             enum: [
+
                               "correct",
+
                               "partially_correct",
+
                               "incorrect",
+
                               "not_attempted",
+
                               "unclear"
+
                             ]
+
                           },
 
                           remarks: {
@@ -946,16 +1073,24 @@ Return ONLY JSON matching the supplied schema.
                         },
 
                         required: [
+
                           "question_number",
+
                           "marks_available",
+
                           "marks_awarded",
+
                           "status",
+
                           "remarks"
+
                         ],
 
                         additionalProperties:
                           false
+
                       }
+
                     },
 
                     total_marks: {
@@ -976,50 +1111,35 @@ Return ONLY JSON matching the supplied schema.
                   },
 
                   required: [
+
                     "overall_summary",
+
                     "questions",
+
                     "total_marks",
+
                     "maximum_marks",
+
                     "percentage"
+
                   ],
 
                   additionalProperties:
                     false
+
                 }
+
               }
+
             }
+
           })
+
       }
     );
 
-  /*
-    IMPORTANT:
-    Read text first instead of directly
-    calling response.json().
-
-    This prevents:
-    Unexpected token 'A'...
-  */
-
-  const rawText =
-    await aiResponse.text();
-
-  let rawResult;
-
-  try {
-
-    rawResult =
-      JSON.parse(
-        rawText
-      );
-
-  } catch {
-
-    rawResult = {
-      raw:
-        rawText
-    };
-  }
+  const rawResult =
+    await aiResponse.json();
 
   if (!aiResponse.ok) {
 
@@ -1028,14 +1148,6 @@ Return ONLY JSON matching the supplied schema.
       rawResult
     );
 
-    const details =
-      rawResult?.error?.message ||
-      rawResult?.message ||
-      rawResult?.raw ||
-      JSON.stringify(
-        rawResult
-      );
-
     return res.status(
       aiResponse.status
     ).json({
@@ -1043,15 +1155,26 @@ Return ONLY JSON matching the supplied schema.
       error:
         "AI evaluation failed.",
 
-      details
+      details:
+        rawResult?.error?.message ||
+        rawResult?.message ||
+        JSON.stringify(
+          rawResult
+        )
+
     });
   }
 
-  let outputText =
+  let outputText = "";
+
+  if (
     typeof rawResult.output_text ===
     "string"
-      ? rawResult.output_text
-      : "";
+  ) {
+
+    outputText =
+      rawResult.output_text;
+  }
 
   if (
     !outputText &&
@@ -1085,6 +1208,7 @@ Return ONLY JSON matching the supplied schema.
 
           outputText +=
             content.text;
+
         }
       }
     }
@@ -1100,10 +1224,8 @@ Return ONLY JSON matching the supplied schema.
       details:
         JSON.stringify(
           rawResult
-        ).slice(
-          0,
-          4000
         )
+
     });
   }
 
@@ -1126,8 +1248,9 @@ Return ONLY JSON matching the supplied schema.
       details:
         outputText.slice(
           0,
-          4000
+          2000
         )
+
     });
   }
 
@@ -1139,77 +1262,111 @@ Return ONLY JSON matching the supplied schema.
   ) {
 
     return res.status(500).json({
+
       error:
         "Invalid evaluation structure."
+
     });
   }
 
   let total = 0;
 
   for (
-    const q
+    const question
     of evaluation.questions
   ) {
 
     const available =
       Number(
-        q.marks_available
+        question.marks_available
+      );
+
+    let awarded =
+      Number(
+        question.marks_awarded
       );
 
     if (
       !Number.isFinite(
         available
-      ) ||
-      available < 0
+      )
     ) {
 
       return res.status(500).json({
+
         error:
           "Invalid marks returned by AI."
+
       });
     }
-
-    let awarded =
-      Number(
-        q.marks_awarded
-      );
 
     if (
       !Number.isFinite(
         awarded
       )
     ) {
+
       awarded = 0;
+
     }
 
-    awarded =
-      Math.max(
-        0,
-        Math.min(
-          available,
-          awarded
-        )
-      );
+    if (
+      awarded < 0
+    ) {
+
+      awarded = 0;
+
+    }
+
+    if (
+      awarded >
+      available
+    ) {
+
+      awarded =
+        available;
+
+    }
 
     awarded =
       Math.round(
         awarded * 100
       ) / 100;
 
-    q.marks_awarded =
+    question.marks_awarded =
       awarded;
 
     total +=
       awarded;
+
   }
 
   total =
     Math.round(
-      Math.min(
-        total,
-        maximumMarks
-      ) * 100
+      total * 100
     ) / 100;
+
+  if (
+    total >
+    maximumMarks
+  ) {
+
+    total =
+      maximumMarks;
+  }
+
+  const percentage =
+    maximumMarks > 0
+
+      ? Math.round(
+          (
+            total /
+            maximumMarks
+          ) *
+          10000
+        ) / 100
+
+      : 0;
 
   evaluation.total_marks =
     total;
@@ -1218,14 +1375,7 @@ Return ONLY JSON matching the supplied schema.
     maximumMarks;
 
   evaluation.percentage =
-    maximumMarks > 0
-      ? Math.round(
-          (
-            total /
-            maximumMarks
-          ) * 10000
-        ) / 100
-      : 0;
+    percentage;
 
   return res.status(200).json({
 
@@ -1256,7 +1406,8 @@ Return ONLY JSON matching the supplied schema.
         pyqAttempt || "",
 
       checkingMode:
-        checkingMode === "strict"
+        checkingMode ===
+        "strict"
           ? "ICAI Strict"
           : "Moderate",
 
@@ -1272,6 +1423,8 @@ Return ONLY JSON matching the supplied schema.
       answerSheet:
         answerSheetName ||
         "answer-sheet.pdf"
+
     }
+
   });
 }
