@@ -427,32 +427,6 @@ footer{
   }
 
 }
-
-.planner-textarea {
-  display: block;
-  width: 100%;
-  min-height: 112px;
-  resize: vertical;
-  background: #080f1c;
-  color: #fff;
-  border: 1px solid #334155;
-  border-radius: 10px;
-  padding: 12px;
-  line-height: 1.5;
-  font-size: 14px;
-  outline: none;
-}
-
-.planner-textarea:focus { border-color: #6366f1; }
-.planner-help { color: #94a3b8; font-size: 12px; line-height: 1.6; margin-top: 10px; }
-.planner-result { margin-top: 12px; }
-.planner-result h3 { font-size: 16px; margin: 16px 0 8px; }
-.planner-result p { font-size: 13px; line-height: 1.6; margin: 6px 0; }
-.planner-sessions { padding-left: 22px; margin-top: 12px; }
-.planner-sessions li { margin: 0 0 12px; padding: 12px; border: 1px solid #26334d; border-radius: 10px; background: #080f1c; line-height: 1.5; }
-.planner-sessions small { display: block; color: #94a3b8; font-size: 12px; margin-top: 4px; }
-.status.warning { display: block; background: #422006; border: 1px solid #92400e; color: #ffedd5; }
-
 </style>
 </head>
 
@@ -464,45 +438,6 @@ footer{
 </header>
 
 <div class="container">
-
-<!-- AI STUDY PLANNER BETA -->
-<div class="card" id="studyPlannerPanel">
-  <span class="badge blue">STUDY PLANNER · BETA</span>
-  <h2>🗓️ AI Study Planner</h2>
-  <p class="planner-help">
-    Create a draft study session from your course, subject and available time.
-    This first version does not save timetables, class changes or study progress to an account.
-  </p>
-
-  <div class="grid" style="margin-top:12px;">
-    <div>
-      <label for="plannerCourse">CA Level</label>
-      <select id="plannerCourse">
-        <option value="">Select CA level</option>
-        <option value="CA_FOUNDATION">CA Foundation</option>
-        <option value="CA_INTERMEDIATE">CA Intermediate</option>
-        <option value="CA_FINAL">CA Final (not supported yet)</option>
-      </select>
-    </div>
-    <div>
-      <label for="plannerMessage">What do you want to work on?</label>
-      <textarea
-        id="plannerMessage"
-        class="planner-textarea"
-        maxlength="1200"
-        rows="4"
-        placeholder="Example: I have 2 hours for Taxation and Advanced Accounting tomorrow."
-      ></textarea>
-    </div>
-  </div>
-
-  <button id="plannerButton" class="primary" type="button" onclick="submitStudyPlanner()">
-    ✨ Create Draft Study Plan
-  </button>
-
-  <div id="plannerStatus" class="status" role="status" aria-live="polite"></div>
-  <div id="plannerResult" class="info hidden" aria-live="polite"></div>
-</div>
 
 <!-- =====================================================
      STUDENT PORTAL
@@ -4280,95 +4215,6 @@ value??""
 );
 
 }
-
-async function submitStudyPlanner() {
-  const course = document.getElementById("plannerCourse").value;
-  const message = document.getElementById("plannerMessage").value.trim();
-  const button = document.getElementById("plannerButton");
-  const statusBox = document.getElementById("plannerStatus");
-  const resultBox = document.getElementById("plannerResult");
-
-  statusBox.className = "status";
-  statusBox.textContent = "";
-  statusBox.style.display = "none";
-  resultBox.classList.add("hidden");
-  resultBox.innerHTML = "";
-
-  if (!course) {
-    statusBox.className = "status warning";
-    statusBox.textContent = "Please select your CA level first.";
-    return;
-  }
-  if (!message) {
-    statusBox.className = "status warning";
-    statusBox.textContent = "Please describe your study goal.";
-    return;
-  }
-
-  button.disabled = true;
-  button.textContent = "⏳ Preparing your draft...";
-
-  try {
-    const response = await fetch("/api/study-planner", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, course }),
-    });
-    const data = await safeJSON(response);
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || "Unable to process this request.");
-    }
-
-    statusBox.className = data.status === "needs_clarification" || data.status === "unsupported_course"
-      ? "status warning"
-      : "status success";
-    statusBox.innerHTML = escapeHTML(data.message || "Request processed.");
-
-    const parsed = data.parsed || {};
-    const summary = `
-      <div class="planner-result">
-        <h3>Request summary</h3>
-        <p><b>Intent:</b> ${escapeHTML(parsed.intent || "Not detected")}</p>
-        <p><b>Course:</b> ${escapeHTML(parsed.course || "Not identified")}</p>
-        <p><b>Subjects:</b> ${escapeHTML((parsed.subjects || []).join(", ") || "Not identified")}</p>
-        <p><b>Duration:</b> ${parsed.duration_minutes == null ? "Not specified" : `${Number(parsed.duration_minutes)} minutes`}</p>
-        <p><b>Date:</b> ${escapeHTML(parsed.date_text || "Not specified")}</p>
-        ${parsed.class_time_text ? `<p><b>Class time:</b> ${escapeHTML(parsed.class_time_text)}</p>` : ""}
-        ${parsed.missing_info?.length ? `<p><b>Still needed:</b> ${escapeHTML(parsed.missing_info.join(", "))}</p>` : ""}
-      </div>`;
-
-    if (data.plan && Array.isArray(data.plan.sessions)) {
-      const sessions = data.plan.sessions.map((session) => `
-        <li>
-          <b>${escapeHTML(session.label)} · ${Number(session.minutes)} min</b>
-          <small>${escapeHTML(session.subject)}</small>
-          <p>${escapeHTML(session.instruction)}</p>
-        </li>`).join("");
-
-      resultBox.innerHTML = `
-        <div class="planner-result">
-          <h3>${escapeHTML(data.plan.title)}</h3>
-          <p><b>Total time:</b> ${Number(data.plan.total_minutes)} minutes</p>
-          <ol class="planner-sessions">${sessions}</ol>
-          <p>${escapeHTML(data.plan.note || "Draft only; not saved.")}</p>
-        </div>
-        ${summary}`;
-    } else {
-      resultBox.innerHTML = `${summary}
-        <p class="planner-help">This beta only builds a draft timetable. Class changes, study-progress entries and chapter rankings are not saved or executed yet.</p>`;
-    }
-
-    resultBox.classList.remove("hidden");
-    resultBox.style.display = "block";
-  } catch (error) {
-    statusBox.className = "status error";
-    statusBox.innerHTML = escapeHTML(error?.message || "Unexpected planner error.");
-  } finally {
-    button.disabled = false;
-    button.textContent = "✨ Create Draft Study Plan";
-  }
-}
-
 
 </script>
 
