@@ -5,8 +5,5 @@
   "type": "module",
   "dependencies": {
     "@vercel/blob": "latest"
-  },
-  "scripts": {
-    "test:planner": "node --test tests/studyPlannerParser.test.js"
   }
 }
