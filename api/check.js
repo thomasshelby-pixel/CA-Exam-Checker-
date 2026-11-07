@@ -784,6 +784,38 @@ For this test type the Question Paper and Suggested Answer are separate PDFs.
 
 `;
 
+  const pyqCheckedCopyNote =
+    testType === "PYQ"
+      ? `
+
+PYQ QUESTION COVERAGE AND ICAI-CHECKED-COPY RULES (PYQ ONLY):
+
+A. QUESTION COMPLETENESS
+- Before evaluating, build a checklist of every descriptive question and separately marked subpart from the Question Paper, in printed order.
+- Return exactly one question entry for every scorable descriptive question/subpart in that checklist. Do not list only the questions that the student attempted.
+- Include unanswered entries with marks_awarded = 0 and status = "not_attempted".
+- If an answer exists but is illegible or cannot be matched confidently, include it with marks_awarded = 0 and status = "unclear" and explain the uncertainty. Never silently omit it.
+- Preserve the original question number and subpart in question_number (for example, Q2(b)(ii)). Do not merge separately marked subparts.
+- For internal choice (OR), do not double-count both alternatives. Identify the candidate's selected alternative from the answer sheet; if neither is selected, represent the unanswered choice once. If both were attempted and ICAI clearly marked one alternative, follow the examiner's marked choice.
+- Scan the complete question paper and answer sheet in page order. Do not omit questions continued on later pages, tables, or working-note pages.
+
+B. ICAI CHECKED-COPY SCORE AUTHORITY
+- This upload may be an already ICAI-evaluated copy. Look for examiner-added numerical marks written beside a question/subpart or in its margin (often red/colored ink), not just ticks or crosses.
+- Set icai_marks_visible = true only when a numeric mark awarded by the examiner is clearly attributable to that exact question/subpart. Set icai_marks_awarded to that exact number, including an explicit 0.
+- If no unambiguous numeric examiner mark is visible, set icai_marks_visible = false, set icai_marks_awarded = 0, and explain in icai_marks_evidence that no clear numeric award is visible.
+- In icai_marks_evidence, briefly describe the location and literal score (for example, "red 0/4 in the right margin beside Q2(b)"). Do not guess. Do not treat printed maximum marks, candidate-written calculations, page numbers, question numbers, or a grand total as examiner-awarded marks.
+- When icai_marks_visible = true, the examiner's numerical award is authoritative and MUST override the AI's independent score for that question. This includes explicit zero: if ICAI awarded 0, marks_awarded must be exactly 0; do not add step marks or partial marks.
+- Retain clear non-zero ICAI marks exactly as well, without exceeding marks_available. If a written score is ambiguous or cannot be mapped to one question, set icai_marks_visible = false and evaluate normally; explain the uncertainty in remarks.
+- Do not infer a zero merely from a cross mark, strike-through, blank area, or negative comment unless a numeric 0 is clearly written as the examiner's award.
+
+C. SCORING
+- If no clear numeric ICAI award is visible for a question, evaluate that question normally against the Suggested Answer and marking principles.
+- An explicitly zero-marked question is NOT "not_attempted" if the candidate wrote an answer; use status = "incorrect" and marks_awarded = 0.
+- Before returning JSON, compare the final question entries against the full checklist. Every descriptive scoring unit must appear exactly once.
+
+`
+      : "";
+
   const prompt = `
 
 You are an expert CA examiner checking a student's answer sheet.
@@ -821,6 +853,8 @@ ${
 ${checkingInstructions}
 
 ${modelTestNote}
+
+${pyqCheckedCopyNote}
 
 CORE RULES:
 
@@ -891,6 +925,46 @@ Do not apply MCQ negative marking to descriptive evaluation.
 Return ONLY valid JSON.
 
 `;
+
+  const questionSchemaProperties = {
+    question_number: { type: "string" },
+    marks_available: { type: "number" },
+    marks_awarded: { type: "number" },
+    status: {
+      type: "string",
+      enum: [
+        "correct",
+        "partially_correct",
+        "incorrect",
+        "not_attempted",
+        "unclear"
+      ]
+    },
+    remarks: { type: "string" }
+  };
+
+  const questionSchemaRequired = [
+    "question_number",
+    "marks_available",
+    "marks_awarded",
+    "status",
+    "remarks"
+  ];
+
+  // Keep ICAI checked-copy metadata exclusive to PYQ so MTP/Model Test
+  // schemas and their existing marking behavior remain unchanged.
+  if (testType === "PYQ") {
+    Object.assign(questionSchemaProperties, {
+      icai_marks_visible: { type: "boolean" },
+      icai_marks_awarded: { type: "number" },
+      icai_marks_evidence: { type: "string" }
+    });
+    questionSchemaRequired.push(
+      "icai_marks_visible",
+      "icai_marks_awarded",
+      "icai_marks_evidence"
+    );
+  }
 
   const aiResponse =
     await fetch(
@@ -1023,72 +1097,10 @@ Return ONLY valid JSON.
                         "array",
 
                       items: {
-
-                        type:
-                          "object",
-
-                        properties: {
-
-                          question_number: {
-                            type:
-                              "string"
-                          },
-
-                          marks_available: {
-                            type:
-                              "number"
-                          },
-
-                          marks_awarded: {
-                            type:
-                              "number"
-                          },
-
-                          status: {
-
-                            type:
-                              "string",
-
-                            enum: [
-
-                              "correct",
-
-                              "partially_correct",
-
-                              "incorrect",
-
-                              "not_attempted",
-
-                              "unclear"
-
-                            ]
-
-                          },
-
-                          remarks: {
-                            type:
-                              "string"
-                          }
-
-                        },
-
-                        required: [
-
-                          "question_number",
-
-                          "marks_available",
-
-                          "marks_awarded",
-
-                          "status",
-
-                          "remarks"
-
-                        ],
-
-                        additionalProperties:
-                          false
-
+                        type: "object",
+                        properties: questionSchemaProperties,
+                        required: questionSchemaRequired,
+                        additionalProperties: false
                       }
 
                     },
@@ -1308,6 +1320,38 @@ Return ONLY valid JSON.
 
       awarded = 0;
 
+    }
+
+    if (
+      testType === "PYQ" &&
+      question.icai_marks_visible === true
+    ) {
+      const icaiAward = Number(question.icai_marks_awarded);
+      const icaiEvidence = String(question.icai_marks_evidence || "").trim();
+
+      // Apply official marks only when the model found a clear, attributable
+      // examiner score and recorded where it appears on the checked copy.
+      if (
+        Number.isFinite(icaiAward) &&
+        icaiAward >= 0 &&
+        icaiEvidence.length >= 8
+      ) {
+        awarded = Math.min(icaiAward, Math.max(available, 0));
+        question.remarks = [
+          String(question.remarks || "").trim(),
+          `ICAI checked-copy mark retained: ${awarded}/${available}. Evidence: ${icaiEvidence}.`
+        ].filter(Boolean).join(" ");
+
+        if (awarded === 0 && question.status !== "not_attempted") {
+          question.status = "incorrect";
+        }
+      } else {
+        question.icai_marks_visible = false;
+        question.remarks = [
+          String(question.remarks || "").trim(),
+          "The examiner's numeric mark was not clear enough to use as an override; normal evaluation was retained."
+        ].filter(Boolean).join(" ");
+      }
     }
 
     if (
